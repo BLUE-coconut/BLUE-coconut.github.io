@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="keyword" content="何昊蓝">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>何昊蓝 album</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+    <div id="butong_net_left" style="overflow:hidden;width:1000 px;height:800px;">
+        <table class="photos" cellpadding="0" cellspacing="0" border="0">
+            <tr><td id="butong_net_left1" valign="top" align="center">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <tr align="center">
+                        <td><img src="../images/2.jpg" height="800px" width="auto"></td>
+                        <td><img src="../images/margin.jpg" height="800px" width="20px"></td>
+                        <td><img src="../images/3.jpg" height="800px" width="auto"></td>
+                        <td><img src="../images/margin.jpg" height="800px" width="20px"></td>
+                        <td><img src="../images/4.jpg" height="800px" width="auto"></td>
+                        <td><img src="../images/margin.jpg" height="800px" width="20px"></td>
+                        <td><img src="../images/6.jpg" height="800px" width="auto"></td>
+                        <td><img src="../images/margin.jpg" height="800px" width="20px"></td>
+                        <td><img src="../images/1.jpg" height="800px" width="auto"></td>
+                        <td><img src="../images/margin.jpg" height="800px" width="20px"></td>
+                    </tr>
+                </table>
+                </td>
+                    <td id="butong_net_left2" valign="top">
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+</body>
+
+
+<script>
+    var speed=5//速度数值越大速度越慢
+    butong_net_left2.innerHTML=butong_net_left1.innerHTML
+    function Marquee3(){
+    if(butong_net_left2.offsetWidth-butong_net_left.scrollLeft<=0)
+    butong_net_left.scrollLeft-=butong_net_left1.offsetWidth
+    else{
+    butong_net_left.scrollLeft++
+    }
+    }
+    var MyMar3=setInterval(Marquee3,speed)
+    butong_net_left.οnmοuseοver=function() {clearInterval(MyMar3)}
+    butong_net_left.οnmοuseοut=function() {MyMar3=setInterval(Marquee3,speed)}
+</script>
