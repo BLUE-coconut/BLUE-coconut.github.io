@@ -55,3 +55,8 @@ img {
     margin: 100px auto;
     border-radius: 20px;
 }
+
+@font-face {
+    font-family: "Pacifico";
+    src: url("../font/Pacifico/Pacifico-1.ttf");
+}
