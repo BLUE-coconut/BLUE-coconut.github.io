@@ -223,7 +223,7 @@
 .my-box .container {
   width: 70%;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 80px auto;
   position: relative;
   padding: 20px;
   border-radius: 30px;
