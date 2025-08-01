@@ -12,7 +12,7 @@
         </li>
         <li role="presentation">
           <router-link to="/biography" :class="{ active: $route.path === '/biography' }">
-            Biography
+            Resume
           </router-link>
         </li>
         <li role="presentation">
