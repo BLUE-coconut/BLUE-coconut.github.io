@@ -225,7 +225,7 @@
   max-width: 1200px;
   margin: 80px auto;
   position: relative;
-  padding: 20px;
+  padding: 10px 20px;
   border-radius: 30px;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -358,10 +358,10 @@
 }
 
 .resume .list-item {
-  font-size: 1.25em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  font-size: 1.2em;
+  /* display: flex; */
+  /* justify-content: space-between; */
+  /* align-items: center; */
 }
 
 .resume .date {
@@ -437,7 +437,7 @@
 @media (max-width: 1100px) {
   .my-box .container {
     width: 80%;
-    padding: 15px;
+    padding: 10px 20px;
   }
   
   .resume .resume__header {
@@ -457,7 +457,7 @@
 @media (max-width: 768px) {
   .my-box .container {
     width: 95%;
-    padding: 10px;
+    padding: 10px 20px;
   }
   
   .resume .resume__header {
