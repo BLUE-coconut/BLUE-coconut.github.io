@@ -109,8 +109,8 @@
 
 .sidebar-image {
   max-width: 75%;
-  margin-top: 5%;
-  margin-bottom: 10%;
+  margin-top: 10%;
+  margin-bottom: 5%;
 }
 
 .sidebar-image img {
@@ -120,7 +120,7 @@
 }
 
 .sidebar-text {
-  width: 80%;
+  width: 85%;
   margin-bottom: 10%;
   font-size: 18px;
   text-align: left;
@@ -129,10 +129,10 @@
 
 .main-content {
   height: 90%;
-  width: 75%;
+  width: 60%;
   align-self: center;
   padding-top: 20px;
-  padding-left: 60px;
+  padding-left: 30px;
   flex-grow: 1;
   background-color: rgb(255, 255, 255);
 }
@@ -144,6 +144,11 @@
   display: flex;
   flex-wrap: wrap;
   line-height: 1.2;
+}
+
+.main-content ul{
+  padding-left: 1.2em;
+  margin-left: 0;
 }
 
 .subhead {
@@ -262,6 +267,7 @@
   }
   
   .sidebar-text {
+    display: none;
     width: 100%;
     text-align: center;
     font-size: 16px;
