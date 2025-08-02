@@ -60,33 +60,33 @@ const router = useRouter()
 
 // 项目数据
 const projects = ref([
-  {
-    id: 1,
-    title: 'Vue 个人网站',
-    description: '基于 Vue 3 + TypeScript 开发的响应式个人网站，包含简历展示、相册轮播、博客系统等功能模块。',
-    coverImage: '/images/project/1.png',
-    time: '2024年1月 - 2024年3月'
-  },
+//   {
+//     id: 1,
+//     title: 'Vue 个人网站',
+//     description: '基于 Vue 3 + TypeScript 开发的响应式个人网站，包含简历展示、相册轮播、博客系统等功能模块。',
+//     coverImage: '/images/project/1.png',
+//     time: '2024年1月 - 2024年3月'
+//   },
   {
     id: 2,
-    title: '智能聊天机器人',
-    description: '集成自然语言处理技术的智能对话系统，支持多轮对话、情感分析和个性化回复。',
-    coverImage: '/images/2.jpg',
-    time: '2023年9月 - 2023年12月'
+    title: '三模态Few-shot图像分割的交互式特征融合与匹配网络',
+    description: "构建了新型交互式特征融合与匹配网络，并提出两个新模块，在VDT-2048-5i数据集上取得SOTA效果。",
+    coverImage: '/images/project/3.png',
+    time: '2023年11月 - 2024年8月'
   },
   {
     id: 3,
-    title: '数据可视化平台',
-    description: '企业级数据分析和可视化平台，支持多种图表类型、实时数据更新和交互式仪表板。',
-    coverImage: '/images/3.jpg',
-    time: '2023年6月 - 2023年8月'
+    title: 'Linker - 星星连连看',
+    description: "基于图像特征匹配与自研算法绘制星座图，纪念宠物，负责前端web开发，基于 Vue 2 框架。",
+    coverImage: '/images/project/2.png',
+    time: '2024年6月 - 至今'
   },
   {
     id: 4,
-    title: '移动端 App 开发',
-    description: '跨平台移动应用开发，包含用户认证、数据同步、离线缓存等核心功能。',
-    coverImage: '/images/4.jpg',
-    time: '2023年3月 - 2023年5月'
+    title: 'Plantmon - 植物宝可梦',
+    description: '获得Adventure-X黑客松赛道二等奖*1、三等奖*1，负责战斗模块的实现与部分前端开发。',
+    coverImage: '/images/project/4.png',
+    time: '2025年7月'
   }
 ])
 
@@ -94,35 +94,27 @@ const projects = ref([
 const blogs = ref([
   {
     id: 1,
-    title: 'Vue 3 Composition API 深度解析',
-    description: '详细介绍 Vue 3 Composition API 的使用方法、最佳实践和与 Options API 的对比分析。',
-    coverImage: '/images/6.jpg',
-    updateTime: '2024年2月15日',
-    url: 'https://example.com/blog/vue3-composition-api'
+    title: 'Unity XR 开发',
+    description: 'Unity XR 开发的学习笔记及相关资料链接。',
+    coverImage: '/images/blog/unityXR.png',
+    updateTime: '2025年4月25日',
+    url: 'https://j2w8lfcfsi.feishu.cn/wiki/GeKhwi4hmipVKgknIVdcO1JXnGh?from=from_copylink'
   },
   {
     id: 2,
-    title: 'TypeScript 在前端开发中的应用',
-    description: '从基础语法到高级特性，全面讲解 TypeScript 如何提升前端开发效率和代码质量。',
-    coverImage: '/images/7.jpg',
+    title: '强化学习',
+    description: '强化学习基础理论笔记。',
+    coverImage: '/images/blog/RL.png',
     updateTime: '2024年1月28日',
-    url: 'https://example.com/blog/typescript-frontend'
+    url: 'https://j2w8lfcfsi.feishu.cn/wiki/WxZ6wAsrXiDcqDkreVQcItgqnFe?from=from_copylink'
   },
   {
     id: 3,
-    title: '现代前端工程化实践',
-    description: '探讨前端工程化的发展趋势，包括构建工具、代码规范、自动化测试等方面的最佳实践。',
-    coverImage: '/images/8.jpg',
-    updateTime: '2024年1月10日',
-    url: 'https://example.com/blog/frontend-engineering'
-  },
-  {
-    id: 4,
-    title: '响应式设计的核心原理',
-    description: '深入理解响应式设计的实现原理，包括媒体查询、弹性布局和移动端适配策略。',
-    coverImage: '/images/9.jpg',
-    updateTime: '2023年12月22日',
-    url: 'https://example.com/blog/responsive-design'
+    title: '雅思IELTS',
+    description: '雅思备考经验分享。',
+    coverImage: '/images/blog/IELTS.jpg',
+    updateTime: '2023年4月25日',
+    url: 'https://j2w8lfcfsi.feishu.cn/wiki/VAyLwKKykiqJTckNcUycoSTLnFd?from=from_copylink'
   }
 ])
 
