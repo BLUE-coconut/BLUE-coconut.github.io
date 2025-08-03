@@ -6,22 +6,22 @@
     <div class="nav-container">
       <ul class="nav nav-pills">
         <li role="presentation">
-          <router-link to="/" :class="{ active: $route.path === '/' }">
+          <router-link to="/" :class="{ active: route.path === '/' }">
             Home
           </router-link>
         </li>
         <li role="presentation">
-          <router-link to="/biography" :class="{ active: $route.path === '/biography' }">
+          <router-link to="/biography" :class="{ active: route.path === '/biography' }">
             Resume
           </router-link>
         </li>
         <li role="presentation">
-          <router-link to="/blog" :class="{ active: $route.path === '/blog' }">
+          <router-link to="/blog" :class="{ active: route.path === '/blog' }">
             Blogs
           </router-link>
         </li>
         <li role="presentation">
-          <router-link to="/album" :class="{ active: $route.path === '/album' }">
+          <router-link to="/album" :class="{ active: route.path === '/album' }">
             Album
           </router-link>
         </li>
@@ -31,7 +31,9 @@
 </template>
 
 <script setup lang="ts">
-// 导航逻辑
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 </script>
 
 <style scoped>
