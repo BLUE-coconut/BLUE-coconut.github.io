@@ -78,7 +78,7 @@
 <style scoped>
 /* 基础样式 */
 .my-box {
-  margin-top: 75px;
+  margin-top: 50px;
   height: fit-content;
   width: 100%;
   padding: 0 15px;
