@@ -6,41 +6,35 @@
           <img src="/images/myphoto.jpg" alt="个人照片" />
         </div>
         <div class="sidebar-text">
-          <b>Add:</b> Hangzhou Dianzi University, No.1158, the 2nd Street in Baiyang Street, 
-          Hangzhou Economic Development Zone, Hangzhou, China <br>
-          <b>E-mail:</b> haolanhe@hdu.edu.cn
+          <!-- <b>Add:</b> Hangzhou Dianzi University, No.1158, the 2nd Street in Baiyang Street, 
+          Hangzhou Economic Development Zone, Hangzhou, China <br> -->
+          <b>E-mail:</b> hehaolan716@gmail.com <br>
+          <b>Tel:</b> 15394257230
         </div>
       </div>
       <div class="main-content">
         <div class="head">
           <span>HaoLan He</span>
-          <span>（何昊蓝）</span>
+          <!-- <span>（何昊蓝）</span> -->
         </div>
         <div class="subhead">
-          <i>University student</i>
+          <i>Postgraduate</i>
         </div>
         <ul class="related-link">
           <li>
-            <a href="https://honor.hdu.edu.cn/" target="_blank">
-              Zhuoyue Honors College（卓越学院）
+            <a href="http://www.cst.zju.edu.cn" target="_blank">
+              School of Software Technology
             </a>
           </li>
           <li>
-            <a href="http://www.hdu.edu.cn/" target="_blank">
-              Hangzhou Dianzi University（杭州电子科技大学）
+            <a href="https://www.zju.edu.cn/" target="_blank">
+              Zhejiang University
             </a>
           </li>
         </ul>
         <div class="introduction">
-          <b style="font-size: 24px;">Self-introduction: </b>
-          <ul>
-            <li style="margin: 2% 0;">                  
-                <b>Today:</b> I'm a senior student at Hangzhou Dianzi University, majoring in intelligent science and technology. My previous work has been mainly centered on computer vision. For detail information, please refer to the section of "Achievements".
-            </li>
-            <li style="margin: 2% 0;">
-                <b>Future:</b> I've secured an offer for the Master's program in Artificial Intelligence at Zhejiang University as a recommended student. Moving forward, I am excited to delve into the research on the intersection of AI and human-computer interaction.
-            </li>
-          </ul>
+          <b style="font-size: 24px;">Self-introduction: </b> <br>
+              I earned my bachelor’s degree in Intelligent Science and Technology from Hangzhou Dianzi University and am now pursuing a master’s in Artificial Intelligence at Zhejiang University. My research focuses on computer vision, human–computer interaction, and AI agents. Over the past year I have tracked emerging technologies, built hands-on prototypes, and met a circle of like-minded collaborators. My goal is to turn these advances into everyday tools that make AI a reliable partner for people—an ambition that keeps me exploring and building every day.
         </div>
       </div>
     </div>
@@ -108,7 +102,7 @@
 }
 
 .sidebar-image {
-  max-width: 75%;
+  max-width: 85%;
   margin-top: 10%;
   margin-bottom: 5%;
 }
@@ -133,6 +127,7 @@
   align-self: center;
   padding-top: 20px;
   padding-left: 30px;
+  padding-right: 30px;
   flex-grow: 1;
   background-color: rgb(255, 255, 255);
 }
@@ -177,9 +172,8 @@
 }
 
 .introduction {
-  margin-top: 20px;
-  margin-left: 10px;
-  width: 90%;
+  margin: 20px 0px;
+  width: 100%;
   font-size: 18px;
   line-height: 1.6;
 }
@@ -258,7 +252,7 @@
   .sidebar {
     width: 100%;
     order: 1;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   
   .sidebar-image {
@@ -267,7 +261,6 @@
   }
   
   .sidebar-text {
-    display: none;
     width: 100%;
     text-align: center;
     font-size: 16px;
@@ -284,27 +277,28 @@
   .main-content .head {
     font-size: 36px;
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
   }
   
   .subhead {
     font-size: 20px;
     margin-left: 0;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
   }
   
   .related-link {
     font-size: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     text-align: center;
   }
   
   .related-link li {
     list-style: none;
+    margin-bottom: 0px;
   }
   
   .introduction {
-    margin: 0;
+    padding: 0px 15px;
     width: 100%;
     font-size: 16px;
     text-align: left;

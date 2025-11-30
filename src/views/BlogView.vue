@@ -105,11 +105,27 @@ const blogs = ref([
     title: '强化学习',
     description: '强化学习基础理论笔记。',
     coverImage: '/images/blog/RL.png',
-    updateTime: '2024年1月28日',
+    updateTime: '2025年9月28日',
     url: 'https://j2w8lfcfsi.feishu.cn/wiki/WxZ6wAsrXiDcqDkreVQcItgqnFe?from=from_copylink'
   },
   {
     id: 3,
+    title: 'AI Agents',
+    description: 'AI Agents 理论+实践学习笔记。',
+    coverImage: '/images/blog/agent.jpg',
+    updateTime: '2025年11月30日',
+    url: 'https://ai.feishu.cn/wiki/SszRwxQ5BicpStkqHq9ckLc3nPe?from=from_copylink'
+  },
+  {
+    id: 4,
+    title: 'Flutter',
+    description: 'Flutter 跨平台开发学习笔记。',
+    coverImage: '/images/blog/Flutter.png',
+    updateTime: '2025年11月12日',
+    url: 'https://ai.feishu.cn/wiki/XJ0swnAvbihJgMkPq9TcT3L1nBg?from=from_copylink'
+  },
+  {
+    id: 5,
     title: '雅思IELTS',
     description: '雅思备考经验分享。',
     coverImage: '/images/blog/IELTS.jpg',
