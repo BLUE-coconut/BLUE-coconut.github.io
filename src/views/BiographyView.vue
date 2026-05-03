@@ -5,17 +5,13 @@
         <section class="resume__section resume__header">
           <div class="resume__content">
             <h1>Haolan He (何昊蓝)</h1>
-            <!-- <div class="info-item">
+            <div class="info-item">
               <span class="info-label"><i class="fa fa-location-arrow"></i></span>
               <span class="info-text">Hangzhou Dianzi University, No.1158, the 2nd Street in Baiyang Street, Hangzhou Economic Development Zone, Hangzhou, China</span>
-            </div> -->
-            <div class="info-item">
-              <span class="info-label"><i class="fa fa-envelope"></i></span>
-              <span class="info-text">haolanhe716@gmail.com</span>
             </div>
             <div class="info-item">
-              <span class="info-label"><i class="fa fa-phone"></i></span>
-              <span class="info-text">15394257230</span>
+              <span class="info-label"><i class="fa fa-envelope"></i></span>
+              <span class="info-text">haolanhe@hdu.edu.cn</span>
             </div>
           </div>
         </section>
@@ -58,10 +54,10 @@
                 </div>
                 <div class="xp-item">
                   <div class="xp-job">
-                    Zhejiang University, School of Software Technology
+                    Zhejiang University
                   </div>
-                  <span>Postgraduate</span>
-                  <div class="xp-date" style="float: right; font-weight: 400;">Sep. 2025 – Present</div>
+                  <span>Master</span>
+                  <div class="xp-date" style="float: right; font-weight: 400;">Pre-admission for Recommended Exemption</div>
                   <div class="xp-detail">
                     <ul>
                       <li>Major: Artificial intellegence</li>
@@ -74,66 +70,33 @@
               <div class="resume__content">
                 <div class="resume__section-title">
                   <i class="fa fa-briefcase"></i>
-                  <h2>Researches & Projects</h2>
+                  <h2>Researches</h2>
                 </div>
                 <div class="xp-item">
                   <div class="xp-job">
-                    Few-shot Salient Object Detection for Three-Modal Images
+                    Interactive Fusion and Correlation Network for Three-Modal Images Few-Shot Semantic Segmentation
                   </div>
                   <div class="xp-detail">
-                    <b>Haolan He</b>
+                    <b>Haolan He</b>; Xianguo Dong; Xiaofei Zhou; Bo Wang; Jiyong Zhang;
                     <ul>
                       <li>
-                        <b>Content:</b> Proposed an innovative Few-shot three-modal salient object detection model for RGB-T-D images, consisting of a weight-shared ResNet50 encoder, two feature matching modules, and a three-level decoder. The two innovative feature matching modules are the interactive fusion matching module and the multi-modal matching module, which sequentially perform query-support feature matching and multi-modal feature fusion, and combine cosine similarity matrices of multi-level encoded features to further enhance matching between query and support images.
-                      </li>
-                      <li>
-                        <b>Achievement:</b> First-author paper published in IEEE SPL (SCI Q2), and one invention patent disclosed.
-                      </li>
-                      <li>
-                        <b>Personal Contribution:</b> Algorithm model architecture design, complete code implementation, paper writing, and patent application.
+                        Published in IEEE Signal Processing Letters, 2024 
+                        [<a href="https://ieeexplore.ieee.org/document/10669915/authors#authors">Paper</a>] 
+                        [<a href="https://github.com/BLUE-coconut/Fewshot-VDT">Code</a>]
                       </li>
                     </ul>
                   </div>
                 </div>
                 <div class="xp-item">
                   <div class="xp-job">
-                    Agent-based Intelligent Learning Q&A System Based on Personal Knowledge Base
+                    Efficient Object Detection Based on Multimodal Remote Sensing Images 
+                    <small>, "Xinmiao" Talents Plan of Zhejiang Province</small>
                   </div>
                   <div class="xp-detail">
-                    <b>Haolan He</b>
-                    <ul>
-                      <li>
-                        <b>Content:</b> Focused on solving knowledge blind spot identification and knowledge system construction in personalized learning through a multi-agent collaborative architecture for deep semantic understanding of student questions and precise detection of knowledge gaps. Frontend built with Gradio framework, backend using LangGraph multi-agent orchestration framework with hybrid retrieval-augmented generation technology and knowledge-aware chunking enhancement.
-                      </li>
-                      <li>
-                        <b>Achievement:</b> Successfully implemented a personalized learning system that effectively helps students trace historical knowledge points through improved indexing efficiency and quality.
-                      </li>
-                      <li>
-                        <b>Personal Contribution:</b> Overall project architecture design, complete code implementation, and technical documentation writing.
-                      </li>
-                    </ul>
+                    <b>Project Leader</b>
+                    <div class="xp-date" style="float: right; font-weight: 400;">ongoing</div>
                   </div>
                 </div>
-                <div class="xp-item">
-                  <div class="xp-job">
-                    Plantmon - AI Agent-based Plant Recognition and Image Generation Card Collection Game
-                  </div>
-                  <div class="xp-detail">
-                    <b>Haolan He</b>
-                    <ul>
-                      <li>
-                        <b>Content:</b> Designed and implemented a web-based card collection game where users upload plant photos for species identification through a Dify-orchestrated Agent workflow using Doubao-Seed-1.6 multimodal model, with Pokémon-style plant spirit images generated by Gemini 2.0 Flash and game audio created by SunoAI. Frontend built with Vue3 + TypeScript + Tailwind CSS.
-                      </li>
-                      <li>
-                        <b>Achievement:</b> Won track awards *2 at Adventure-X Hackathon competition.
-                      </li>
-                      <li>
-                        <b>Personal Contribution:</b> Application overall architecture design and core Agent functionality code implementation.
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              
               </div>
             </section>
             <section class="resume__section resume__experience">
@@ -174,33 +137,45 @@
                 </div>
                 <div class="resume__text">
                   <div class="extra">
+                    <div class="extra-info">Python</div>
+                    <div class="extra-details">
+                      <div class="extra-details__progress" style="width:95%"></div>
+                    </div>
+                  </div>
+                  <div class="extra">
                     <div class="extra-info">Deeplearning<br/><small>ML · DL · CV · NLP</small></div>
-                    <div class="extra-details">
-                      <div class="extra-details__progress" style="width:90%"></div>
-                    </div>
-                  </div>
-                  <div class="extra">
-                    <div class="extra-info">AI<br/><small>Pytorch · Mindspore · LangChain · LangGraph</small></div>
-                    <div class="extra-details">
-                      <div class="extra-details__progress" style="width:85%"></div>
-                    </div>
-                  </div>
-                  <div class="extra">
-                    <div class="extra-info">Frontend<br/><small>HTML · CSS · JavaScript · TypeScript · Vue</small></div>
-                    <div class="extra-details">
-                      <div class="extra-details__progress" style="width:85%"></div>
-                    </div>
-                  </div>
-                  <div class="extra">
-                    <div class="extra-info">AI Application Backend<br/><small>Python · Flask · FastAPI</small></div>
                     <div class="extra-details">
                       <div class="extra-details__progress" style="width:80%"></div>
                     </div>
                   </div>
                   <div class="extra">
-                    <div class="extra-info">Mobile Development<br/><small>Swift · Flutter</small></div>
+                    <div class="extra-info">AI framework<br/><small>Pytorch · Tensflow · Mindspore · Paddle</small></div>
                     <div class="extra-details">
                       <div class="extra-details__progress" style="width:75%"></div>
+                    </div>
+                  </div>
+                  <div class="extra">
+                    <div class="extra-info">HTML</div>
+                    <div class="extra-details">
+                      <div class="extra-details__progress" style="width:90%"></div>
+                    </div>
+                  </div>
+                  <div class="extra">
+                    <div class="extra-info">CSS</div>
+                    <div class="extra-details">
+                      <div class="extra-details__progress" style="width:75%"></div>
+                    </div>
+                  </div>
+                  <div class="extra">
+                    <div class="extra-info">JavaScript<br/><small>React · Vue</small></div>
+                    <div class="extra-details">
+                      <div class="extra-details__progress" style="width:50%"></div>
+                    </div>
+                  </div>
+                  <div class="extra">
+                    <div class="extra-info">IOS Development</div>
+                    <div class="extra-details">
+                      <div class="extra-details__progress" style="width:15%"></div>
                     </div>
                   </div>
                 </div>
@@ -239,18 +214,17 @@
 
 <style scoped>
 .my-box {
-  margin-top: 75px;
   height: fit-content;
   width: 100%;
-  padding: 0 15px;
+  padding: 0;
 }
 
 .my-box .container {
-  width: 70%;
-  max-width: 1500px;
-  margin: 80px auto;
+  width: min(1200px, 100%);
+  max-width: 1200px;
+  margin: 0 auto;
   position: relative;
-  padding: 10px 20px;
+  padding: clamp(16px, 2.5vw, 28px);
   border-radius: 30px;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -319,31 +293,6 @@
 .resume .resume__side {
   float: left;
   width: 25%;
-}
-
-/* Clear fix for floated elements */
-.resume .resume__columns::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Ensure left-right layout for larger screens */
-@media (min-width: 769px) {
-  .resume .resume__columns {
-    display: block;
-  }
-  
-  .resume .resume__main {
-    float: left;
-    width: 75%;
-    padding-right: 6em;
-  }
-  
-  .resume .resume__side {
-    float: left;
-    width: 25%;
-  }
 }
 
 .resume .other-info p {
@@ -486,8 +435,8 @@
 /* Mobile responsive styles */
 @media (max-width: 1100px) {
   .my-box .container {
-    width: 80%;
-    padding: 10px 20px;
+    width: 100%;
+    padding: 20px;
   }
   
   .resume .resume__header {
@@ -497,27 +446,18 @@
   .resume .resume__columns {
     padding: 2em;
     padding-top: 0;
-    display: flex;
-    flex-direction: column;
   }
   
   .resume .resume__main {
-    width: 100%;
     padding-right: 3em;
-    order: 1;
   }
-
-  .resume .resume__side {
-    width: 80%;
-    order: 2;
-  }
-  
 }
 
 @media (max-width: 768px) {
   .my-box .container {
-    width: 95%;
-    padding: 10px 20px;
+    width: 100%;
+    padding: 18px;
+    border-radius: 20px;
   }
   
   .resume .resume__header {
@@ -566,12 +506,12 @@
 
 @media (max-width: 480px) {
   .my-box {
-    padding: 0 10px;
+    padding: 0;
   }
   
   .my-box .container {
     width: 100%;
-    padding: 8px;
+    padding: 12px;
     border-radius: 15px;
   }
   

@@ -2,7 +2,7 @@
   <div class="my-box">
     <div class="container">
       <!-- Projects Section -->
-      <section class="section">
+      <!-- <section class="section">
         <h2 class="section-title">Projects</h2>
         <div class="projects-grid">
           <div 
@@ -24,6 +24,7 @@
           </div>
         </div>
       </section>
+      -->
 
       <!-- Blogs Section -->
       <section class="section">
@@ -150,18 +151,17 @@ const goToBlog = (url: string) => {
 <style scoped>
 /* 基础样式 */
 .my-box {
-  margin-top: 75px;
   height: fit-content;
   width: 100%;
-  padding: 0 15px;
+  padding: 0;
 }
 
 .my-box .container {
-  width: 80%;
+  width: min(1500px, 100%);
   max-width: 1500px;
   margin: 0 auto;
   position: relative;
-  padding: 30px;
+  padding: clamp(22px, 3vw, 36px);
   border-radius: 30px;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -379,7 +379,7 @@ const goToBlog = (url: string) => {
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .my-box .container {
-    width: 85%;
+    width: 100%;
     padding: 25px;
   }
   
@@ -406,8 +406,9 @@ const goToBlog = (url: string) => {
 
 @media (max-width: 768px) {
   .my-box .container {
-    width: 95%;
+    width: 100%;
     padding: 20px;
+    border-radius: 20px;
   }
   
   .section-title {
@@ -455,8 +456,8 @@ const goToBlog = (url: string) => {
 
 @media (max-width: 480px) {
   .my-box {
-    margin-top: 60px;
-    padding: 0 10px;
+    margin-top: 0;
+    padding: 0;
   }
   
   .my-box .container {

@@ -77,4 +77,11 @@ a {
 a:hover {
   color: #0056b3;
 }
+
+/* Bootstrap's .container clearfix pseudo-elements interfere with page-level flex/grid layouts. */
+.app-layout .container::before,
+.app-layout .container::after {
+  display: none;
+  content: none;
+}
 </style>

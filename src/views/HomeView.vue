@@ -6,35 +6,44 @@
           <img src="/images/myphoto.jpg" alt="个人照片" />
         </div>
         <div class="sidebar-text">
-          <!-- <b>Add:</b> Hangzhou Dianzi University, No.1158, the 2nd Street in Baiyang Street, 
-          Hangzhou Economic Development Zone, Hangzhou, China <br> -->
-          <b>E-mail:</b> hehaolan716@gmail.com <br>
-          <b>Tel:</b> 15394257230
+          <b>Add:</b> Hangzhou Dianzi University, No.1158, the 2nd Street in Baiyang Street, 
+          Hangzhou Economic Development Zone, Hangzhou, China <br>
+          <b>E-mail:</b> haolanhe@hdu.edu.cn
         </div>
       </div>
       <div class="main-content">
         <div class="head">
           <span>HaoLan He</span>
-          <!-- <span>（何昊蓝）</span> -->
+          <span>（何昊蓝）</span>
         </div>
         <div class="subhead">
-          <i>Postgraduate</i>
+          <i>AI Research Student &bull; ENFJ </i>
         </div>
         <ul class="related-link">
           <li>
-            <a href="http://www.cst.zju.edu.cn" target="_blank">
-              School of Software Technology
+            <a href="https://www.cs.zju.edu.cn/" target="_blank">
+              Zhejiang University（浙江大学）
             </a>
           </li>
           <li>
-            <a href="https://www.zju.edu.cn/" target="_blank">
-              Zhejiang University
+            <a href="https://www.cst.zju.edu.cn/" target="_blank">
+              College of Software（软件学院）
             </a>
           </li>
         </ul>
         <div class="introduction">
-          <b style="font-size: 24px;">Self-introduction: </b> <br>
-              I earned my bachelor’s degree in Intelligent Science and Technology from Hangzhou Dianzi University and am now pursuing a master’s in Artificial Intelligence at Zhejiang University. My research focuses on computer vision, human–computer interaction, and AI agents. Over the past year I have tracked emerging technologies, built hands-on prototypes, and met a circle of like-minded collaborators. My goal is to turn these advances into everyday tools that make AI a reliable partner for people—an ambition that keeps me exploring and building every day.
+          <b style="font-size: 24px;">Self-introduction: </b>
+          <ul>
+            <li style="margin: 2% 0;">
+                I graduated from Hangzhou Dianzi University with a degree in Intelligent Science and Technology, ranking <b>#1</b> in my major and securing a recommended place at Zhejiang University.
+            </li>
+            <li style="margin: 2% 0;">
+                Currently, I am a graduate student in Artificial Intelligence at the <b>College of Software, Zhejiang University</b>. My research focuses on <b>AI Agent</b> and <b>HCI</b>, with additional interests in <b>CV</b> and <b>AR&VR</b>.
+            </li>
+            <li style="margin: 2% 0;">
+                I always aspire to <i>"build valuable, warm products and technologies that truly serve people."</i>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -72,39 +81,43 @@
 <style scoped>
 /* 基础样式 */
 .my-box {
-  margin-top: 50px;
   height: fit-content;
   width: 100%;
-  padding: 0 15px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: auto;
 }
 
 .my-box .container {
-  width: 70%;
-  max-width: 1200px;
+  width: min(1240px, 100%);
+  max-width: 1280px;
   margin: 0 auto;
   position: relative;
-  padding: 20px;
+  padding: clamp(6px, 0.9vw, 12px);
   border-radius: 30px;
-  display: flex;
-  gap: 3%;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(10px, 1.5vw, 20px);
+  align-items: center;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: min(75vh, 740px);
+  min-height: min(65vh, 620px);
 }
 
 .sidebar {
-  width: 35%;
-  align-self: center;
   align-items: center;
-  align-content: center;
   display: flex;
   flex-direction: column;
   background-color: rgb(255, 255, 255);
 }
 
 .sidebar-image {
-  max-width: 85%;
-  margin-top: 10%;
-  margin-bottom: 5%;
+  width: min(75%, 260px);
+  margin: 0 0 15px;
 }
 
 .sidebar-image img {
@@ -114,31 +127,28 @@
 }
 
 .sidebar-text {
-  width: 85%;
-  margin-bottom: 10%;
-  font-size: 18px;
+  width: 100%;
+  max-width: 330px;
+  font-size: clamp(13px, 0.95vw, 16px);
   text-align: left;
-  line-height: 1.5;
+  line-height: 1.4;
+  padding: 0 8px;
 }
 
 .main-content {
-  height: 90%;
-  width: 60%;
-  align-self: center;
-  padding-top: 20px;
-  padding-left: 30px;
-  padding-right: 30px;
-  flex-grow: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 0 8px 0 4px;
   background-color: rgb(255, 255, 255);
 }
 
 .main-content .head {
   font-weight: bold;
-  font-size: 52px;
-  margin-bottom: 1%;
+  font-size: clamp(30px, 3vw, 46px);
+  margin-bottom: 0.25em;
   display: flex;
   flex-wrap: wrap;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .main-content ul{
@@ -147,19 +157,19 @@
 }
 
 .subhead {
-  font-size: 25px;
-  margin-bottom: 3%;
+  font-size: clamp(18px, 1.5vw, 23px);
+  margin-bottom: 0.35em;
   margin-left: 5px;
 }
 
 .related-link {
-  font-size: 20px;
-  margin-bottom: 5%;
+  font-size: clamp(15px, 1.2vw, 18px);
+  margin-bottom: 1.0em;
   padding-left: 0;
 }
 
 .related-link li {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .related-link a {
@@ -172,20 +182,35 @@
 }
 
 .introduction {
-  margin: 20px 0px;
+  margin-top: 6px;
+  margin-left: 0;
   width: 100%;
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: clamp(14px, 1vw, 17px);
+  line-height: 1.45;
+  padding: 0 14px;
+}
+
+.introduction ul {
+  padding-left: 1.25em;
+  padding-right: 1.5em;
+}
+
+.introduction b[style] {
+  font-size: clamp(20px, 1.75vw, 28px) !important;
+}
+
+.introduction li[style] {
+  margin: 0.45em 0 !important;
+  padding-right: 4px;
 }
 
 .my-links {
   position: relative;
   height: 50px;
-  width: 30%;
-  min-width: 280px;
+  width: min(360px, 100%);
   border-radius: 25px;
   align-content: center;
-  margin: 40px auto;
+  margin: 20px auto 0;
   background-color: rgba(255, 255, 255, 0.8);
   display: flex;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -209,12 +234,11 @@
 /* 平板端响应式设计 */
 @media (max-width: 1024px) {
   .my-box .container {
-    width: 85%;
-    padding: 15px;
-  }
-  
-  .main-content {
-    padding-left: 40px;
+    width: 100%;
+    max-height: none;
+    min-height: auto;
+    padding: 14px;
+    gap: 18px;
   }
   
   .main-content .head {
@@ -237,22 +261,24 @@
 /* 移动端响应式设计 */
 @media (max-width: 768px) {
   .my-box {
-    margin-top: 20px;
-    padding: 0 10px;
+    padding: 0;
+    min-height: auto;
   }
   
   .my-box .container {
-    width: 95%;
+    width: 100%;
     flex-direction: column;
-    gap: 20px;
-    padding: 20px 35px;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
     border-radius: 20px;
+    max-height: none;
+    min-height: auto;
   }
   
   .sidebar {
     width: 100%;
     order: 1;
-    margin-bottom: 10px;
   }
   
   .sidebar-image {
@@ -261,6 +287,7 @@
   }
   
   .sidebar-text {
+    display: none;
     width: 100%;
     text-align: center;
     font-size: 16px;
@@ -270,37 +297,37 @@
   .main-content {
     width: 100%;
     order: 2;
-    padding: 0;
+    padding: 0 4px;
     text-align: center;
   }
   
   .main-content .head {
     font-size: 36px;
     justify-content: center;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
   }
   
   .subhead {
     font-size: 20px;
     margin-left: 0;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
   }
   
   .related-link {
     font-size: 16px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     text-align: center;
   }
   
   .related-link li {
     list-style: none;
-    margin-bottom: 0px;
   }
   
   .introduction {
-    padding: 0px 15px;
+    margin: 0;
     width: 100%;
     font-size: 16px;
+    padding: 0 2px;
     text-align: left;
   }
   .introduction li{
@@ -310,19 +337,19 @@
   .my-links {
     width: 80%;
     max-width: 320px;
-    margin: 30px auto;
+    margin: 10px auto 0;
   }
 }
 
 /* 小屏手机端响应式设计 */
 @media (max-width: 480px) {
   .my-box {
-    margin-top: 15px;
+    margin-top: 0;
   }
   
   .my-box .container {
-    width: 98%;
-    padding: 15px 10px;
+    width: 100%;
+    padding: 18px 14px;
     border-radius: 15px;
   }
   
@@ -353,6 +380,12 @@
   
   .introduction {
     font-size: 14px;
+    padding: 0 4px;
+  }
+
+  .introduction ul {
+    padding-left: 4px;
+    padding-right: 4px;
   }
   
   .my-links {

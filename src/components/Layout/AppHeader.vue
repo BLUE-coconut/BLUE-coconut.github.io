@@ -1,9 +1,9 @@
 <template>
   <nav>
-    <div class="nav-container">
+    <div class="nav-container brand-container">
       <span class="brand">Welcome to my website!</span>
     </div>
-    <div class="nav-container">
+    <div class="nav-container tabs-container">
       <ul class="nav nav-pills">
         <li role="presentation">
           <router-link to="/" :class="{ active: route.path === '/' }">
@@ -13,6 +13,11 @@
         <li role="presentation">
           <router-link to="/biography" :class="{ active: route.path === '/biography' }">
             Resume
+          </router-link>
+        </li>
+        <li role="presentation">
+          <router-link to="/project" :class="{ active: route.path === '/project' }">
+            Projects
           </router-link>
         </li>
         <li role="presentation">
@@ -27,6 +32,7 @@
         </li>
       </ul>
     </div>
+    <div class="nav-spacer" aria-hidden="true"></div>
   </nav>
 </template>
 
@@ -42,17 +48,31 @@ nav {
   height: fit-content;
   background-color: white;
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  padding: 10px 0;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 10px clamp(16px, 4vw, 48px);
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .nav-container {
   height: fit-content;
-  margin: auto;
-  align-content: center;
-  padding-left: 5%;
-  padding-right: 5%;
+  margin: 0;
+  min-width: 0;
+}
+
+.brand-container {
+  justify-self: center;
+  text-align: center;
+  width: 100%;
+}
+
+.tabs-container {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.nav-spacer {
+  grid-column: 3;
 }
 
 .brand {
@@ -67,11 +87,12 @@ nav {
   justify-content: center;
   font-size: 1.5em;
   flex-wrap: wrap;
+  gap: 8px 16px;
 }
 
 .nav.nav-pills li {
   list-style: none;
-  margin: 5px 15px;
+  margin: 0;
 }
 
 .nav.nav-pills a {
@@ -93,17 +114,18 @@ nav {
 }
 
 /* 移动端响应式设计 */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   nav {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
     gap: 10px;
-    padding: 15px 0;
+    padding: 15px 12px;
   }
-  
-  .nav-container {
-    padding-left: 2%;
-    padding-right: 2%;
+
+  .brand-container,
+  .tabs-container,
+  .nav-spacer {
+    grid-column: 1;
+    justify-self: center;
   }
   
   .brand {

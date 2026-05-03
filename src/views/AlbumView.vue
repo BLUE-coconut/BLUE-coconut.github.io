@@ -132,60 +132,59 @@ onUnmounted(() => {
 
 <style scoped>
 .container {
-    height: 90%;
-    width: 100%;
-    margin: 15px auto;
+  height: auto;
+  min-height: min(75vh, 760px);
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* 设置容器的基本样式 */
 .album-container {
   overflow: hidden;
-  margin: 80px auto;
-  width: 100%;
-  height: 700px;
-  padding-top: 50px;
+  margin: 0 auto;
+  width: min(1480px, 100%);
+  height: clamp(420px, 75vh, 720px);
+  padding: clamp(14px, 2vw, 28px);
   white-space: nowrap; /* 防止图片换行 */
   position: relative;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 20px;
+  display: flex;
+  align-items: center;
 }
 
 /* 包裹图片的容器，设置其宽度 */
 .photos {
-  height: 600px;
-  display: inline-block;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
   white-space: nowrap; /* 防止换行 */
 }
 
 .photos img {
-  height: 600px; /* 保证图片高度与容器高度一致 */
+  height: 100%; /* 保证图片高度与容器高度一致 */
   display: inline-block;
   border-radius: 20px;
   object-fit: cover;
+  flex: 0 0 auto;
 }
 
 /* 图片之间的间隔 */
 .margin {
-  width: 20px; /* 间隙宽度 */
-  display: inline-block;
+  width: clamp(12px, 1.6vw, 24px); /* 间隙宽度 */
+  flex: 0 0 auto;
 }
 
 /* 移动端适配 */
 @media (max-width: 768px) {
   .album-container {
-    margin: 40px auto;
-    height: 400px;
-    padding-top: 30px;
+    height: clamp(320px, 58vh, 460px);
+    border-radius: 16px;
   }
-  
-  .photos {
-    height: 350px;
-  }
-  
-  .photos img {
-    height: 350px;
-  }
-  
+
   .margin {
     width: 15px;
   }
@@ -193,19 +192,10 @@ onUnmounted(() => {
 
 @media (max-width: 480px) {
   .album-container {
-    margin: 20px auto;
-    height: 300px;
-    padding-top: 20px;
+    height: clamp(260px, 52vh, 340px);
+    padding: 10px;
   }
-  
-  .photos {
-    height: 250px;
-  }
-  
-  .photos img {
-    height: 250px;
-  }
-  
+
   .margin {
     width: 10px;
   }

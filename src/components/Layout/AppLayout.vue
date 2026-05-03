@@ -20,15 +20,20 @@ import AppHeader from './AppHeader.vue'
 
 .main-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 0;
+  padding: clamp(8px, 1.2vw, 16px) clamp(12px, 3vw, 40px) clamp(14px, 2vw, 26px);
   margin: 0;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .main-content {
-    padding: 10px;
+    justify-content: flex-start;
+    padding: 10px 12px 18px;
   }
 }
 </style>
