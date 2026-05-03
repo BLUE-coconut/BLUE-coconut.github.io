@@ -158,6 +158,7 @@ const goToBlog = (url: string) => {
 
 .my-box .container {
   width: min(1500px, 100%);
+  max-width: 1500px;
   margin: 0 auto;
   position: relative;
   padding: clamp(22px, 3vw, 36px);

@@ -96,7 +96,7 @@
   max-width: 1280px;
   margin: 0 auto;
   position: relative;
-  padding: clamp(6px, 0.9vw, 12px);
+  padding: 30px clamp(6px, 0.9vw, 12px);
   border-radius: 30px;
   display: grid;
   grid-template-columns: minmax(220px, 0.78fr) minmax(0, 1.22fr);
@@ -104,8 +104,8 @@
   align-items: center;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-height: min(80vh, 780px);
-  min-height: auto;
+  max-height: min(75vh, 740px);
+  overflow-y: auto;
 }
 
 .sidebar {
@@ -210,7 +210,7 @@
   width: min(360px, 100%);
   border-radius: 25px;
   align-content: center;
-  margin: 8px auto 0;
+  margin: 20px auto 0;
   background-color: rgba(255, 255, 255, 0.8);
   display: flex;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -236,7 +236,6 @@
   .my-box .container {
     width: 100%;
     max-height: none;
-    min-height: auto;
     padding: 14px;
     gap: 18px;
   }
@@ -273,7 +272,6 @@
     padding: 16px;
     border-radius: 20px;
     max-height: none;
-    min-height: auto;
   }
   
   .sidebar {
