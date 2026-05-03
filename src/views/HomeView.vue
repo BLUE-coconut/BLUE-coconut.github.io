@@ -104,8 +104,8 @@
   align-items: center;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-height: min(75vh, 740px);
-  min-height: min(65vh, 620px);
+  max-height: min(80vh, 780px);
+  min-height: auto;
 }
 
 .sidebar {
@@ -210,7 +210,7 @@
   width: min(360px, 100%);
   border-radius: 25px;
   align-content: center;
-  margin: 20px auto 0;
+  margin: 8px auto 0;
   background-color: rgba(255, 255, 255, 0.8);
   display: flex;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

@@ -2,7 +2,7 @@
   <div class="my-box">
     <div class="container">
       <!-- Projects Section -->
-      <!-- <section class="section">
+      <section class="section">
         <h2 class="section-title">Projects</h2>
         <div class="projects-grid">
           <div 
@@ -24,10 +24,9 @@
           </div>
         </div>
       </section>
-      -->
 
       <!-- Blogs Section -->
-      <section class="section">
+      <!-- <section class="section">
         <h2 class="section-title">Blogs</h2>
         <div class="blogs-list">
           <div 
@@ -49,6 +48,7 @@
           </div>
         </div>
       </section>
+      -->
     </div>
   </div>
 </template>
@@ -106,27 +106,11 @@ const blogs = ref([
     title: '强化学习',
     description: '强化学习基础理论笔记。',
     coverImage: '/images/blog/RL.png',
-    updateTime: '2025年9月28日',
+    updateTime: '2024年1月28日',
     url: 'https://j2w8lfcfsi.feishu.cn/wiki/WxZ6wAsrXiDcqDkreVQcItgqnFe?from=from_copylink'
   },
   {
     id: 3,
-    title: 'AI Agents',
-    description: 'AI Agents 理论+实践学习笔记。',
-    coverImage: '/images/blog/agent.jpg',
-    updateTime: '2025年11月30日',
-    url: 'https://ai.feishu.cn/wiki/SszRwxQ5BicpStkqHq9ckLc3nPe?from=from_copylink'
-  },
-  {
-    id: 4,
-    title: 'Flutter',
-    description: 'Flutter 跨平台开发学习笔记。',
-    coverImage: '/images/blog/Flutter.png',
-    updateTime: '2025年11月12日',
-    url: 'https://ai.feishu.cn/wiki/XJ0swnAvbihJgMkPq9TcT3L1nBg?from=from_copylink'
-  },
-  {
-    id: 5,
     title: '雅思IELTS',
     description: '雅思备考经验分享。',
     coverImage: '/images/blog/IELTS.jpg',
@@ -158,6 +142,7 @@ const goToBlog = (url: string) => {
 
 .my-box .container {
   width: min(1500px, 100%);
+  max-width: 1500px;
   margin: 0 auto;
   position: relative;
   padding: clamp(22px, 3vw, 36px);

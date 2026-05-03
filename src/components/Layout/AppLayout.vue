@@ -33,7 +33,7 @@ import AppHeader from './AppHeader.vue'
 @media (max-width: 768px) {
   .main-content {
     justify-content: flex-start;
-    padding: 10px 12px 18px;
+    padding: 8px 10px 14px;
   }
 }
 </style>

@@ -221,7 +221,6 @@
 
 .my-box .container {
   width: min(1200px, 100%);
-  max-width: 1200px;
   margin: 0 auto;
   position: relative;
   padding: clamp(16px, 2.5vw, 28px);
