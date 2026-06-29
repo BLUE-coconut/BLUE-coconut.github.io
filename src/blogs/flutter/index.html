@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flutter 跨平台开发</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; }
+    h2 { font-size: 26px; font-weight: 700; margin: 48px 0 16px; padding-left: 14px; border-left: 4px solid #3498db; scroll-margin-top: 24px; }
+    h3 { font-size: 20px; font-weight: 600; margin: 32px 0 12px; scroll-margin-top: 24px; }
+    p { margin: 16px 0; }
+    code { background: rgba(22, 160, 133, 0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #138d75; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 16px 20px; border-radius: 12px; overflow-x: auto; font-size: 14px; line-height: 1.6; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+    pre code { background: none; color: inherit; padding: 0; }
+    .lead { font-size: 17px; color: #7f8c8d; margin-bottom: 28px; }
+    @media (max-width: 768px) { body { padding: 16px; } h1 { font-size: 26px; } h2 { font-size: 22px; } }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">Flutter 用一套 Dart 代码同时构建 iOS、Android、Web、桌面应用。本文总结关键设计模式。</p>
+
+    <h2 id="widget">Widget 体系</h2>
+    <p>Flutter 一切皆 Widget，分为三类：</p>
+    <ul>
+      <li><strong>StatelessWidget</strong>：不可变，纯渲染</li>
+      <li><strong>StatefulWidget</strong>：可变状态，配合 State 类使用</li>
+      <li><strong>InheritedWidget</strong>：依赖注入，状态向下传递</li>
+    </ul>
+
+    <h2 id="state-management">状态管理</h2>
+    <p>主流方案对比：</p>
+    <ul>
+      <li><strong>Provider</strong>：官方推荐，入门首选</li>
+      <li><strong>Riverpod</strong>：Provider 的进化版，编译期安全</li>
+      <li><strong>Bloc</strong>：事件驱动，适合复杂业务</li>
+      <li><strong>GetX</strong>：轻量但社区有争议</li>
+    </ul>
+
+    <h2 id="layout">布局核心</h2>
+    <p>理解三个核心 Widget：</p>
+    <pre><code>Column(children: [...])  // 纵向排列
+Row(children: [...])     // 横向排列
+Stack(children: [...])   // 层叠</code></pre>
+
+    <h2 id="performance">性能优化</h2>
+    <ul>
+      <li>用 <code>const</code> 标记不变 Widget，让框架跳过重建</li>
+      <li>长列表用 <code>ListView.builder</code>（懒构建）</li>
+      <li>避免在 build 中执行耗时操作</li>
+    </ul>
+  </article>
+</body>
+</html>

@@ -1,0 +1,44 @@
+/**
+ * 博客系统 CSS 变量集中管理
+ *
+ * 品牌色仅保留 brand-primary 一种强调色。
+ * 分类色变量保留作为向后兼容，但不在新 UI 中使用。
+ */
+
+:root {
+  /* ===== 品牌色（唯一强调色） ===== */
+  --brand-primary: #3498db;
+  --brand-primary-dark: #2980b9;
+  --brand-primary-light: rgba(52, 152, 219, 0.06);
+  --brand-primary-hover-bg: rgba(52, 152, 219, 0.04);
+
+  /* ===== 分类色（保留兼容，新 UI 不使用） ===== */
+  --cat-ai: #3498db;
+  --cat-rl: #9b59b6;
+  --cat-game: #e67e22;
+  --cat-mobile: #16a085;
+  --cat-language: #e74c3c;
+
+  /* ===== 中性色（高级感灰阶） ===== */
+  --text-primary: #0a0a0a;
+  --text-secondary: #525252;
+  --text-muted: #737373;
+  --text-faint: #a3a3a3;
+  --surface: #ffffff;
+  --surface-soft: #fafafa;
+  --border: #e5e5e5;
+  --border-light: #f5f5f5;
+  --code-bg: #1e293b;
+  --code-fg: #e2e8f0;
+
+  /* ===== 阴影（仅用于顶部进度条，不用于卡片） ===== */
+  --shadow-progress: 0 1px 4px rgba(52, 152, 219, 0.4);
+
+  /* ===== 排版尺寸 ===== */
+  --container-max: 1200px;
+  --article-max-width: 760px;
+  --toc-width: 220px;
+  --header-height: 80px;
+  --radius-card: 4px;
+  --radius-pill: 999px;
+}

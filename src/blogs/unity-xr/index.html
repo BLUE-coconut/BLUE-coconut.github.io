@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unity XR 开发笔记</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; }
+    h2 { font-size: 26px; font-weight: 700; margin: 48px 0 16px; padding-left: 14px; border-left: 4px solid #3498db; scroll-margin-top: 24px; }
+    h3 { font-size: 20px; font-weight: 600; margin: 32px 0 12px; scroll-margin-top: 24px; }
+    p { margin: 16px 0; }
+    code { background: rgba(230, 126, 34, 0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #d35400; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 16px 20px; border-radius: 12px; overflow-x: auto; font-size: 14px; line-height: 1.6; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+    pre code { background: none; color: inherit; padding: 0; }
+    .lead { font-size: 17px; color: #7f8c8d; margin-bottom: 28px; }
+    @media (max-width: 768px) { body { padding: 16px; } h1 { font-size: 26px; } h2 { font-size: 22px; } }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">Unity XR 开发的核心是 <strong>OpenXR</strong> + XR Interaction Toolkit，本文记录关键流程与踩坑。</p>
+
+    <h2 id="setup">环境搭建</h2>
+    <p>推荐配置：</p>
+    <ul>
+      <li>Unity 2022.3 LTS 或更新</li>
+      <li>OpenXR Plugin</li>
+      <li>XR Interaction Toolkit (XRI)</li>
+      <li>XR Plugin Management（自动加载各平台 provider）</li>
+    </ul>
+
+    <h2 id="openxr">OpenXR 优势</h2>
+    <p>OpenXR 是跨厂商标准，相比各厂商私有 SDK：</p>
+    <ul>
+      <li>一套代码支持 Quest / Pico / Vision Pro / SteamVR</li>
+      <li>自动处理输入映射</li>
+      <li>Khronos 维护，长期可靠</li>
+    </ul>
+
+    <h2 id="hand-tracking">手部追踪</h2>
+    <p>Quest 上启用手部追踪：</p>
+    <ol>
+      <li>在 Oculus Feature Group 勾选 <em>Hand Tracking</em></li>
+      <li>XR Hands Package 引入</li>
+      <li>绑定 <code>HandVisualizer</code> 预制体</li>
+    </ol>
+
+    <h2 id="performance">性能优化要点</h2>
+    <ul>
+      <li>单眼分辨率建议 1.4x（Quest 2）</li>
+      <li>URP 优于 Built-in（支持 Foveated Rendering）</li>
+      <li>动态分辨率比固定分辨率体验更好</li>
+      <li>避免过多数量 Update 调用（XR 设备帧率敏感）</li>
+    </ul>
+  </article>
+</body>
+</html>
