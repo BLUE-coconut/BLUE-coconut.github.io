@@ -1,30 +1,6 @@
 <template>
   <div class="my-box">
     <div class="container">
-      <!-- Projects Section -->
-      <!-- <section class="section">
-        <h2 class="section-title">Projects</h2>
-        <div class="projects-grid">
-          <div 
-            v-for="project in projects" 
-            :key="project.id"
-            class="project-card"
-            @click="goToProject(project.id)"
-          >
-            <div class="card-image">
-              <img :src="project.coverImage" :alt="project.title" />
-            </div>
-            <div class="card-content">
-              <h3 class="card-title">{{ project.title }}</h3>
-              <p class="card-description">{{ project.description }}</p>
-              <div class="card-meta">
-                <span class="project-time">{{ project.time }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      -->
 
       <!-- Blogs Section -->
       <section class="section">
@@ -58,38 +34,6 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
-// 项目数据
-const projects = ref([
-//   {
-//     id: 1,
-//     title: 'Vue 个人网站',
-//     description: '基于 Vue 3 + TypeScript 开发的响应式个人网站，包含简历展示、相册轮播、博客系统等功能模块。',
-//     coverImage: '/images/project/1.png',
-//     time: '2024年1月 - 2024年3月'
-//   },
-  {
-    id: 2,
-    title: '三模态Few-shot图像分割的交互式特征融合与匹配网络',
-    description: "构建了新型交互式特征融合与匹配网络，并提出两个新模块，在VDT-2048-5i数据集上取得SOTA效果。",
-    coverImage: '/images/project/3.png',
-    time: '2023年11月 - 2024年8月'
-  },
-  {
-    id: 3,
-    title: 'Linker - 星星连连看',
-    description: "基于图像特征匹配与自研算法绘制星座图，纪念宠物，负责前端web开发，基于 Vue 2 框架。",
-    coverImage: '/images/project/2.png',
-    time: '2024年6月 - 至今'
-  },
-  {
-    id: 4,
-    title: 'Plantmon - 植物宝可梦',
-    description: '获得Adventure-X黑客松赛道二等奖*1、三等奖*1，负责战斗模块的实现与部分前端开发。',
-    coverImage: '/images/project/4.png',
-    time: '2025年7月'
-  }
-])
 
 // 博客数据
 const blogs = ref([

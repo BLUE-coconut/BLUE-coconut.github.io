@@ -80,7 +80,7 @@ const projects = ref([
     title: 'Linker - 星星连连看',
     description: "基于图像特征匹配与自研算法绘制星座图，纪念宠物，负责前端web开发，基于 Vue 2 框架。",
     coverImage: '/images/project/2.png',
-    time: '2024年6月 - 至今'
+    time: '2024年6月 - 2025年7月'
   },
   {
     id: 4,
