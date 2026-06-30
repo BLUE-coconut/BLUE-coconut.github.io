@@ -1,0 +1,3703 @@
+(function(){const n=document.createElement("link").relList;if(n&&n.supports&&n.supports("modulepreload"))return;for(const r of document.querySelectorAll('link[rel="modulepreload"]'))o(r);new MutationObserver(r=>{for(const i of r)if(i.type==="childList")for(const s of i.addedNodes)s.tagName==="LINK"&&s.rel==="modulepreload"&&o(s)}).observe(document,{childList:!0,subtree:!0});function e(r){const i={};return r.integrity&&(i.integrity=r.integrity),r.referrerPolicy&&(i.referrerPolicy=r.referrerPolicy),r.crossOrigin==="use-credentials"?i.credentials="include":r.crossOrigin==="anonymous"?i.credentials="omit":i.credentials="same-origin",i}function o(r){if(r.ep)return;r.ep=!0;const i=e(r);fetch(r.href,i)}})();/**
+* @vue/shared v3.5.18
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**//*! #__NO_SIDE_EFFECTS__ */function _o(t){const n=Object.create(null);for(const e of t.split(","))n[e]=1;return e=>e in n}const st={},Fn=[],Jt=()=>{},ss=()=>!1,Ie=t=>t.charCodeAt(0)===111&&t.charCodeAt(1)===110&&(t.charCodeAt(2)>122||t.charCodeAt(2)<97),xo=t=>t.startsWith("onUpdate:"),_t=Object.assign,yo=(t,n)=>{const e=t.indexOf(n);e>-1&&t.splice(e,1)},ls=Object.prototype.hasOwnProperty,Q=(t,n)=>ls.call(t,n),j=Array.isArray,zn=t=>Ee(t)==="[object Map]",$r=t=>Ee(t)==="[object Set]",N=t=>typeof t=="function",dt=t=>typeof t=="string",_n=t=>typeof t=="symbol",lt=t=>t!==null&&typeof t=="object",Br=t=>(lt(t)||N(t))&&N(t.then)&&N(t.catch),Vr=Object.prototype.toString,Ee=t=>Vr.call(t),as=t=>Ee(t).slice(8,-1),jr=t=>Ee(t)==="[object Object]",wo=t=>dt(t)&&t!=="NaN"&&t[0]!=="-"&&""+parseInt(t,10)===t,Xn=_o(",key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted"),Le=t=>{const n=Object.create(null);return e=>n[e]||(n[e]=t(e))},cs=/-(\w)/g,Ft=Le(t=>t.replace(cs,(n,e)=>e?e.toUpperCase():"")),ds=/\B([A-Z])/g,Pn=Le(t=>t.replace(ds,"-$1").toLowerCase()),Oe=Le(t=>t.charAt(0).toUpperCase()+t.slice(1)),Ge=Le(t=>t?`on${Oe(t)}`:""),mn=(t,n)=>!Object.is(t,n),qe=(t,...n)=>{for(let e=0;e<t.length;e++)t[e](...n)},io=(t,n,e,o=!1)=>{Object.defineProperty(t,n,{configurable:!0,enumerable:!1,writable:o,value:e})},us=t=>{const n=parseFloat(t);return isNaN(n)?t:n};let Go;const Fe=()=>Go||(Go=typeof globalThis<"u"?globalThis:typeof self<"u"?self:typeof window<"u"?window:typeof global<"u"?global:{});function ze(t){if(j(t)){const n={};for(let e=0;e<t.length;e++){const o=t[e],r=dt(o)?hs(o):ze(o);if(r)for(const i in r)n[i]=r[i]}return n}else if(dt(t)||lt(t))return t}const ps=/;(?![^(]*\))/g,gs=/:([^]+)/,fs=/\/\*[^]*?\*\//g;function hs(t){const n={};return t.replace(fs,"").split(ps).forEach(e=>{if(e){const o=e.split(gs);o.length>1&&(n[o[0].trim()]=o[1].trim())}}),n}function on(t){let n="";if(dt(t))n=t;else if(j(t))for(let e=0;e<t.length;e++){const o=on(t[e]);o&&(n+=o+" ")}else if(lt(t))for(const e in t)t[e]&&(n+=e+" ");return n.trim()}const ms="itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly",bs=_o(ms);function Nr(t){return!!t||t===""}const Kr=t=>!!(t&&t.__v_isRef===!0),tt=t=>dt(t)?t:t==null?"":j(t)||lt(t)&&(t.toString===Vr||!N(t.toString))?Kr(t)?tt(t.value):JSON.stringify(t,Ur,2):String(t),Ur=(t,n)=>Kr(n)?Ur(t,n.value):zn(n)?{[`Map(${n.size})`]:[...n.entries()].reduce((e,[o,r],i)=>(e[We(o,i)+" =>"]=r,e),{})}:$r(n)?{[`Set(${n.size})`]:[...n.values()].map(e=>We(e))}:_n(n)?We(n):lt(n)&&!j(n)&&!jr(n)?String(n):n,We=(t,n="")=>{var e;return _n(t)?`Symbol(${(e=t.description)!=null?e:n})`:t};/**
+* @vue/reactivity v3.5.18
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/let At;class Gr{constructor(n=!1){this.detached=n,this._active=!0,this._on=0,this.effects=[],this.cleanups=[],this._isPaused=!1,this.parent=At,!n&&At&&(this.index=(At.scopes||(At.scopes=[])).push(this)-1)}get active(){return this._active}pause(){if(this._active){this._isPaused=!0;let n,e;if(this.scopes)for(n=0,e=this.scopes.length;n<e;n++)this.scopes[n].pause();for(n=0,e=this.effects.length;n<e;n++)this.effects[n].pause()}}resume(){if(this._active&&this._isPaused){this._isPaused=!1;let n,e;if(this.scopes)for(n=0,e=this.scopes.length;n<e;n++)this.scopes[n].resume();for(n=0,e=this.effects.length;n<e;n++)this.effects[n].resume()}}run(n){if(this._active){const e=At;try{return At=this,n()}finally{At=e}}}on(){++this._on===1&&(this.prevScope=At,At=this)}off(){this._on>0&&--this._on===0&&(At=this.prevScope,this.prevScope=void 0)}stop(n){if(this._active){this._active=!1;let e,o;for(e=0,o=this.effects.length;e<o;e++)this.effects[e].stop();for(this.effects.length=0,e=0,o=this.cleanups.length;e<o;e++)this.cleanups[e]();if(this.cleanups.length=0,this.scopes){for(e=0,o=this.scopes.length;e<o;e++)this.scopes[e].stop(!0);this.scopes.length=0}if(!this.detached&&this.parent&&!n){const r=this.parent.scopes.pop();r&&r!==this&&(this.parent.scopes[this.index]=r,r.index=this.index)}this.parent=void 0}}}function vs(t){return new Gr(t)}function _s(){return At}let it;const Xe=new WeakSet;class qr{constructor(n){this.fn=n,this.deps=void 0,this.depsTail=void 0,this.flags=5,this.next=void 0,this.cleanup=void 0,this.scheduler=void 0,At&&At.active&&At.effects.push(this)}pause(){this.flags|=64}resume(){this.flags&64&&(this.flags&=-65,Xe.has(this)&&(Xe.delete(this),this.trigger()))}notify(){this.flags&2&&!(this.flags&32)||this.flags&8||Xr(this)}run(){if(!(this.flags&1))return this.fn();this.flags|=2,qo(this),Qr(this);const n=it,e=Dt;it=this,Dt=!0;try{return this.fn()}finally{Jr(this),it=n,Dt=e,this.flags&=-3}}stop(){if(this.flags&1){for(let n=this.deps;n;n=n.nextDep)ko(n);this.deps=this.depsTail=void 0,qo(this),this.onStop&&this.onStop(),this.flags&=-2}}trigger(){this.flags&64?Xe.add(this):this.scheduler?this.scheduler():this.runIfDirty()}runIfDirty(){so(this)&&this.run()}get dirty(){return so(this)}}let Wr=0,Qn,Jn;function Xr(t,n=!1){if(t.flags|=8,n){t.next=Jn,Jn=t;return}t.next=Qn,Qn=t}function Co(){Wr++}function So(){if(--Wr>0)return;if(Jn){let n=Jn;for(Jn=void 0;n;){const e=n.next;n.next=void 0,n.flags&=-9,n=e}}let t;for(;Qn;){let n=Qn;for(Qn=void 0;n;){const e=n.next;if(n.next=void 0,n.flags&=-9,n.flags&1)try{n.trigger()}catch(o){t||(t=o)}n=e}}if(t)throw t}function Qr(t){for(let n=t.deps;n;n=n.nextDep)n.version=-1,n.prevActiveLink=n.dep.activeLink,n.dep.activeLink=n}function Jr(t){let n,e=t.depsTail,o=e;for(;o;){const r=o.prevDep;o.version===-1?(o===e&&(e=r),ko(o),xs(o)):n=o,o.dep.activeLink=o.prevActiveLink,o.prevActiveLink=void 0,o=r}t.deps=n,t.depsTail=e}function so(t){for(let n=t.deps;n;n=n.nextDep)if(n.dep.version!==n.version||n.dep.computed&&(Yr(n.dep.computed)||n.dep.version!==n.version))return!0;return!!t._dirty}function Yr(t){if(t.flags&4&&!(t.flags&16)||(t.flags&=-17,t.globalVersion===re)||(t.globalVersion=re,!t.isSSR&&t.flags&128&&(!t.deps&&!t._dirty||!so(t))))return;t.flags|=2;const n=t.dep,e=it,o=Dt;it=t,Dt=!0;try{Qr(t);const r=t.fn(t._value);(n.version===0||mn(r,t._value))&&(t.flags|=128,t._value=r,n.version++)}catch(r){throw n.version++,r}finally{it=e,Dt=o,Jr(t),t.flags&=-3}}function ko(t,n=!1){const{dep:e,prevSub:o,nextSub:r}=t;if(o&&(o.nextSub=r,t.prevSub=void 0),r&&(r.prevSub=o,t.nextSub=void 0),e.subs===t&&(e.subs=o,!o&&e.computed)){e.computed.flags&=-5;for(let i=e.computed.deps;i;i=i.nextDep)ko(i,!0)}!n&&!--e.sc&&e.map&&e.map.delete(e.key)}function xs(t){const{prevDep:n,nextDep:e}=t;n&&(n.nextDep=e,t.prevDep=void 0),e&&(e.prevDep=n,t.nextDep=void 0)}let Dt=!0;const Zr=[];function sn(){Zr.push(Dt),Dt=!1}function ln(){const t=Zr.pop();Dt=t===void 0?!0:t}function qo(t){const{cleanup:n}=t;if(t.cleanup=void 0,n){const e=it;it=void 0;try{n()}finally{it=e}}}let re=0;class ys{constructor(n,e){this.sub=n,this.dep=e,this.version=e.version,this.nextDep=this.prevDep=this.nextSub=this.prevSub=this.prevActiveLink=void 0}}class Ao{constructor(n){this.computed=n,this.version=0,this.activeLink=void 0,this.subs=void 0,this.map=void 0,this.key=void 0,this.sc=0,this.__v_skip=!0}track(n){if(!it||!Dt||it===this.computed)return;let e=this.activeLink;if(e===void 0||e.sub!==it)e=this.activeLink=new ys(it,this),it.deps?(e.prevDep=it.depsTail,it.depsTail.nextDep=e,it.depsTail=e):it.deps=it.depsTail=e,ti(e);else if(e.version===-1&&(e.version=this.version,e.nextDep)){const o=e.nextDep;o.prevDep=e.prevDep,e.prevDep&&(e.prevDep.nextDep=o),e.prevDep=it.depsTail,e.nextDep=void 0,it.depsTail.nextDep=e,it.depsTail=e,it.deps===e&&(it.deps=o)}return e}trigger(n){this.version++,re++,this.notify(n)}notify(n){Co();try{for(let e=this.subs;e;e=e.prevSub)e.sub.notify()&&e.sub.dep.notify()}finally{So()}}}function ti(t){if(t.dep.sc++,t.sub.flags&4){const n=t.dep.computed;if(n&&!t.dep.subs){n.flags|=20;for(let o=n.deps;o;o=o.nextDep)ti(o)}const e=t.dep.subs;e!==t&&(t.prevSub=e,e&&(e.nextSub=t)),t.dep.subs=t}}const we=new WeakMap,Sn=Symbol(""),lo=Symbol(""),ie=Symbol("");function bt(t,n,e){if(Dt&&it){let o=we.get(t);o||we.set(t,o=new Map);let r=o.get(e);r||(o.set(e,r=new Ao),r.map=o,r.key=e),r.track()}}function rn(t,n,e,o,r,i){const s=we.get(t);if(!s){re++;return}const l=a=>{a&&a.trigger()};if(Co(),n==="clear")s.forEach(l);else{const a=j(t),p=a&&wo(e);if(a&&e==="length"){const d=Number(o);s.forEach((g,h)=>{(h==="length"||h===ie||!_n(h)&&h>=d)&&l(g)})}else switch((e!==void 0||s.has(void 0))&&l(s.get(e)),p&&l(s.get(ie)),n){case"add":a?p&&l(s.get("length")):(l(s.get(Sn)),zn(t)&&l(s.get(lo)));break;case"delete":a||(l(s.get(Sn)),zn(t)&&l(s.get(lo)));break;case"set":zn(t)&&l(s.get(Sn));break}}So()}function ws(t,n){const e=we.get(t);return e&&e.get(n)}function En(t){const n=q(t);return n===t?n:(bt(n,"iterate",ie),Ot(t)?n:n.map(ht))}function De(t){return bt(t=q(t),"iterate",ie),t}const Cs={__proto__:null,[Symbol.iterator](){return Qe(this,Symbol.iterator,ht)},concat(...t){return En(this).concat(...t.map(n=>j(n)?En(n):n))},entries(){return Qe(this,"entries",t=>(t[1]=ht(t[1]),t))},every(t,n){return tn(this,"every",t,n,void 0,arguments)},filter(t,n){return tn(this,"filter",t,n,e=>e.map(ht),arguments)},find(t,n){return tn(this,"find",t,n,ht,arguments)},findIndex(t,n){return tn(this,"findIndex",t,n,void 0,arguments)},findLast(t,n){return tn(this,"findLast",t,n,ht,arguments)},findLastIndex(t,n){return tn(this,"findLastIndex",t,n,void 0,arguments)},forEach(t,n){return tn(this,"forEach",t,n,void 0,arguments)},includes(...t){return Je(this,"includes",t)},indexOf(...t){return Je(this,"indexOf",t)},join(t){return En(this).join(t)},lastIndexOf(...t){return Je(this,"lastIndexOf",t)},map(t,n){return tn(this,"map",t,n,void 0,arguments)},pop(){return Un(this,"pop")},push(...t){return Un(this,"push",t)},reduce(t,...n){return Wo(this,"reduce",t,n)},reduceRight(t,...n){return Wo(this,"reduceRight",t,n)},shift(){return Un(this,"shift")},some(t,n){return tn(this,"some",t,n,void 0,arguments)},splice(...t){return Un(this,"splice",t)},toReversed(){return En(this).toReversed()},toSorted(t){return En(this).toSorted(t)},toSpliced(...t){return En(this).toSpliced(...t)},unshift(...t){return Un(this,"unshift",t)},values(){return Qe(this,"values",ht)}};function Qe(t,n,e){const o=De(t),r=o[n]();return o!==t&&!Ot(t)&&(r._next=r.next,r.next=()=>{const i=r._next();return i.value&&(i.value=e(i.value)),i}),r}const Ss=Array.prototype;function tn(t,n,e,o,r,i){const s=De(t),l=s!==t&&!Ot(t),a=s[n];if(a!==Ss[n]){const g=a.apply(t,i);return l?ht(g):g}let p=e;s!==t&&(l?p=function(g,h){return e.call(this,ht(g),h,t)}:e.length>2&&(p=function(g,h){return e.call(this,g,h,t)}));const d=a.call(s,p,o);return l&&r?r(d):d}function Wo(t,n,e,o){const r=De(t);let i=e;return r!==t&&(Ot(t)?e.length>3&&(i=function(s,l,a){return e.call(this,s,l,a,t)}):i=function(s,l,a){return e.call(this,s,ht(l),a,t)}),r[n](i,...o)}function Je(t,n,e){const o=q(t);bt(o,"iterate",ie);const r=o[n](...e);return(r===-1||r===!1)&&Mo(e[0])?(e[0]=q(e[0]),o[n](...e)):r}function Un(t,n,e=[]){sn(),Co();const o=q(t)[n].apply(t,e);return So(),ln(),o}const ks=_o("__proto__,__v_isRef,__isVue"),ni=new Set(Object.getOwnPropertyNames(Symbol).filter(t=>t!=="arguments"&&t!=="caller").map(t=>Symbol[t]).filter(_n));function As(t){_n(t)||(t=String(t));const n=q(this);return bt(n,"has",t),n.hasOwnProperty(t)}class ei{constructor(n=!1,e=!1){this._isReadonly=n,this._isShallow=e}get(n,e,o){if(e==="__v_skip")return n.__v_skip;const r=this._isReadonly,i=this._isShallow;if(e==="__v_isReactive")return!r;if(e==="__v_isReadonly")return r;if(e==="__v_isShallow")return i;if(e==="__v_raw")return o===(r?i?zs:si:i?ii:ri).get(n)||Object.getPrototypeOf(n)===Object.getPrototypeOf(o)?n:void 0;const s=j(n);if(!r){let a;if(s&&(a=Cs[e]))return a;if(e==="hasOwnProperty")return As}const l=Reflect.get(n,e,ft(n)?n:o);return(_n(e)?ni.has(e):ks(e))||(r||bt(n,"get",e),i)?l:ft(l)?s&&wo(e)?l:l.value:lt(l)?r?ai(l):He(l):l}}class oi extends ei{constructor(n=!1){super(!1,n)}set(n,e,o,r){let i=n[e];if(!this._isShallow){const a=bn(i);if(!Ot(o)&&!bn(o)&&(i=q(i),o=q(o)),!j(n)&&ft(i)&&!ft(o))return a?!1:(i.value=o,!0)}const s=j(n)&&wo(e)?Number(e)<n.length:Q(n,e),l=Reflect.set(n,e,o,ft(n)?n:r);return n===q(r)&&(s?mn(o,i)&&rn(n,"set",e,o):rn(n,"add",e,o)),l}deleteProperty(n,e){const o=Q(n,e);n[e];const r=Reflect.deleteProperty(n,e);return r&&o&&rn(n,"delete",e,void 0),r}has(n,e){const o=Reflect.has(n,e);return(!_n(e)||!ni.has(e))&&bt(n,"has",e),o}ownKeys(n){return bt(n,"iterate",j(n)?"length":Sn),Reflect.ownKeys(n)}}class Ps extends ei{constructor(n=!1){super(!0,n)}set(n,e){return!0}deleteProperty(n,e){return!0}}const Rs=new oi,Ms=new Ps,Ts=new oi(!0);const ao=t=>t,he=t=>Reflect.getPrototypeOf(t);function Is(t,n,e){return function(...o){const r=this.__v_raw,i=q(r),s=zn(i),l=t==="entries"||t===Symbol.iterator&&s,a=t==="keys"&&s,p=r[t](...o),d=e?ao:n?Ce:ht;return!n&&bt(i,"iterate",a?lo:Sn),{next(){const{value:g,done:h}=p.next();return h?{value:g,done:h}:{value:l?[d(g[0]),d(g[1])]:d(g),done:h}},[Symbol.iterator](){return this}}}}function me(t){return function(...n){return t==="delete"?!1:t==="clear"?void 0:this}}function Es(t,n){const e={get(r){const i=this.__v_raw,s=q(i),l=q(r);t||(mn(r,l)&&bt(s,"get",r),bt(s,"get",l));const{has:a}=he(s),p=n?ao:t?Ce:ht;if(a.call(s,r))return p(i.get(r));if(a.call(s,l))return p(i.get(l));i!==s&&i.get(r)},get size(){const r=this.__v_raw;return!t&&bt(q(r),"iterate",Sn),Reflect.get(r,"size",r)},has(r){const i=this.__v_raw,s=q(i),l=q(r);return t||(mn(r,l)&&bt(s,"has",r),bt(s,"has",l)),r===l?i.has(r):i.has(r)||i.has(l)},forEach(r,i){const s=this,l=s.__v_raw,a=q(l),p=n?ao:t?Ce:ht;return!t&&bt(a,"iterate",Sn),l.forEach((d,g)=>r.call(i,p(d),p(g),s))}};return _t(e,t?{add:me("add"),set:me("set"),delete:me("delete"),clear:me("clear")}:{add(r){!n&&!Ot(r)&&!bn(r)&&(r=q(r));const i=q(this);return he(i).has.call(i,r)||(i.add(r),rn(i,"add",r,r)),this},set(r,i){!n&&!Ot(i)&&!bn(i)&&(i=q(i));const s=q(this),{has:l,get:a}=he(s);let p=l.call(s,r);p||(r=q(r),p=l.call(s,r));const d=a.call(s,r);return s.set(r,i),p?mn(i,d)&&rn(s,"set",r,i):rn(s,"add",r,i),this},delete(r){const i=q(this),{has:s,get:l}=he(i);let a=s.call(i,r);a||(r=q(r),a=s.call(i,r)),l&&l.call(i,r);const p=i.delete(r);return a&&rn(i,"delete",r,void 0),p},clear(){const r=q(this),i=r.size!==0,s=r.clear();return i&&rn(r,"clear",void 0,void 0),s}}),["keys","values","entries",Symbol.iterator].forEach(r=>{e[r]=Is(r,t,n)}),e}function Po(t,n){const e=Es(t,n);return(o,r,i)=>r==="__v_isReactive"?!t:r==="__v_isReadonly"?t:r==="__v_raw"?o:Reflect.get(Q(e,r)&&r in o?e:o,r,i)}const Ls={get:Po(!1,!1)},Os={get:Po(!1,!0)},Fs={get:Po(!0,!1)};const ri=new WeakMap,ii=new WeakMap,si=new WeakMap,zs=new WeakMap;function Ds(t){switch(t){case"Object":case"Array":return 1;case"Map":case"Set":case"WeakMap":case"WeakSet":return 2;default:return 0}}function Hs(t){return t.__v_skip||!Object.isExtensible(t)?0:Ds(as(t))}function He(t){return bn(t)?t:Ro(t,!1,Rs,Ls,ri)}function li(t){return Ro(t,!1,Ts,Os,ii)}function ai(t){return Ro(t,!0,Ms,Fs,si)}function Ro(t,n,e,o,r){if(!lt(t)||t.__v_raw&&!(n&&t.__v_isReactive))return t;const i=Hs(t);if(i===0)return t;const s=r.get(t);if(s)return s;const l=new Proxy(t,i===2?o:e);return r.set(t,l),l}function Dn(t){return bn(t)?Dn(t.__v_raw):!!(t&&t.__v_isReactive)}function bn(t){return!!(t&&t.__v_isReadonly)}function Ot(t){return!!(t&&t.__v_isShallow)}function Mo(t){return t?!!t.__v_raw:!1}function q(t){const n=t&&t.__v_raw;return n?q(n):t}function ci(t){return!Q(t,"__v_skip")&&Object.isExtensible(t)&&io(t,"__v_skip",!0),t}const ht=t=>lt(t)?He(t):t,Ce=t=>lt(t)?ai(t):t;function ft(t){return t?t.__v_isRef===!0:!1}function ct(t){return di(t,!1)}function $s(t){return di(t,!0)}function di(t,n){return ft(t)?t:new Bs(t,n)}class Bs{constructor(n,e){this.dep=new Ao,this.__v_isRef=!0,this.__v_isShallow=!1,this._rawValue=e?n:q(n),this._value=e?n:ht(n),this.__v_isShallow=e}get value(){return this.dep.track(),this._value}set value(n){const e=this._rawValue,o=this.__v_isShallow||Ot(n)||bn(n);n=o?n:q(n),mn(n,e)&&(this._rawValue=n,this._value=o?n:ht(n),this.dep.trigger())}}function Z(t){return ft(t)?t.value:t}const Vs={get:(t,n,e)=>n==="__v_raw"?t:Z(Reflect.get(t,n,e)),set:(t,n,e,o)=>{const r=t[n];return ft(r)&&!ft(e)?(r.value=e,!0):Reflect.set(t,n,e,o)}};function ui(t){return Dn(t)?t:new Proxy(t,Vs)}class js{constructor(n,e,o){this._object=n,this._key=e,this._defaultValue=o,this.__v_isRef=!0,this._value=void 0}get value(){const n=this._object[this._key];return this._value=n===void 0?this._defaultValue:n}set value(n){this._object[this._key]=n}get dep(){return ws(q(this._object),this._key)}}class Ns{constructor(n){this._getter=n,this.__v_isRef=!0,this.__v_isReadonly=!0,this._value=void 0}get value(){return this._value=this._getter()}}function Xo(t,n,e){return ft(t)?t:N(t)?new Ns(t):lt(t)&&arguments.length>1?Ks(t,n,e):ct(t)}function Ks(t,n,e){const o=t[n];return ft(o)?o:new js(t,n,e)}class Us{constructor(n,e,o){this.fn=n,this.setter=e,this._value=void 0,this.dep=new Ao(this),this.__v_isRef=!0,this.deps=void 0,this.depsTail=void 0,this.flags=16,this.globalVersion=re-1,this.next=void 0,this.effect=this,this.__v_isReadonly=!e,this.isSSR=o}notify(){if(this.flags|=16,!(this.flags&8)&&it!==this)return Xr(this,!0),!0}get value(){const n=this.dep.track();return Yr(this),n&&(n.version=this.dep.version),this._value}set value(n){this.setter&&this.setter(n)}}function Gs(t,n,e=!1){let o,r;return N(t)?o=t:(o=t.get,r=t.set),new Us(o,r,e)}const be={},Se=new WeakMap;let Cn;function qs(t,n=!1,e=Cn){if(e){let o=Se.get(e);o||Se.set(e,o=[]),o.push(t)}}function Ws(t,n,e=st){const{immediate:o,deep:r,once:i,scheduler:s,augmentJob:l,call:a}=e,p=I=>r?I:Ot(I)||r===!1||r===0?hn(I,1):hn(I);let d,g,h,m,S=!1,A=!1;if(ft(t)?(g=()=>t.value,S=Ot(t)):Dn(t)?(g=()=>p(t),S=!0):j(t)?(A=!0,S=t.some(I=>Dn(I)||Ot(I)),g=()=>t.map(I=>{if(ft(I))return I.value;if(Dn(I))return p(I);if(N(I))return a?a(I,2):I()})):N(t)?n?g=a?()=>a(t,2):t:g=()=>{if(h){sn();try{h()}finally{ln()}}const I=Cn;Cn=d;try{return a?a(t,3,[m]):t(m)}finally{Cn=I}}:g=Jt,n&&r){const I=g,K=r===!0?1/0:r;g=()=>hn(I(),K)}const T=_s(),O=()=>{d.stop(),T&&T.active&&yo(T.effects,d)};if(i&&n){const I=n;n=(...K)=>{I(...K),O()}}let L=A?new Array(t.length).fill(be):be;const $=I=>{if(!(!(d.flags&1)||!d.dirty&&!I))if(n){const K=d.run();if(r||S||(A?K.some((et,U)=>mn(et,L[U])):mn(K,L))){h&&h();const et=Cn;Cn=d;try{const U=[K,L===be?void 0:A&&L[0]===be?[]:L,m];L=K,a?a(n,3,U):n(...U)}finally{Cn=et}}}else d.run()};return l&&l($),d=new qr(g),d.scheduler=s?()=>s($,!1):$,m=I=>qs(I,!1,d),h=d.onStop=()=>{const I=Se.get(d);if(I){if(a)a(I,4);else for(const K of I)K();Se.delete(d)}},n?o?$(!0):L=d.run():s?s($.bind(null,!0),!0):d.run(),O.pause=d.pause.bind(d),O.resume=d.resume.bind(d),O.stop=O,O}function hn(t,n=1/0,e){if(n<=0||!lt(t)||t.__v_skip||(e=e||new Set,e.has(t)))return t;if(e.add(t),n--,ft(t))hn(t.value,n,e);else if(j(t))for(let o=0;o<t.length;o++)hn(t[o],n,e);else if($r(t)||zn(t))t.forEach(o=>{hn(o,n,e)});else if(jr(t)){for(const o in t)hn(t[o],n,e);for(const o of Object.getOwnPropertySymbols(t))Object.prototype.propertyIsEnumerable.call(t,o)&&hn(t[o],n,e)}return t}/**
+* @vue/runtime-core v3.5.18
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/function ue(t,n,e,o){try{return o?t(...o):t()}catch(r){$e(r,n,e)}}function Yt(t,n,e,o){if(N(t)){const r=ue(t,n,e,o);return r&&Br(r)&&r.catch(i=>{$e(i,n,e)}),r}if(j(t)){const r=[];for(let i=0;i<t.length;i++)r.push(Yt(t[i],n,e,o));return r}}function $e(t,n,e,o=!0){const r=n?n.vnode:null,{errorHandler:i,throwUnhandledErrorInProduction:s}=n&&n.appContext.config||st;if(n){let l=n.parent;const a=n.proxy,p=`https://vuejs.org/error-reference/#runtime-${e}`;for(;l;){const d=l.ec;if(d){for(let g=0;g<d.length;g++)if(d[g](t,a,p)===!1)return}l=l.parent}if(i){sn(),ue(i,null,10,[t,a,p]),ln();return}}Xs(t,e,r,o,s)}function Xs(t,n,e,o=!0,r=!1){if(r)throw t;console.error(t)}const wt=[];let Wt=-1;const Hn=[];let pn=null,Ln=0;const pi=Promise.resolve();let ke=null;function To(t){const n=ke||pi;return t?n.then(this?t.bind(this):t):n}function Qs(t){let n=Wt+1,e=wt.length;for(;n<e;){const o=n+e>>>1,r=wt[o],i=se(r);i<t||i===t&&r.flags&2?n=o+1:e=o}return n}function Io(t){if(!(t.flags&1)){const n=se(t),e=wt[wt.length-1];!e||!(t.flags&2)&&n>=se(e)?wt.push(t):wt.splice(Qs(n),0,t),t.flags|=1,gi()}}function gi(){ke||(ke=pi.then(hi))}function Js(t){j(t)?Hn.push(...t):pn&&t.id===-1?pn.splice(Ln+1,0,t):t.flags&1||(Hn.push(t),t.flags|=1),gi()}function Qo(t,n,e=Wt+1){for(;e<wt.length;e++){const o=wt[e];if(o&&o.flags&2){if(t&&o.id!==t.uid)continue;wt.splice(e,1),e--,o.flags&4&&(o.flags&=-2),o(),o.flags&4||(o.flags&=-2)}}}function fi(t){if(Hn.length){const n=[...new Set(Hn)].sort((e,o)=>se(e)-se(o));if(Hn.length=0,pn){pn.push(...n);return}for(pn=n,Ln=0;Ln<pn.length;Ln++){const e=pn[Ln];e.flags&4&&(e.flags&=-2),e.flags&8||e(),e.flags&=-2}pn=null,Ln=0}}const se=t=>t.id==null?t.flags&2?-1:1/0:t.id;function hi(t){try{for(Wt=0;Wt<wt.length;Wt++){const n=wt[Wt];n&&!(n.flags&8)&&(n.flags&4&&(n.flags&=-2),ue(n,n.i,n.i?15:14),n.flags&4||(n.flags&=-2))}}finally{for(;Wt<wt.length;Wt++){const n=wt[Wt];n&&(n.flags&=-2)}Wt=-1,wt.length=0,fi(),ke=null,(wt.length||Hn.length)&&hi()}}let zt=null,mi=null;function Ae(t){const n=zt;return zt=t,mi=t&&t.type.__scopeId||null,n}function mt(t,n=zt,e){if(!n||t._n)return t;const o=(...r)=>{o._d&&sr(-1);const i=Ae(n);let s;try{s=t(...r)}finally{Ae(i),o._d&&sr(1)}return s};return o._n=!0,o._c=!0,o._d=!0,o}function yn(t,n,e,o){const r=t.dirs,i=n&&n.dirs;for(let s=0;s<r.length;s++){const l=r[s];i&&(l.oldValue=i[s].value);let a=l.dir[o];a&&(sn(),Yt(a,e,8,[t.el,l,t,n]),ln())}}const Ys=Symbol("_vte"),Zs=t=>t.__isTeleport;function Eo(t,n){t.shapeFlag&6&&t.component?(t.transition=n,Eo(t.component.subTree,n)):t.shapeFlag&128?(t.ssContent.transition=n.clone(t.ssContent),t.ssFallback.transition=n.clone(t.ssFallback)):t.transition=n}/*! #__NO_SIDE_EFFECTS__ */function xt(t,n){return N(t)?_t({name:t.name},n,{setup:t}):t}function bi(t){t.ids=[t.ids[0]+t.ids[2]+++"-",0,0]}function Yn(t,n,e,o,r=!1){if(j(t)){t.forEach((S,A)=>Yn(S,n&&(j(n)?n[A]:n),e,o,r));return}if(Zn(o)&&!r){o.shapeFlag&512&&o.type.__asyncResolved&&o.component.subTree.component&&Yn(t,n,e,o.component.subTree);return}const i=o.shapeFlag&4?Ho(o.component):o.el,s=r?null:i,{i:l,r:a}=t,p=n&&n.r,d=l.refs===st?l.refs={}:l.refs,g=l.setupState,h=q(g),m=g===st?()=>!1:S=>Q(h,S);if(p!=null&&p!==a&&(dt(p)?(d[p]=null,m(p)&&(g[p]=null)):ft(p)&&(p.value=null)),N(a))ue(a,l,12,[s,d]);else{const S=dt(a),A=ft(a);if(S||A){const T=()=>{if(t.f){const O=S?m(a)?g[a]:d[a]:a.value;r?j(O)&&yo(O,i):j(O)?O.includes(i)||O.push(i):S?(d[a]=[i],m(a)&&(g[a]=d[a])):(a.value=[i],t.k&&(d[t.k]=a.value))}else S?(d[a]=s,m(a)&&(g[a]=s)):A&&(a.value=s,t.k&&(d[t.k]=s))};s?(T.id=-1,Tt(T,e)):T()}}}Fe().requestIdleCallback;Fe().cancelIdleCallback;const Zn=t=>!!t.type.__asyncLoader,vi=t=>t.type.__isKeepAlive;function tl(t,n){_i(t,"a",n)}function nl(t,n){_i(t,"da",n)}function _i(t,n,e=vt){const o=t.__wdc||(t.__wdc=()=>{let r=e;for(;r;){if(r.isDeactivated)return;r=r.parent}return t()});if(Be(n,o,e),e){let r=e.parent;for(;r&&r.parent;)vi(r.parent.vnode)&&el(o,n,e,r),r=r.parent}}function el(t,n,e,o){const r=Be(n,t,o,!0);Oo(()=>{yo(o[n],r)},e)}function Be(t,n,e=vt,o=!1){if(e){const r=e[t]||(e[t]=[]),i=n.__weh||(n.__weh=(...s)=>{sn();const l=ge(e),a=Yt(n,e,t,s);return l(),ln(),a});return o?r.unshift(i):r.push(i),i}}const an=t=>(n,e=vt)=>{(!ae||t==="sp")&&Be(t,(...o)=>n(...o),e)},ol=an("bm"),pe=an("m"),rl=an("bu"),il=an("u"),Lo=an("bum"),Oo=an("um"),sl=an("sp"),ll=an("rtg"),al=an("rtc");function cl(t,n=vt){Be("ec",t,n)}const dl="components";function Rn(t,n){return pl(dl,t,!0,n)||t}const ul=Symbol.for("v-ndc");function pl(t,n,e=!0,o=!1){const r=zt||vt;if(r){const i=r.type;{const l=Zl(i,!1);if(l&&(l===n||l===Ft(n)||l===Oe(Ft(n))))return i}const s=Jo(r[t]||i[t],n)||Jo(r.appContext[t],n);return!s&&o?i:s}}function Jo(t,n){return t&&(t[n]||t[Ft(n)]||t[Oe(Ft(n))])}function An(t,n,e,o){let r;const i=e,s=j(t);if(s||dt(t)){const l=s&&Dn(t);let a=!1,p=!1;l&&(a=!Ot(t),p=bn(t),t=De(t)),r=new Array(t.length);for(let d=0,g=t.length;d<g;d++)r[d]=n(a?p?Ce(ht(t[d])):ht(t[d]):t[d],d,void 0,i)}else if(typeof t=="number"){r=new Array(t);for(let l=0;l<t;l++)r[l]=n(l+1,l,void 0,i)}else if(lt(t))if(t[Symbol.iterator])r=Array.from(t,(l,a)=>n(l,a,void 0,i));else{const l=Object.keys(t);r=new Array(l.length);for(let a=0,p=l.length;a<p;a++){const d=l[a];r[a]=n(t[d],d,a,i)}}else r=[];return r}const co=t=>t?Bi(t)?Ho(t):co(t.parent):null,te=_t(Object.create(null),{$:t=>t,$el:t=>t.vnode.el,$data:t=>t.data,$props:t=>t.props,$attrs:t=>t.attrs,$slots:t=>t.slots,$refs:t=>t.refs,$parent:t=>co(t.parent),$root:t=>co(t.root),$host:t=>t.ce,$emit:t=>t.emit,$options:t=>yi(t),$forceUpdate:t=>t.f||(t.f=()=>{Io(t.update)}),$nextTick:t=>t.n||(t.n=To.bind(t.proxy)),$watch:t=>Ll.bind(t)}),Ye=(t,n)=>t!==st&&!t.__isScriptSetup&&Q(t,n),gl={get({_:t},n){if(n==="__v_skip")return!0;const{ctx:e,setupState:o,data:r,props:i,accessCache:s,type:l,appContext:a}=t;let p;if(n[0]!=="$"){const m=s[n];if(m!==void 0)switch(m){case 1:return o[n];case 2:return r[n];case 4:return e[n];case 3:return i[n]}else{if(Ye(o,n))return s[n]=1,o[n];if(r!==st&&Q(r,n))return s[n]=2,r[n];if((p=t.propsOptions[0])&&Q(p,n))return s[n]=3,i[n];if(e!==st&&Q(e,n))return s[n]=4,e[n];uo&&(s[n]=0)}}const d=te[n];let g,h;if(d)return n==="$attrs"&&bt(t.attrs,"get",""),d(t);if((g=l.__cssModules)&&(g=g[n]))return g;if(e!==st&&Q(e,n))return s[n]=4,e[n];if(h=a.config.globalProperties,Q(h,n))return h[n]},set({_:t},n,e){const{data:o,setupState:r,ctx:i}=t;return Ye(r,n)?(r[n]=e,!0):o!==st&&Q(o,n)?(o[n]=e,!0):Q(t.props,n)||n[0]==="$"&&n.slice(1)in t?!1:(i[n]=e,!0)},has({_:{data:t,setupState:n,accessCache:e,ctx:o,appContext:r,propsOptions:i}},s){let l;return!!e[s]||t!==st&&Q(t,s)||Ye(n,s)||(l=i[0])&&Q(l,s)||Q(o,s)||Q(te,s)||Q(r.config.globalProperties,s)},defineProperty(t,n,e){return e.get!=null?t._.accessCache[n]=0:Q(e,"value")&&this.set(t,n,e.value,null),Reflect.defineProperty(t,n,e)}};function Yo(t){return j(t)?t.reduce((n,e)=>(n[e]=null,n),{}):t}let uo=!0;function fl(t){const n=yi(t),e=t.proxy,o=t.ctx;uo=!1,n.beforeCreate&&Zo(n.beforeCreate,t,"bc");const{data:r,computed:i,methods:s,watch:l,provide:a,inject:p,created:d,beforeMount:g,mounted:h,beforeUpdate:m,updated:S,activated:A,deactivated:T,beforeDestroy:O,beforeUnmount:L,destroyed:$,unmounted:I,render:K,renderTracked:et,renderTriggered:U,errorCaptured:Et,serverPrefetch:Bt,expose:Vt,inheritAttrs:cn,components:xn,directives:jt,filters:Nn}=n;if(p&&hl(p,o,null),s)for(const nt in s){const W=s[nt];N(W)&&(o[nt]=W.bind(e))}if(r){const nt=r.call(e,e);lt(nt)&&(t.data=He(nt))}if(uo=!0,i)for(const nt in i){const W=i[nt],Zt=N(W)?W.bind(e,e):N(W.get)?W.get.bind(e,e):Jt,dn=!N(W)&&N(W.set)?W.set.bind(e):Jt,Nt=at({get:Zt,set:dn});Object.defineProperty(o,nt,{enumerable:!0,configurable:!0,get:()=>Nt.value,set:Ct=>Nt.value=Ct})}if(l)for(const nt in l)xi(l[nt],o,e,nt);if(a){const nt=N(a)?a.call(e):a;Reflect.ownKeys(nt).forEach(W=>{ve(W,nt[W])})}d&&Zo(d,t,"c");function pt(nt,W){j(W)?W.forEach(Zt=>nt(Zt.bind(e))):W&&nt(W.bind(e))}if(pt(ol,g),pt(pe,h),pt(rl,m),pt(il,S),pt(tl,A),pt(nl,T),pt(cl,Et),pt(al,et),pt(ll,U),pt(Lo,L),pt(Oo,I),pt(sl,Bt),j(Vt))if(Vt.length){const nt=t.exposed||(t.exposed={});Vt.forEach(W=>{Object.defineProperty(nt,W,{get:()=>e[W],set:Zt=>e[W]=Zt,enumerable:!0})})}else t.exposed||(t.exposed={});K&&t.render===Jt&&(t.render=K),cn!=null&&(t.inheritAttrs=cn),xn&&(t.components=xn),jt&&(t.directives=jt),Bt&&bi(t)}function hl(t,n,e=Jt){j(t)&&(t=po(t));for(const o in t){const r=t[o];let i;lt(r)?"default"in r?i=Ht(r.from||o,r.default,!0):i=Ht(r.from||o):i=Ht(r),ft(i)?Object.defineProperty(n,o,{enumerable:!0,configurable:!0,get:()=>i.value,set:s=>i.value=s}):n[o]=i}}function Zo(t,n,e){Yt(j(t)?t.map(o=>o.bind(n.proxy)):t.bind(n.proxy),n,e)}function xi(t,n,e,o){let r=o.includes(".")?Oi(e,o):()=>e[o];if(dt(t)){const i=n[t];N(i)&&kn(r,i)}else if(N(t))kn(r,t.bind(e));else if(lt(t))if(j(t))t.forEach(i=>xi(i,n,e,o));else{const i=N(t.handler)?t.handler.bind(e):n[t.handler];N(i)&&kn(r,i,t)}}function yi(t){const n=t.type,{mixins:e,extends:o}=n,{mixins:r,optionsCache:i,config:{optionMergeStrategies:s}}=t.appContext,l=i.get(n);let a;return l?a=l:!r.length&&!e&&!o?a=n:(a={},r.length&&r.forEach(p=>Pe(a,p,s,!0)),Pe(a,n,s)),lt(n)&&i.set(n,a),a}function Pe(t,n,e,o=!1){const{mixins:r,extends:i}=n;i&&Pe(t,i,e,!0),r&&r.forEach(s=>Pe(t,s,e,!0));for(const s in n)if(!(o&&s==="expose")){const l=ml[s]||e&&e[s];t[s]=l?l(t[s],n[s]):n[s]}return t}const ml={data:tr,props:nr,emits:nr,methods:Wn,computed:Wn,beforeCreate:yt,created:yt,beforeMount:yt,mounted:yt,beforeUpdate:yt,updated:yt,beforeDestroy:yt,beforeUnmount:yt,destroyed:yt,unmounted:yt,activated:yt,deactivated:yt,errorCaptured:yt,serverPrefetch:yt,components:Wn,directives:Wn,watch:vl,provide:tr,inject:bl};function tr(t,n){return n?t?function(){return _t(N(t)?t.call(this,this):t,N(n)?n.call(this,this):n)}:n:t}function bl(t,n){return Wn(po(t),po(n))}function po(t){if(j(t)){const n={};for(let e=0;e<t.length;e++)n[t[e]]=t[e];return n}return t}function yt(t,n){return t?[...new Set([].concat(t,n))]:n}function Wn(t,n){return t?_t(Object.create(null),t,n):n}function nr(t,n){return t?j(t)&&j(n)?[...new Set([...t,...n])]:_t(Object.create(null),Yo(t),Yo(n??{})):n}function vl(t,n){if(!t)return n;if(!n)return t;const e=_t(Object.create(null),t);for(const o in n)e[o]=yt(t[o],n[o]);return e}function wi(){return{app:null,config:{isNativeTag:ss,performance:!1,globalProperties:{},optionMergeStrategies:{},errorHandler:void 0,warnHandler:void 0,compilerOptions:{}},mixins:[],components:{},directives:{},provides:Object.create(null),optionsCache:new WeakMap,propsCache:new WeakMap,emitsCache:new WeakMap}}let _l=0;function xl(t,n){return function(o,r=null){N(o)||(o=_t({},o)),r!=null&&!lt(r)&&(r=null);const i=wi(),s=new WeakSet,l=[];let a=!1;const p=i.app={_uid:_l++,_component:o,_props:r,_container:null,_context:i,_instance:null,version:na,get config(){return i.config},set config(d){},use(d,...g){return s.has(d)||(d&&N(d.install)?(s.add(d),d.install(p,...g)):N(d)&&(s.add(d),d(p,...g))),p},mixin(d){return i.mixins.includes(d)||i.mixins.push(d),p},component(d,g){return g?(i.components[d]=g,p):i.components[d]},directive(d,g){return g?(i.directives[d]=g,p):i.directives[d]},mount(d,g,h){if(!a){const m=p._ceVNode||J(o,r);return m.appContext=i,h===!0?h="svg":h===!1&&(h=void 0),t(m,d,h),a=!0,p._container=d,d.__vue_app__=p,Ho(m.component)}},onUnmount(d){l.push(d)},unmount(){a&&(Yt(l,p._instance,16),t(null,p._container),delete p._container.__vue_app__)},provide(d,g){return i.provides[d]=g,p},runWithContext(d){const g=$n;$n=p;try{return d()}finally{$n=g}}};return p}}let $n=null;function ve(t,n){if(vt){let e=vt.provides;const o=vt.parent&&vt.parent.provides;o===e&&(e=vt.provides=Object.create(o)),e[t]=n}}function Ht(t,n,e=!1){const o=Wl();if(o||$n){let r=$n?$n._context.provides:o?o.parent==null||o.ce?o.vnode.appContext&&o.vnode.appContext.provides:o.parent.provides:void 0;if(r&&t in r)return r[t];if(arguments.length>1)return e&&N(n)?n.call(o&&o.proxy):n}}const Ci={},Si=()=>Object.create(Ci),ki=t=>Object.getPrototypeOf(t)===Ci;function yl(t,n,e,o=!1){const r={},i=Si();t.propsDefaults=Object.create(null),Ai(t,n,r,i);for(const s in t.propsOptions[0])s in r||(r[s]=void 0);e?t.props=o?r:li(r):t.type.props?t.props=r:t.props=i,t.attrs=i}function wl(t,n,e,o){const{props:r,attrs:i,vnode:{patchFlag:s}}=t,l=q(r),[a]=t.propsOptions;let p=!1;if((o||s>0)&&!(s&16)){if(s&8){const d=t.vnode.dynamicProps;for(let g=0;g<d.length;g++){let h=d[g];if(Ve(t.emitsOptions,h))continue;const m=n[h];if(a)if(Q(i,h))m!==i[h]&&(i[h]=m,p=!0);else{const S=Ft(h);r[S]=go(a,l,S,m,t,!1)}else m!==i[h]&&(i[h]=m,p=!0)}}}else{Ai(t,n,r,i)&&(p=!0);let d;for(const g in l)(!n||!Q(n,g)&&((d=Pn(g))===g||!Q(n,d)))&&(a?e&&(e[g]!==void 0||e[d]!==void 0)&&(r[g]=go(a,l,g,void 0,t,!0)):delete r[g]);if(i!==l)for(const g in i)(!n||!Q(n,g))&&(delete i[g],p=!0)}p&&rn(t.attrs,"set","")}function Ai(t,n,e,o){const[r,i]=t.propsOptions;let s=!1,l;if(n)for(let a in n){if(Xn(a))continue;const p=n[a];let d;r&&Q(r,d=Ft(a))?!i||!i.includes(d)?e[d]=p:(l||(l={}))[d]=p:Ve(t.emitsOptions,a)||(!(a in o)||p!==o[a])&&(o[a]=p,s=!0)}if(i){const a=q(e),p=l||st;for(let d=0;d<i.length;d++){const g=i[d];e[g]=go(r,a,g,p[g],t,!Q(p,g))}}return s}function go(t,n,e,o,r,i){const s=t[e];if(s!=null){const l=Q(s,"default");if(l&&o===void 0){const a=s.default;if(s.type!==Function&&!s.skipFactory&&N(a)){const{propsDefaults:p}=r;if(e in p)o=p[e];else{const d=ge(r);o=p[e]=a.call(null,n),d()}}else o=a;r.ce&&r.ce._setProp(e,o)}s[0]&&(i&&!l?o=!1:s[1]&&(o===""||o===Pn(e))&&(o=!0))}return o}const Cl=new WeakMap;function Pi(t,n,e=!1){const o=e?Cl:n.propsCache,r=o.get(t);if(r)return r;const i=t.props,s={},l=[];let a=!1;if(!N(t)){const d=g=>{a=!0;const[h,m]=Pi(g,n,!0);_t(s,h),m&&l.push(...m)};!e&&n.mixins.length&&n.mixins.forEach(d),t.extends&&d(t.extends),t.mixins&&t.mixins.forEach(d)}if(!i&&!a)return lt(t)&&o.set(t,Fn),Fn;if(j(i))for(let d=0;d<i.length;d++){const g=Ft(i[d]);er(g)&&(s[g]=st)}else if(i)for(const d in i){const g=Ft(d);if(er(g)){const h=i[d],m=s[g]=j(h)||N(h)?{type:h}:_t({},h),S=m.type;let A=!1,T=!0;if(j(S))for(let O=0;O<S.length;++O){const L=S[O],$=N(L)&&L.name;if($==="Boolean"){A=!0;break}else $==="String"&&(T=!1)}else A=N(S)&&S.name==="Boolean";m[0]=A,m[1]=T,(A||Q(m,"default"))&&l.push(g)}}const p=[s,l];return lt(t)&&o.set(t,p),p}function er(t){return t[0]!=="$"&&!Xn(t)}const Fo=t=>t==="_"||t==="__"||t==="_ctx"||t==="$stable",zo=t=>j(t)?t.map(Xt):[Xt(t)],Sl=(t,n,e)=>{if(n._n)return n;const o=mt((...r)=>zo(n(...r)),e);return o._c=!1,o},Ri=(t,n,e)=>{const o=t._ctx;for(const r in t){if(Fo(r))continue;const i=t[r];if(N(i))n[r]=Sl(r,i,o);else if(i!=null){const s=zo(i);n[r]=()=>s}}},Mi=(t,n)=>{const e=zo(n);t.slots.default=()=>e},Ti=(t,n,e)=>{for(const o in n)(e||!Fo(o))&&(t[o]=n[o])},kl=(t,n,e)=>{const o=t.slots=Si();if(t.vnode.shapeFlag&32){const r=n.__;r&&io(o,"__",r,!0);const i=n._;i?(Ti(o,n,e),e&&io(o,"_",i,!0)):Ri(n,o)}else n&&Mi(t,n)},Al=(t,n,e)=>{const{vnode:o,slots:r}=t;let i=!0,s=st;if(o.shapeFlag&32){const l=n._;l?e&&l===1?i=!1:Ti(r,n,e):(i=!n.$stable,Ri(n,r)),s=n}else n&&(Mi(t,n),s={default:1});if(i)for(const l in r)!Fo(l)&&s[l]==null&&delete r[l]},Tt=Bl;function Pl(t){return Rl(t)}function Rl(t,n){const e=Fe();e.__VUE__=!0;const{insert:o,remove:r,patchProp:i,createElement:s,createText:l,createComment:a,setText:p,setElementText:d,parentNode:g,nextSibling:h,setScopeId:m=Jt,insertStaticContent:S}=t,A=(c,u,f,b=null,x=null,_=null,P=void 0,k=null,C=!!u.dynamicChildren)=>{if(c===u)return;c&&!Gn(c,u)&&(b=v(c),Ct(c,x,_,!0),c=null),u.patchFlag===-2&&(C=!1,u.dynamicChildren=null);const{type:w,ref:H,shapeFlag:M}=u;switch(w){case je:T(c,u,f,b);break;case vn:O(c,u,f,b);break;case _e:c==null&&L(u,f,b,P);break;case ut:xn(c,u,f,b,x,_,P,k,C);break;default:M&1?K(c,u,f,b,x,_,P,k,C):M&6?jt(c,u,f,b,x,_,P,k,C):(M&64||M&128)&&w.process(c,u,f,b,x,_,P,k,C,z)}H!=null&&x?Yn(H,c&&c.ref,_,u||c,!u):H==null&&c&&c.ref!=null&&Yn(c.ref,null,_,c,!0)},T=(c,u,f,b)=>{if(c==null)o(u.el=l(u.children),f,b);else{const x=u.el=c.el;u.children!==c.children&&p(x,u.children)}},O=(c,u,f,b)=>{c==null?o(u.el=a(u.children||""),f,b):u.el=c.el},L=(c,u,f,b)=>{[c.el,c.anchor]=S(c.children,u,f,b,c.el,c.anchor)},$=({el:c,anchor:u},f,b)=>{let x;for(;c&&c!==u;)x=h(c),o(c,f,b),c=x;o(u,f,b)},I=({el:c,anchor:u})=>{let f;for(;c&&c!==u;)f=h(c),r(c),c=f;r(u)},K=(c,u,f,b,x,_,P,k,C)=>{u.type==="svg"?P="svg":u.type==="math"&&(P="mathml"),c==null?et(u,f,b,x,_,P,k,C):Bt(c,u,x,_,P,k,C)},et=(c,u,f,b,x,_,P,k)=>{let C,w;const{props:H,shapeFlag:M,transition:D,dirs:V}=c;if(C=c.el=s(c.type,_,H&&H.is,H),M&8?d(C,c.children):M&16&&Et(c.children,C,null,b,x,Ze(c,_),P,k),V&&yn(c,null,b,"created"),U(C,c,c.scopeId,P,b),H){for(const rt in H)rt!=="value"&&!Xn(rt)&&i(C,rt,null,H[rt],_,b);"value"in H&&i(C,"value",null,H.value,_),(w=H.onVnodeBeforeMount)&&qt(w,b,c)}V&&yn(c,null,b,"beforeMount");const G=Ml(x,D);G&&D.beforeEnter(C),o(C,u,f),((w=H&&H.onVnodeMounted)||G||V)&&Tt(()=>{w&&qt(w,b,c),G&&D.enter(C),V&&yn(c,null,b,"mounted")},x)},U=(c,u,f,b,x)=>{if(f&&m(c,f),b)for(let _=0;_<b.length;_++)m(c,b[_]);if(x){let _=x.subTree;if(u===_||zi(_.type)&&(_.ssContent===u||_.ssFallback===u)){const P=x.vnode;U(c,P,P.scopeId,P.slotScopeIds,x.parent)}}},Et=(c,u,f,b,x,_,P,k,C=0)=>{for(let w=C;w<c.length;w++){const H=c[w]=k?gn(c[w]):Xt(c[w]);A(null,H,u,f,b,x,_,P,k)}},Bt=(c,u,f,b,x,_,P)=>{const k=u.el=c.el;let{patchFlag:C,dynamicChildren:w,dirs:H}=u;C|=c.patchFlag&16;const M=c.props||st,D=u.props||st;let V;if(f&&wn(f,!1),(V=D.onVnodeBeforeUpdate)&&qt(V,f,u,c),H&&yn(u,c,f,"beforeUpdate"),f&&wn(f,!0),(M.innerHTML&&D.innerHTML==null||M.textContent&&D.textContent==null)&&d(k,""),w?Vt(c.dynamicChildren,w,k,f,b,Ze(u,x),_):P||W(c,u,k,null,f,b,Ze(u,x),_,!1),C>0){if(C&16)cn(k,M,D,f,x);else if(C&2&&M.class!==D.class&&i(k,"class",null,D.class,x),C&4&&i(k,"style",M.style,D.style,x),C&8){const G=u.dynamicProps;for(let rt=0;rt<G.length;rt++){const Y=G[rt],St=M[Y],kt=D[Y];(kt!==St||Y==="value")&&i(k,Y,St,kt,x,f)}}C&1&&c.children!==u.children&&d(k,u.children)}else!P&&w==null&&cn(k,M,D,f,x);((V=D.onVnodeUpdated)||H)&&Tt(()=>{V&&qt(V,f,u,c),H&&yn(u,c,f,"updated")},b)},Vt=(c,u,f,b,x,_,P)=>{for(let k=0;k<u.length;k++){const C=c[k],w=u[k],H=C.el&&(C.type===ut||!Gn(C,w)||C.shapeFlag&198)?g(C.el):f;A(C,w,H,null,b,x,_,P,!0)}},cn=(c,u,f,b,x)=>{if(u!==f){if(u!==st)for(const _ in u)!Xn(_)&&!(_ in f)&&i(c,_,u[_],null,x,b);for(const _ in f){if(Xn(_))continue;const P=f[_],k=u[_];P!==k&&_!=="value"&&i(c,_,k,P,x,b)}"value"in f&&i(c,"value",u.value,f.value,x)}},xn=(c,u,f,b,x,_,P,k,C)=>{const w=u.el=c?c.el:l(""),H=u.anchor=c?c.anchor:l("");let{patchFlag:M,dynamicChildren:D,slotScopeIds:V}=u;V&&(k=k?k.concat(V):V),c==null?(o(w,f,b),o(H,f,b),Et(u.children||[],f,H,x,_,P,k,C)):M>0&&M&64&&D&&c.dynamicChildren?(Vt(c.dynamicChildren,D,f,x,_,P,k),(u.key!=null||x&&u===x.subTree)&&Ii(c,u,!0)):W(c,u,f,H,x,_,P,k,C)},jt=(c,u,f,b,x,_,P,k,C)=>{u.slotScopeIds=k,c==null?u.shapeFlag&512?x.ctx.activate(u,f,b,P,C):Nn(u,f,b,x,_,P,C):Mn(c,u,C)},Nn=(c,u,f,b,x,_,P)=>{const k=c.component=ql(c,b,x);if(vi(c)&&(k.ctx.renderer=z),Xl(k,!1,P),k.asyncDep){if(x&&x.registerDep(k,pt,P),!c.el){const C=k.subTree=J(vn);O(null,C,u,f),c.placeholder=C.el}}else pt(k,c,u,f,x,_,P)},Mn=(c,u,f)=>{const b=u.component=c.component;if(Hl(c,u,f))if(b.asyncDep&&!b.asyncResolved){nt(b,u,f);return}else b.next=u,b.update();else u.el=c.el,b.vnode=u},pt=(c,u,f,b,x,_,P)=>{const k=()=>{if(c.isMounted){let{next:M,bu:D,u:V,parent:G,vnode:rt}=c;{const Ut=Ei(c);if(Ut){M&&(M.el=rt.el,nt(c,M,P)),Ut.asyncDep.then(()=>{c.isUnmounted||k()});return}}let Y=M,St;wn(c,!1),M?(M.el=rt.el,nt(c,M,P)):M=rt,D&&qe(D),(St=M.props&&M.props.onVnodeBeforeUpdate)&&qt(St,G,M,rt),wn(c,!0);const kt=rr(c),Kt=c.subTree;c.subTree=kt,A(Kt,kt,g(Kt.el),v(Kt),c,x,_),M.el=kt.el,Y===null&&$l(c,kt.el),V&&Tt(V,x),(St=M.props&&M.props.onVnodeUpdated)&&Tt(()=>qt(St,G,M,rt),x)}else{let M;const{el:D,props:V}=u,{bm:G,m:rt,parent:Y,root:St,type:kt}=c,Kt=Zn(u);wn(c,!1),G&&qe(G),!Kt&&(M=V&&V.onVnodeBeforeMount)&&qt(M,Y,u),wn(c,!0);{St.ce&&St.ce._def.shadowRoot!==!1&&St.ce._injectChildStyle(kt);const Ut=c.subTree=rr(c);A(null,Ut,f,b,c,x,_),u.el=Ut.el}if(rt&&Tt(rt,x),!Kt&&(M=V&&V.onVnodeMounted)){const Ut=u;Tt(()=>qt(M,Y,Ut),x)}(u.shapeFlag&256||Y&&Zn(Y.vnode)&&Y.vnode.shapeFlag&256)&&c.a&&Tt(c.a,x),c.isMounted=!0,u=f=b=null}};c.scope.on();const C=c.effect=new qr(k);c.scope.off();const w=c.update=C.run.bind(C),H=c.job=C.runIfDirty.bind(C);H.i=c,H.id=c.uid,C.scheduler=()=>Io(H),wn(c,!0),w()},nt=(c,u,f)=>{u.component=c;const b=c.vnode.props;c.vnode=u,c.next=null,wl(c,u.props,b,f),Al(c,u.children,f),sn(),Qo(c),ln()},W=(c,u,f,b,x,_,P,k,C=!1)=>{const w=c&&c.children,H=c?c.shapeFlag:0,M=u.children,{patchFlag:D,shapeFlag:V}=u;if(D>0){if(D&128){dn(w,M,f,b,x,_,P,k,C);return}else if(D&256){Zt(w,M,f,b,x,_,P,k,C);return}}V&8?(H&16&&Lt(w,x,_),M!==w&&d(f,M)):H&16?V&16?dn(w,M,f,b,x,_,P,k,C):Lt(w,x,_,!0):(H&8&&d(f,""),V&16&&Et(M,f,b,x,_,P,k,C))},Zt=(c,u,f,b,x,_,P,k,C)=>{c=c||Fn,u=u||Fn;const w=c.length,H=u.length,M=Math.min(w,H);let D;for(D=0;D<M;D++){const V=u[D]=C?gn(u[D]):Xt(u[D]);A(c[D],V,f,null,x,_,P,k,C)}w>H?Lt(c,x,_,!0,!1,M):Et(u,f,b,x,_,P,k,C,M)},dn=(c,u,f,b,x,_,P,k,C)=>{let w=0;const H=u.length;let M=c.length-1,D=H-1;for(;w<=M&&w<=D;){const V=c[w],G=u[w]=C?gn(u[w]):Xt(u[w]);if(Gn(V,G))A(V,G,f,null,x,_,P,k,C);else break;w++}for(;w<=M&&w<=D;){const V=c[M],G=u[D]=C?gn(u[D]):Xt(u[D]);if(Gn(V,G))A(V,G,f,null,x,_,P,k,C);else break;M--,D--}if(w>M){if(w<=D){const V=D+1,G=V<H?u[V].el:b;for(;w<=D;)A(null,u[w]=C?gn(u[w]):Xt(u[w]),f,G,x,_,P,k,C),w++}}else if(w>D)for(;w<=M;)Ct(c[w],x,_,!0),w++;else{const V=w,G=w,rt=new Map;for(w=G;w<=D;w++){const Mt=u[w]=C?gn(u[w]):Xt(u[w]);Mt.key!=null&&rt.set(Mt.key,w)}let Y,St=0;const kt=D-G+1;let Kt=!1,Ut=0;const Kn=new Array(kt);for(w=0;w<kt;w++)Kn[w]=0;for(w=V;w<=M;w++){const Mt=c[w];if(St>=kt){Ct(Mt,x,_,!0);continue}let Gt;if(Mt.key!=null)Gt=rt.get(Mt.key);else for(Y=G;Y<=D;Y++)if(Kn[Y-G]===0&&Gn(Mt,u[Y])){Gt=Y;break}Gt===void 0?Ct(Mt,x,_,!0):(Kn[Gt-G]=w+1,Gt>=Ut?Ut=Gt:Kt=!0,A(Mt,u[Gt],f,null,x,_,P,k,C),St++)}const No=Kt?Tl(Kn):Fn;for(Y=No.length-1,w=kt-1;w>=0;w--){const Mt=G+w,Gt=u[Mt],Ko=u[Mt+1],Uo=Mt+1<H?Ko.el||Ko.placeholder:b;Kn[w]===0?A(null,Gt,f,Uo,x,_,P,k,C):Kt&&(Y<0||w!==No[Y]?Nt(Gt,f,Uo,2):Y--)}}},Nt=(c,u,f,b,x=null)=>{const{el:_,type:P,transition:k,children:C,shapeFlag:w}=c;if(w&6){Nt(c.component.subTree,u,f,b);return}if(w&128){c.suspense.move(u,f,b);return}if(w&64){P.move(c,u,f,z);return}if(P===ut){o(_,u,f);for(let M=0;M<C.length;M++)Nt(C[M],u,f,b);o(c.anchor,u,f);return}if(P===_e){$(c,u,f);return}if(b!==2&&w&1&&k)if(b===0)k.beforeEnter(_),o(_,u,f),Tt(()=>k.enter(_),x);else{const{leave:M,delayLeave:D,afterLeave:V}=k,G=()=>{c.ctx.isUnmounted?r(_):o(_,u,f)},rt=()=>{M(_,()=>{G(),V&&V()})};D?D(_,G,rt):rt()}else o(_,u,f)},Ct=(c,u,f,b=!1,x=!1)=>{const{type:_,props:P,ref:k,children:C,dynamicChildren:w,shapeFlag:H,patchFlag:M,dirs:D,cacheIndex:V}=c;if(M===-2&&(x=!1),k!=null&&(sn(),Yn(k,null,f,c,!0),ln()),V!=null&&(u.renderCache[V]=void 0),H&256){u.ctx.deactivate(c);return}const G=H&1&&D,rt=!Zn(c);let Y;if(rt&&(Y=P&&P.onVnodeBeforeUnmount)&&qt(Y,u,c),H&6)fe(c.component,f,b);else{if(H&128){c.suspense.unmount(f,b);return}G&&yn(c,null,u,"beforeUnmount"),H&64?c.type.remove(c,u,f,z,b):w&&!w.hasOnce&&(_!==ut||M>0&&M&64)?Lt(w,u,f,!1,!0):(_===ut&&M&384||!x&&H&16)&&Lt(C,u,f),b&&Tn(c)}(rt&&(Y=P&&P.onVnodeUnmounted)||G)&&Tt(()=>{Y&&qt(Y,u,c),G&&yn(c,null,u,"unmounted")},f)},Tn=c=>{const{type:u,el:f,anchor:b,transition:x}=c;if(u===ut){In(f,b);return}if(u===_e){I(c);return}const _=()=>{r(f),x&&!x.persisted&&x.afterLeave&&x.afterLeave()};if(c.shapeFlag&1&&x&&!x.persisted){const{leave:P,delayLeave:k}=x,C=()=>P(f,_);k?k(c.el,_,C):C()}else _()},In=(c,u)=>{let f;for(;c!==u;)f=h(c),r(c),c=f;r(u)},fe=(c,u,f)=>{const{bum:b,scope:x,job:_,subTree:P,um:k,m:C,a:w,parent:H,slots:{__:M}}=c;or(C),or(w),b&&qe(b),H&&j(M)&&M.forEach(D=>{H.renderCache[D]=void 0}),x.stop(),_&&(_.flags|=8,Ct(P,c,u,f)),k&&Tt(k,u),Tt(()=>{c.isUnmounted=!0},u),u&&u.pendingBranch&&!u.isUnmounted&&c.asyncDep&&!c.asyncResolved&&c.suspenseId===u.pendingId&&(u.deps--,u.deps===0&&u.resolve())},Lt=(c,u,f,b=!1,x=!1,_=0)=>{for(let P=_;P<c.length;P++)Ct(c[P],u,f,b,x)},v=c=>{if(c.shapeFlag&6)return v(c.component.subTree);if(c.shapeFlag&128)return c.suspense.next();const u=h(c.anchor||c.el),f=u&&u[Ys];return f?h(f):u};let E=!1;const R=(c,u,f)=>{c==null?u._vnode&&Ct(u._vnode,null,null,!0):A(u._vnode||null,c,u,null,null,null,f),u._vnode=c,E||(E=!0,Qo(),fi(),E=!1)},z={p:A,um:Ct,m:Nt,r:Tn,mt:Nn,mc:Et,pc:W,pbc:Vt,n:v,o:t};return{render:R,hydrate:void 0,createApp:xl(R)}}function Ze({type:t,props:n},e){return e==="svg"&&t==="foreignObject"||e==="mathml"&&t==="annotation-xml"&&n&&n.encoding&&n.encoding.includes("html")?void 0:e}function wn({effect:t,job:n},e){e?(t.flags|=32,n.flags|=4):(t.flags&=-33,n.flags&=-5)}function Ml(t,n){return(!t||t&&!t.pendingBranch)&&n&&!n.persisted}function Ii(t,n,e=!1){const o=t.children,r=n.children;if(j(o)&&j(r))for(let i=0;i<o.length;i++){const s=o[i];let l=r[i];l.shapeFlag&1&&!l.dynamicChildren&&((l.patchFlag<=0||l.patchFlag===32)&&(l=r[i]=gn(r[i]),l.el=s.el),!e&&l.patchFlag!==-2&&Ii(s,l)),l.type===je&&(l.el=s.el),l.type===vn&&!l.el&&(l.el=s.el)}}function Tl(t){const n=t.slice(),e=[0];let o,r,i,s,l;const a=t.length;for(o=0;o<a;o++){const p=t[o];if(p!==0){if(r=e[e.length-1],t[r]<p){n[o]=r,e.push(o);continue}for(i=0,s=e.length-1;i<s;)l=i+s>>1,t[e[l]]<p?i=l+1:s=l;p<t[e[i]]&&(i>0&&(n[o]=e[i-1]),e[i]=o)}}for(i=e.length,s=e[i-1];i-- >0;)e[i]=s,s=n[s];return e}function Ei(t){const n=t.subTree.component;if(n)return n.asyncDep&&!n.asyncResolved?n:Ei(n)}function or(t){if(t)for(let n=0;n<t.length;n++)t[n].flags|=8}const Il=Symbol.for("v-scx"),El=()=>Ht(Il);function kn(t,n,e){return Li(t,n,e)}function Li(t,n,e=st){const{immediate:o,deep:r,flush:i,once:s}=e,l=_t({},e),a=n&&o||!n&&i!=="post";let p;if(ae){if(i==="sync"){const m=El();p=m.__watcherHandles||(m.__watcherHandles=[])}else if(!a){const m=()=>{};return m.stop=Jt,m.resume=Jt,m.pause=Jt,m}}const d=vt;l.call=(m,S,A)=>Yt(m,d,S,A);let g=!1;i==="post"?l.scheduler=m=>{Tt(m,d&&d.suspense)}:i!=="sync"&&(g=!0,l.scheduler=(m,S)=>{S?m():Io(m)}),l.augmentJob=m=>{n&&(m.flags|=4),g&&(m.flags|=2,d&&(m.id=d.uid,m.i=d))};const h=Ws(t,n,l);return ae&&(p?p.push(h):a&&h()),h}function Ll(t,n,e){const o=this.proxy,r=dt(t)?t.includes(".")?Oi(o,t):()=>o[t]:t.bind(o,o);let i;N(n)?i=n:(i=n.handler,e=n);const s=ge(this),l=Li(r,i.bind(o),e);return s(),l}function Oi(t,n){const e=n.split(".");return()=>{let o=t;for(let r=0;r<e.length&&o;r++)o=o[e[r]];return o}}const Ol=(t,n)=>n==="modelValue"||n==="model-value"?t.modelModifiers:t[`${n}Modifiers`]||t[`${Ft(n)}Modifiers`]||t[`${Pn(n)}Modifiers`];function Fl(t,n,...e){if(t.isUnmounted)return;const o=t.vnode.props||st;let r=e;const i=n.startsWith("update:"),s=i&&Ol(o,n.slice(7));s&&(s.trim&&(r=e.map(d=>dt(d)?d.trim():d)),s.number&&(r=e.map(us)));let l,a=o[l=Ge(n)]||o[l=Ge(Ft(n))];!a&&i&&(a=o[l=Ge(Pn(n))]),a&&Yt(a,t,6,r);const p=o[l+"Once"];if(p){if(!t.emitted)t.emitted={};else if(t.emitted[l])return;t.emitted[l]=!0,Yt(p,t,6,r)}}function Fi(t,n,e=!1){const o=n.emitsCache,r=o.get(t);if(r!==void 0)return r;const i=t.emits;let s={},l=!1;if(!N(t)){const a=p=>{const d=Fi(p,n,!0);d&&(l=!0,_t(s,d))};!e&&n.mixins.length&&n.mixins.forEach(a),t.extends&&a(t.extends),t.mixins&&t.mixins.forEach(a)}return!i&&!l?(lt(t)&&o.set(t,null),null):(j(i)?i.forEach(a=>s[a]=null):_t(s,i),lt(t)&&o.set(t,s),s)}function Ve(t,n){return!t||!Ie(n)?!1:(n=n.slice(2).replace(/Once$/,""),Q(t,n[0].toLowerCase()+n.slice(1))||Q(t,Pn(n))||Q(t,n))}function rr(t){const{type:n,vnode:e,proxy:o,withProxy:r,propsOptions:[i],slots:s,attrs:l,emit:a,render:p,renderCache:d,props:g,data:h,setupState:m,ctx:S,inheritAttrs:A}=t,T=Ae(t);let O,L;try{if(e.shapeFlag&4){const I=r||o,K=I;O=Xt(p.call(K,I,d,g,m,h,S)),L=l}else{const I=n;O=Xt(I.length>1?I(g,{attrs:l,slots:s,emit:a}):I(g,null)),L=n.props?l:zl(l)}}catch(I){ne.length=0,$e(I,t,1),O=J(vn)}let $=O;if(L&&A!==!1){const I=Object.keys(L),{shapeFlag:K}=$;I.length&&K&7&&(i&&I.some(xo)&&(L=Dl(L,i)),$=Bn($,L,!1,!0))}return e.dirs&&($=Bn($,null,!1,!0),$.dirs=$.dirs?$.dirs.concat(e.dirs):e.dirs),e.transition&&Eo($,e.transition),O=$,Ae(T),O}const zl=t=>{let n;for(const e in t)(e==="class"||e==="style"||Ie(e))&&((n||(n={}))[e]=t[e]);return n},Dl=(t,n)=>{const e={};for(const o in t)(!xo(o)||!(o.slice(9)in n))&&(e[o]=t[o]);return e};function Hl(t,n,e){const{props:o,children:r,component:i}=t,{props:s,children:l,patchFlag:a}=n,p=i.emitsOptions;if(n.dirs||n.transition)return!0;if(e&&a>=0){if(a&1024)return!0;if(a&16)return o?ir(o,s,p):!!s;if(a&8){const d=n.dynamicProps;for(let g=0;g<d.length;g++){const h=d[g];if(s[h]!==o[h]&&!Ve(p,h))return!0}}}else return(r||l)&&(!l||!l.$stable)?!0:o===s?!1:o?s?ir(o,s,p):!0:!!s;return!1}function ir(t,n,e){const o=Object.keys(n);if(o.length!==Object.keys(t).length)return!0;for(let r=0;r<o.length;r++){const i=o[r];if(n[i]!==t[i]&&!Ve(e,i))return!0}return!1}function $l({vnode:t,parent:n},e){for(;n;){const o=n.subTree;if(o.suspense&&o.suspense.activeBranch===t&&(o.el=t.el),o===t)(t=n.vnode).el=e,n=n.parent;else break}}const zi=t=>t.__isSuspense;function Bl(t,n){n&&n.pendingBranch?j(t)?n.effects.push(...t):n.effects.push(t):Js(t)}const ut=Symbol.for("v-fgt"),je=Symbol.for("v-txt"),vn=Symbol.for("v-cmt"),_e=Symbol.for("v-stc"),ne=[];let It=null;function F(t=!1){ne.push(It=t?null:[])}function Vl(){ne.pop(),It=ne[ne.length-1]||null}let le=1;function sr(t,n=!1){le+=t,t<0&&It&&n&&(It.hasOnce=!0)}function Di(t){return t.dynamicChildren=le>0?It||Fn:null,Vl(),le>0&&It&&It.push(t),t}function B(t,n,e,o,r,i){return Di(y(t,n,e,o,r,i,!0))}function Qt(t,n,e,o,r){return Di(J(t,n,e,o,r,!0))}function Re(t){return t?t.__v_isVNode===!0:!1}function Gn(t,n){return t.type===n.type&&t.key===n.key}const Hi=({key:t})=>t??null,xe=({ref:t,ref_key:n,ref_for:e})=>(typeof t=="number"&&(t=""+t),t!=null?dt(t)||ft(t)||N(t)?{i:zt,r:t,k:n,f:!!e}:t:null);function y(t,n=null,e=null,o=0,r=null,i=t===ut?0:1,s=!1,l=!1){const a={__v_isVNode:!0,__v_skip:!0,type:t,props:n,key:n&&Hi(n),ref:n&&xe(n),scopeId:mi,slotScopeIds:null,children:e,component:null,suspense:null,ssContent:null,ssFallback:null,dirs:null,transition:null,el:null,anchor:null,target:null,targetStart:null,targetAnchor:null,staticCount:0,shapeFlag:i,patchFlag:o,dynamicProps:r,dynamicChildren:null,appContext:null,ctx:zt};return l?(Do(a,e),i&128&&t.normalize(a)):e&&(a.shapeFlag|=dt(e)?8:16),le>0&&!s&&It&&(a.patchFlag>0||i&6)&&a.patchFlag!==32&&It.push(a),a}const J=jl;function jl(t,n=null,e=null,o=0,r=null,i=!1){if((!t||t===ul)&&(t=vn),Re(t)){const l=Bn(t,n,!0);return e&&Do(l,e),le>0&&!i&&It&&(l.shapeFlag&6?It[It.indexOf(t)]=l:It.push(l)),l.patchFlag=-2,l}if(ta(t)&&(t=t.__vccOpts),n){n=Nl(n);let{class:l,style:a}=n;l&&!dt(l)&&(n.class=on(l)),lt(a)&&(Mo(a)&&!j(a)&&(a=_t({},a)),n.style=ze(a))}const s=dt(t)?1:zi(t)?128:Zs(t)?64:lt(t)?4:N(t)?2:0;return y(t,n,e,o,r,s,i,!0)}function Nl(t){return t?Mo(t)||ki(t)?_t({},t):t:null}function Bn(t,n,e=!1,o=!1){const{props:r,ref:i,patchFlag:s,children:l,transition:a}=t,p=n?Kl(r||{},n):r,d={__v_isVNode:!0,__v_skip:!0,type:t.type,props:p,key:p&&Hi(p),ref:n&&n.ref?e&&i?j(i)?i.concat(xe(n)):[i,xe(n)]:xe(n):i,scopeId:t.scopeId,slotScopeIds:t.slotScopeIds,children:l,target:t.target,targetStart:t.targetStart,targetAnchor:t.targetAnchor,staticCount:t.staticCount,shapeFlag:t.shapeFlag,patchFlag:n&&t.type!==ut?s===-1?16:s|16:s,dynamicProps:t.dynamicProps,dynamicChildren:t.dynamicChildren,appContext:t.appContext,dirs:t.dirs,transition:a,component:t.component,suspense:t.suspense,ssContent:t.ssContent&&Bn(t.ssContent),ssFallback:t.ssFallback&&Bn(t.ssFallback),placeholder:t.placeholder,el:t.el,anchor:t.anchor,ctx:t.ctx,ce:t.ce};return a&&o&&Eo(d,a.clone(d)),d}function Pt(t=" ",n=0){return J(je,null,t,n)}function $i(t,n){const e=J(_e,null,t);return e.staticCount=n,e}function gt(t="",n=!1){return n?(F(),Qt(vn,null,t)):J(vn,null,t)}function Xt(t){return t==null||typeof t=="boolean"?J(vn):j(t)?J(ut,null,t.slice()):Re(t)?gn(t):J(je,null,String(t))}function gn(t){return t.el===null&&t.patchFlag!==-1||t.memo?t:Bn(t)}function Do(t,n){let e=0;const{shapeFlag:o}=t;if(n==null)n=null;else if(j(n))e=16;else if(typeof n=="object")if(o&65){const r=n.default;r&&(r._c&&(r._d=!1),Do(t,r()),r._c&&(r._d=!0));return}else{e=32;const r=n._;!r&&!ki(n)?n._ctx=zt:r===3&&zt&&(zt.slots._===1?n._=1:(n._=2,t.patchFlag|=1024))}else N(n)?(n={default:n,_ctx:zt},e=32):(n=String(n),o&64?(e=16,n=[Pt(n)]):e=8);t.children=n,t.shapeFlag|=e}function Kl(...t){const n={};for(let e=0;e<t.length;e++){const o=t[e];for(const r in o)if(r==="class")n.class!==o.class&&(n.class=on([n.class,o.class]));else if(r==="style")n.style=ze([n.style,o.style]);else if(Ie(r)){const i=n[r],s=o[r];s&&i!==s&&!(j(i)&&i.includes(s))&&(n[r]=i?[].concat(i,s):s)}else r!==""&&(n[r]=o[r])}return n}function qt(t,n,e,o=null){Yt(t,n,7,[e,o])}const Ul=wi();let Gl=0;function ql(t,n,e){const o=t.type,r=(n?n.appContext:t.appContext)||Ul,i={uid:Gl++,vnode:t,type:o,parent:n,appContext:r,root:null,next:null,subTree:null,effect:null,update:null,job:null,scope:new Gr(!0),render:null,proxy:null,exposed:null,exposeProxy:null,withProxy:null,provides:n?n.provides:Object.create(r.provides),ids:n?n.ids:["",0,0],accessCache:null,renderCache:[],components:null,directives:null,propsOptions:Pi(o,r),emitsOptions:Fi(o,r),emit:null,emitted:null,propsDefaults:st,inheritAttrs:o.inheritAttrs,ctx:st,data:st,props:st,attrs:st,slots:st,refs:st,setupState:st,setupContext:null,suspense:e,suspenseId:e?e.pendingId:0,asyncDep:null,asyncResolved:!1,isMounted:!1,isUnmounted:!1,isDeactivated:!1,bc:null,c:null,bm:null,m:null,bu:null,u:null,um:null,bum:null,da:null,a:null,rtg:null,rtc:null,ec:null,sp:null};return i.ctx={_:i},i.root=n?n.root:i,i.emit=Fl.bind(null,i),t.ce&&t.ce(i),i}let vt=null;const Wl=()=>vt||zt;let Me,fo;{const t=Fe(),n=(e,o)=>{let r;return(r=t[e])||(r=t[e]=[]),r.push(o),i=>{r.length>1?r.forEach(s=>s(i)):r[0](i)}};Me=n("__VUE_INSTANCE_SETTERS__",e=>vt=e),fo=n("__VUE_SSR_SETTERS__",e=>ae=e)}const ge=t=>{const n=vt;return Me(t),t.scope.on(),()=>{t.scope.off(),Me(n)}},lr=()=>{vt&&vt.scope.off(),Me(null)};function Bi(t){return t.vnode.shapeFlag&4}let ae=!1;function Xl(t,n=!1,e=!1){n&&fo(n);const{props:o,children:r}=t.vnode,i=Bi(t);yl(t,o,i,n),kl(t,r,e||n);const s=i?Ql(t,n):void 0;return n&&fo(!1),s}function Ql(t,n){const e=t.type;t.accessCache=Object.create(null),t.proxy=new Proxy(t.ctx,gl);const{setup:o}=e;if(o){sn();const r=t.setupContext=o.length>1?Yl(t):null,i=ge(t),s=ue(o,t,0,[t.props,r]),l=Br(s);if(ln(),i(),(l||t.sp)&&!Zn(t)&&bi(t),l){if(s.then(lr,lr),n)return s.then(a=>{ar(t,a)}).catch(a=>{$e(a,t,0)});t.asyncDep=s}else ar(t,s)}else Vi(t)}function ar(t,n,e){N(n)?t.type.__ssrInlineRender?t.ssrRender=n:t.render=n:lt(n)&&(t.setupState=ui(n)),Vi(t)}function Vi(t,n,e){const o=t.type;t.render||(t.render=o.render||Jt);{const r=ge(t);sn();try{fl(t)}finally{ln(),r()}}}const Jl={get(t,n){return bt(t,"get",""),t[n]}};function Yl(t){const n=e=>{t.exposed=e||{}};return{attrs:new Proxy(t.attrs,Jl),slots:t.slots,emit:t.emit,expose:n}}function Ho(t){return t.exposed?t.exposeProxy||(t.exposeProxy=new Proxy(ui(ci(t.exposed)),{get(n,e){if(e in n)return n[e];if(e in te)return te[e](t)},has(n,e){return e in n||e in te}})):t.proxy}function Zl(t,n=!0){return N(t)?t.displayName||t.name:t.name||n&&t.__name}function ta(t){return N(t)&&"__vccOpts"in t}const at=(t,n)=>Gs(t,n,ae);function ji(t,n,e){const o=arguments.length;return o===2?lt(n)&&!j(n)?Re(n)?J(t,null,[n]):J(t,n):J(t,null,n):(o>3?e=Array.prototype.slice.call(arguments,2):o===3&&Re(e)&&(e=[e]),J(t,n,e))}const na="3.5.18";/**
+* @vue/runtime-dom v3.5.18
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/let ho;const cr=typeof window<"u"&&window.trustedTypes;if(cr)try{ho=cr.createPolicy("vue",{createHTML:t=>t})}catch{}const Ni=ho?t=>ho.createHTML(t):t=>t,ea="http://www.w3.org/2000/svg",oa="http://www.w3.org/1998/Math/MathML",en=typeof document<"u"?document:null,dr=en&&en.createElement("template"),ra={insert:(t,n,e)=>{n.insertBefore(t,e||null)},remove:t=>{const n=t.parentNode;n&&n.removeChild(t)},createElement:(t,n,e,o)=>{const r=n==="svg"?en.createElementNS(ea,t):n==="mathml"?en.createElementNS(oa,t):e?en.createElement(t,{is:e}):en.createElement(t);return t==="select"&&o&&o.multiple!=null&&r.setAttribute("multiple",o.multiple),r},createText:t=>en.createTextNode(t),createComment:t=>en.createComment(t),setText:(t,n)=>{t.nodeValue=n},setElementText:(t,n)=>{t.textContent=n},parentNode:t=>t.parentNode,nextSibling:t=>t.nextSibling,querySelector:t=>en.querySelector(t),setScopeId(t,n){t.setAttribute(n,"")},insertStaticContent(t,n,e,o,r,i){const s=e?e.previousSibling:n.lastChild;if(r&&(r===i||r.nextSibling))for(;n.insertBefore(r.cloneNode(!0),e),!(r===i||!(r=r.nextSibling)););else{dr.innerHTML=Ni(o==="svg"?`<svg>${t}</svg>`:o==="mathml"?`<math>${t}</math>`:t);const l=dr.content;if(o==="svg"||o==="mathml"){const a=l.firstChild;for(;a.firstChild;)l.appendChild(a.firstChild);l.removeChild(a)}n.insertBefore(l,e)}return[s?s.nextSibling:n.firstChild,e?e.previousSibling:n.lastChild]}},ia=Symbol("_vtc");function sa(t,n,e){const o=t[ia];o&&(n=(n?[n,...o]:[...o]).join(" ")),n==null?t.removeAttribute("class"):e?t.setAttribute("class",n):t.className=n}const ur=Symbol("_vod"),la=Symbol("_vsh"),aa=Symbol(""),ca=/(^|;)\s*display\s*:/;function da(t,n,e){const o=t.style,r=dt(e);let i=!1;if(e&&!r){if(n)if(dt(n))for(const s of n.split(";")){const l=s.slice(0,s.indexOf(":")).trim();e[l]==null&&ye(o,l,"")}else for(const s in n)e[s]==null&&ye(o,s,"");for(const s in e)s==="display"&&(i=!0),ye(o,s,e[s])}else if(r){if(n!==e){const s=o[aa];s&&(e+=";"+s),o.cssText=e,i=ca.test(e)}}else n&&t.removeAttribute("style");ur in t&&(t[ur]=i?o.display:"",t[la]&&(o.display="none"))}const pr=/\s*!important$/;function ye(t,n,e){if(j(e))e.forEach(o=>ye(t,n,o));else if(e==null&&(e=""),n.startsWith("--"))t.setProperty(n,e);else{const o=ua(t,n);pr.test(e)?t.setProperty(Pn(o),e.replace(pr,""),"important"):t[o]=e}}const gr=["Webkit","Moz","ms"],to={};function ua(t,n){const e=to[n];if(e)return e;let o=Ft(n);if(o!=="filter"&&o in t)return to[n]=o;o=Oe(o);for(let r=0;r<gr.length;r++){const i=gr[r]+o;if(i in t)return to[n]=i}return n}const fr="http://www.w3.org/1999/xlink";function hr(t,n,e,o,r,i=bs(n)){o&&n.startsWith("xlink:")?e==null?t.removeAttributeNS(fr,n.slice(6,n.length)):t.setAttributeNS(fr,n,e):e==null||i&&!Nr(e)?t.removeAttribute(n):t.setAttribute(n,i?"":_n(e)?String(e):e)}function mr(t,n,e,o,r){if(n==="innerHTML"||n==="textContent"){e!=null&&(t[n]=n==="innerHTML"?Ni(e):e);return}const i=t.tagName;if(n==="value"&&i!=="PROGRESS"&&!i.includes("-")){const l=i==="OPTION"?t.getAttribute("value")||"":t.value,a=e==null?t.type==="checkbox"?"on":"":String(e);(l!==a||!("_value"in t))&&(t.value=a),e==null&&t.removeAttribute(n),t._value=e;return}let s=!1;if(e===""||e==null){const l=typeof t[n];l==="boolean"?e=Nr(e):e==null&&l==="string"?(e="",s=!0):l==="number"&&(e=0,s=!0)}try{t[n]=e}catch{}s&&t.removeAttribute(r||n)}function pa(t,n,e,o){t.addEventListener(n,e,o)}function ga(t,n,e,o){t.removeEventListener(n,e,o)}const br=Symbol("_vei");function fa(t,n,e,o,r=null){const i=t[br]||(t[br]={}),s=i[n];if(o&&s)s.value=o;else{const[l,a]=ha(n);if(o){const p=i[n]=va(o,r);pa(t,l,p,a)}else s&&(ga(t,l,s,a),i[n]=void 0)}}const vr=/(?:Once|Passive|Capture)$/;function ha(t){let n;if(vr.test(t)){n={};let o;for(;o=t.match(vr);)t=t.slice(0,t.length-o[0].length),n[o[0].toLowerCase()]=!0}return[t[2]===":"?t.slice(3):Pn(t.slice(2)),n]}let no=0;const ma=Promise.resolve(),ba=()=>no||(ma.then(()=>no=0),no=Date.now());function va(t,n){const e=o=>{if(!o._vts)o._vts=Date.now();else if(o._vts<=e.attached)return;Yt(_a(o,e.value),n,5,[o])};return e.value=t,e.attached=ba(),e}function _a(t,n){if(j(n)){const e=t.stopImmediatePropagation;return t.stopImmediatePropagation=()=>{e.call(t),t._stopped=!0},n.map(o=>r=>!r._stopped&&o&&o(r))}else return n}const _r=t=>t.charCodeAt(0)===111&&t.charCodeAt(1)===110&&t.charCodeAt(2)>96&&t.charCodeAt(2)<123,xa=(t,n,e,o,r,i)=>{const s=r==="svg";n==="class"?sa(t,o,s):n==="style"?da(t,e,o):Ie(n)?xo(n)||fa(t,n,e,o,i):(n[0]==="."?(n=n.slice(1),!0):n[0]==="^"?(n=n.slice(1),!1):ya(t,n,o,s))?(mr(t,n,o),!t.tagName.includes("-")&&(n==="value"||n==="checked"||n==="selected")&&hr(t,n,o,s,i,n!=="value")):t._isVueCE&&(/[A-Z]/.test(n)||!dt(o))?mr(t,Ft(n),o,i,n):(n==="true-value"?t._trueValue=o:n==="false-value"&&(t._falseValue=o),hr(t,n,o,s))};function ya(t,n,e,o){if(o)return!!(n==="innerHTML"||n==="textContent"||n in t&&_r(n)&&N(e));if(n==="spellcheck"||n==="draggable"||n==="translate"||n==="autocorrect"||n==="form"||n==="list"&&t.tagName==="INPUT"||n==="type"&&t.tagName==="TEXTAREA")return!1;if(n==="width"||n==="height"){const r=t.tagName;if(r==="IMG"||r==="VIDEO"||r==="CANVAS"||r==="SOURCE")return!1}return _r(n)&&dt(e)?!1:n in t}const wa=["ctrl","shift","alt","meta"],Ca={stop:t=>t.stopPropagation(),prevent:t=>t.preventDefault(),self:t=>t.target!==t.currentTarget,ctrl:t=>!t.ctrlKey,shift:t=>!t.shiftKey,alt:t=>!t.altKey,meta:t=>!t.metaKey,left:t=>"button"in t&&t.button!==0,middle:t=>"button"in t&&t.button!==1,right:t=>"button"in t&&t.button!==2,exact:(t,n)=>wa.some(e=>t[`${e}Key`]&&!n.includes(e))},Sa=(t,n)=>{const e=t._withMods||(t._withMods={}),o=n.join(".");return e[o]||(e[o]=(r,...i)=>{for(let s=0;s<n.length;s++){const l=Ca[n[s]];if(l&&l(r,n))return}return t(r,...i)})},ka=_t({patchProp:xa},ra);let xr;function Aa(){return xr||(xr=Pl(ka))}const Pa=(...t)=>{const n=Aa().createApp(...t),{mount:e}=n;return n.mount=o=>{const r=Ma(o);if(!r)return;const i=n._component;!N(i)&&!i.render&&!i.template&&(i.template=r.innerHTML),r.nodeType===1&&(r.textContent="");const s=e(r,!1,Ra(r));return r instanceof Element&&(r.removeAttribute("v-cloak"),r.setAttribute("data-v-app","")),s},n};function Ra(t){if(t instanceof SVGElement)return"svg";if(typeof MathMLElement=="function"&&t instanceof MathMLElement)return"mathml"}function Ma(t){return dt(t)?document.querySelector(t):t}/*!
+ * pinia v3.0.3
+ * (c) 2025 Eduardo San Martin Morote
+ * @license MIT
+ */const Ta=Symbol();var yr;(function(t){t.direct="direct",t.patchObject="patch object",t.patchFunction="patch function"})(yr||(yr={}));function Ia(){const t=vs(!0),n=t.run(()=>ct({}));let e=[],o=[];const r=ci({install(i){r._a=i,i.provide(Ta,r),i.config.globalProperties.$pinia=r,o.forEach(s=>e.push(s)),o=[]},use(i){return this._a?e.push(i):o.push(i),this},_p:e,_a:null,_e:t,_s:new Map,state:n});return r}/*!
+  * vue-router v4.5.1
+  * (c) 2025 Eduardo San Martin Morote
+  * @license MIT
+  */const On=typeof document<"u";function Ki(t){return typeof t=="object"||"displayName"in t||"props"in t||"__vccOpts"in t}function Ea(t){return t.__esModule||t[Symbol.toStringTag]==="Module"||t.default&&Ki(t.default)}const X=Object.assign;function eo(t,n){const e={};for(const o in n){const r=n[o];e[o]=$t(r)?r.map(t):t(r)}return e}const ee=()=>{},$t=Array.isArray,Ui=/#/g,La=/&/g,Oa=/\//g,Fa=/=/g,za=/\?/g,Gi=/\+/g,Da=/%5B/g,Ha=/%5D/g,qi=/%5E/g,$a=/%60/g,Wi=/%7B/g,Ba=/%7C/g,Xi=/%7D/g,Va=/%20/g;function $o(t){return encodeURI(""+t).replace(Ba,"|").replace(Da,"[").replace(Ha,"]")}function ja(t){return $o(t).replace(Wi,"{").replace(Xi,"}").replace(qi,"^")}function mo(t){return $o(t).replace(Gi,"%2B").replace(Va,"+").replace(Ui,"%23").replace(La,"%26").replace($a,"`").replace(Wi,"{").replace(Xi,"}").replace(qi,"^")}function Na(t){return mo(t).replace(Fa,"%3D")}function Ka(t){return $o(t).replace(Ui,"%23").replace(za,"%3F")}function Ua(t){return t==null?"":Ka(t).replace(Oa,"%2F")}function ce(t){try{return decodeURIComponent(""+t)}catch{}return""+t}const Ga=/\/$/,qa=t=>t.replace(Ga,"");function oo(t,n,e="/"){let o,r={},i="",s="";const l=n.indexOf("#");let a=n.indexOf("?");return l<a&&l>=0&&(a=-1),a>-1&&(o=n.slice(0,a),i=n.slice(a+1,l>-1?l:n.length),r=t(i)),l>-1&&(o=o||n.slice(0,l),s=n.slice(l,n.length)),o=Ja(o??n,e),{fullPath:o+(i&&"?")+i+s,path:o,query:r,hash:ce(s)}}function Wa(t,n){const e=n.query?t(n.query):"";return n.path+(e&&"?")+e+(n.hash||"")}function wr(t,n){return!n||!t.toLowerCase().startsWith(n.toLowerCase())?t:t.slice(n.length)||"/"}function Xa(t,n,e){const o=n.matched.length-1,r=e.matched.length-1;return o>-1&&o===r&&Vn(n.matched[o],e.matched[r])&&Qi(n.params,e.params)&&t(n.query)===t(e.query)&&n.hash===e.hash}function Vn(t,n){return(t.aliasOf||t)===(n.aliasOf||n)}function Qi(t,n){if(Object.keys(t).length!==Object.keys(n).length)return!1;for(const e in t)if(!Qa(t[e],n[e]))return!1;return!0}function Qa(t,n){return $t(t)?Cr(t,n):$t(n)?Cr(n,t):t===n}function Cr(t,n){return $t(n)?t.length===n.length&&t.every((e,o)=>e===n[o]):t.length===1&&t[0]===n}function Ja(t,n){if(t.startsWith("/"))return t;if(!t)return n;const e=n.split("/"),o=t.split("/"),r=o[o.length-1];(r===".."||r===".")&&o.push("");let i=e.length-1,s,l;for(s=0;s<o.length;s++)if(l=o[s],l!==".")if(l==="..")i>1&&i--;else break;return e.slice(0,i).join("/")+"/"+o.slice(s).join("/")}const un={path:"/",name:void 0,params:{},query:{},hash:"",fullPath:"/",matched:[],meta:{},redirectedFrom:void 0};var de;(function(t){t.pop="pop",t.push="push"})(de||(de={}));var oe;(function(t){t.back="back",t.forward="forward",t.unknown=""})(oe||(oe={}));function Ya(t){if(!t)if(On){const n=document.querySelector("base");t=n&&n.getAttribute("href")||"/",t=t.replace(/^\w+:\/\/[^\/]+/,"")}else t="/";return t[0]!=="/"&&t[0]!=="#"&&(t="/"+t),qa(t)}const Za=/^[^#]+#/;function tc(t,n){return t.replace(Za,"#")+n}function nc(t,n){const e=document.documentElement.getBoundingClientRect(),o=t.getBoundingClientRect();return{behavior:n.behavior,left:o.left-e.left-(n.left||0),top:o.top-e.top-(n.top||0)}}const Ne=()=>({left:window.scrollX,top:window.scrollY});function ec(t){let n;if("el"in t){const e=t.el,o=typeof e=="string"&&e.startsWith("#"),r=typeof e=="string"?o?document.getElementById(e.slice(1)):document.querySelector(e):e;if(!r)return;n=nc(r,t)}else n=t;"scrollBehavior"in document.documentElement.style?window.scrollTo(n):window.scrollTo(n.left!=null?n.left:window.scrollX,n.top!=null?n.top:window.scrollY)}function Sr(t,n){return(history.state?history.state.position-n:-1)+t}const bo=new Map;function oc(t,n){bo.set(t,n)}function rc(t){const n=bo.get(t);return bo.delete(t),n}let ic=()=>location.protocol+"//"+location.host;function Ji(t,n){const{pathname:e,search:o,hash:r}=n,i=t.indexOf("#");if(i>-1){let l=r.includes(t.slice(i))?t.slice(i).length:1,a=r.slice(l);return a[0]!=="/"&&(a="/"+a),wr(a,"")}return wr(e,t)+o+r}function sc(t,n,e,o){let r=[],i=[],s=null;const l=({state:h})=>{const m=Ji(t,location),S=e.value,A=n.value;let T=0;if(h){if(e.value=m,n.value=h,s&&s===S){s=null;return}T=A?h.position-A.position:0}else o(m);r.forEach(O=>{O(e.value,S,{delta:T,type:de.pop,direction:T?T>0?oe.forward:oe.back:oe.unknown})})};function a(){s=e.value}function p(h){r.push(h);const m=()=>{const S=r.indexOf(h);S>-1&&r.splice(S,1)};return i.push(m),m}function d(){const{history:h}=window;h.state&&h.replaceState(X({},h.state,{scroll:Ne()}),"")}function g(){for(const h of i)h();i=[],window.removeEventListener("popstate",l),window.removeEventListener("beforeunload",d)}return window.addEventListener("popstate",l),window.addEventListener("beforeunload",d,{passive:!0}),{pauseListeners:a,listen:p,destroy:g}}function kr(t,n,e,o=!1,r=!1){return{back:t,current:n,forward:e,replaced:o,position:window.history.length,scroll:r?Ne():null}}function lc(t){const{history:n,location:e}=window,o={value:Ji(t,e)},r={value:n.state};r.value||i(o.value,{back:null,current:o.value,forward:null,position:n.length-1,replaced:!0,scroll:null},!0);function i(a,p,d){const g=t.indexOf("#"),h=g>-1?(e.host&&document.querySelector("base")?t:t.slice(g))+a:ic()+t+a;try{n[d?"replaceState":"pushState"](p,"",h),r.value=p}catch(m){console.error(m),e[d?"replace":"assign"](h)}}function s(a,p){const d=X({},n.state,kr(r.value.back,a,r.value.forward,!0),p,{position:r.value.position});i(a,d,!0),o.value=a}function l(a,p){const d=X({},r.value,n.state,{forward:a,scroll:Ne()});i(d.current,d,!0);const g=X({},kr(o.value,a,null),{position:d.position+1},p);i(a,g,!1),o.value=a}return{location:o,state:r,push:l,replace:s}}function ac(t){t=Ya(t);const n=lc(t),e=sc(t,n.state,n.location,n.replace);function o(i,s=!0){s||e.pauseListeners(),history.go(i)}const r=X({location:"",base:t,go:o,createHref:tc.bind(null,t)},n,e);return Object.defineProperty(r,"location",{enumerable:!0,get:()=>n.location.value}),Object.defineProperty(r,"state",{enumerable:!0,get:()=>n.state.value}),r}function cc(t){return typeof t=="string"||t&&typeof t=="object"}function Yi(t){return typeof t=="string"||typeof t=="symbol"}const Zi=Symbol("");var Ar;(function(t){t[t.aborted=4]="aborted",t[t.cancelled=8]="cancelled",t[t.duplicated=16]="duplicated"})(Ar||(Ar={}));function jn(t,n){return X(new Error,{type:t,[Zi]:!0},n)}function nn(t,n){return t instanceof Error&&Zi in t&&(n==null||!!(t.type&n))}const Pr="[^/]+?",dc={sensitive:!1,strict:!1,start:!0,end:!0},uc=/[.+*?^${}()[\]/\\]/g;function pc(t,n){const e=X({},dc,n),o=[];let r=e.start?"^":"";const i=[];for(const p of t){const d=p.length?[]:[90];e.strict&&!p.length&&(r+="/");for(let g=0;g<p.length;g++){const h=p[g];let m=40+(e.sensitive?.25:0);if(h.type===0)g||(r+="/"),r+=h.value.replace(uc,"\\$&"),m+=40;else if(h.type===1){const{value:S,repeatable:A,optional:T,regexp:O}=h;i.push({name:S,repeatable:A,optional:T});const L=O||Pr;if(L!==Pr){m+=10;try{new RegExp(`(${L})`)}catch(I){throw new Error(`Invalid custom RegExp for param "${S}" (${L}): `+I.message)}}let $=A?`((?:${L})(?:/(?:${L}))*)`:`(${L})`;g||($=T&&p.length<2?`(?:/${$})`:"/"+$),T&&($+="?"),r+=$,m+=20,T&&(m+=-8),A&&(m+=-20),L===".*"&&(m+=-50)}d.push(m)}o.push(d)}if(e.strict&&e.end){const p=o.length-1;o[p][o[p].length-1]+=.7000000000000001}e.strict||(r+="/?"),e.end?r+="$":e.strict&&!r.endsWith("/")&&(r+="(?:/|$)");const s=new RegExp(r,e.sensitive?"":"i");function l(p){const d=p.match(s),g={};if(!d)return null;for(let h=1;h<d.length;h++){const m=d[h]||"",S=i[h-1];g[S.name]=m&&S.repeatable?m.split("/"):m}return g}function a(p){let d="",g=!1;for(const h of t){(!g||!d.endsWith("/"))&&(d+="/"),g=!1;for(const m of h)if(m.type===0)d+=m.value;else if(m.type===1){const{value:S,repeatable:A,optional:T}=m,O=S in p?p[S]:"";if($t(O)&&!A)throw new Error(`Provided param "${S}" is an array but it is not repeatable (* or + modifiers)`);const L=$t(O)?O.join("/"):O;if(!L)if(T)h.length<2&&(d.endsWith("/")?d=d.slice(0,-1):g=!0);else throw new Error(`Missing required param "${S}"`);d+=L}}return d||"/"}return{re:s,score:o,keys:i,parse:l,stringify:a}}function gc(t,n){let e=0;for(;e<t.length&&e<n.length;){const o=n[e]-t[e];if(o)return o;e++}return t.length<n.length?t.length===1&&t[0]===80?-1:1:t.length>n.length?n.length===1&&n[0]===80?1:-1:0}function ts(t,n){let e=0;const o=t.score,r=n.score;for(;e<o.length&&e<r.length;){const i=gc(o[e],r[e]);if(i)return i;e++}if(Math.abs(r.length-o.length)===1){if(Rr(o))return 1;if(Rr(r))return-1}return r.length-o.length}function Rr(t){const n=t[t.length-1];return t.length>0&&n[n.length-1]<0}const fc={type:0,value:""},hc=/[a-zA-Z0-9_]/;function mc(t){if(!t)return[[]];if(t==="/")return[[fc]];if(!t.startsWith("/"))throw new Error(`Invalid path "${t}"`);function n(m){throw new Error(`ERR (${e})/"${p}": ${m}`)}let e=0,o=e;const r=[];let i;function s(){i&&r.push(i),i=[]}let l=0,a,p="",d="";function g(){p&&(e===0?i.push({type:0,value:p}):e===1||e===2||e===3?(i.length>1&&(a==="*"||a==="+")&&n(`A repeatable param (${p}) must be alone in its segment. eg: '/:ids+.`),i.push({type:1,value:p,regexp:d,repeatable:a==="*"||a==="+",optional:a==="*"||a==="?"})):n("Invalid state to consume buffer"),p="")}function h(){p+=a}for(;l<t.length;){if(a=t[l++],a==="\\"&&e!==2){o=e,e=4;continue}switch(e){case 0:a==="/"?(p&&g(),s()):a===":"?(g(),e=1):h();break;case 4:h(),e=o;break;case 1:a==="("?e=2:hc.test(a)?h():(g(),e=0,a!=="*"&&a!=="?"&&a!=="+"&&l--);break;case 2:a===")"?d[d.length-1]=="\\"?d=d.slice(0,-1)+a:e=3:d+=a;break;case 3:g(),e=0,a!=="*"&&a!=="?"&&a!=="+"&&l--,d="";break;default:n("Unknown state");break}}return e===2&&n(`Unfinished custom RegExp for param "${p}"`),g(),s(),r}function bc(t,n,e){const o=pc(mc(t.path),e),r=X(o,{record:t,parent:n,children:[],alias:[]});return n&&!r.record.aliasOf==!n.record.aliasOf&&n.children.push(r),r}function vc(t,n){const e=[],o=new Map;n=Er({strict:!1,end:!0,sensitive:!1},n);function r(g){return o.get(g)}function i(g,h,m){const S=!m,A=Tr(g);A.aliasOf=m&&m.record;const T=Er(n,g),O=[A];if("alias"in g){const I=typeof g.alias=="string"?[g.alias]:g.alias;for(const K of I)O.push(Tr(X({},A,{components:m?m.record.components:A.components,path:K,aliasOf:m?m.record:A})))}let L,$;for(const I of O){const{path:K}=I;if(h&&K[0]!=="/"){const et=h.record.path,U=et[et.length-1]==="/"?"":"/";I.path=h.record.path+(K&&U+K)}if(L=bc(I,h,T),m?m.alias.push(L):($=$||L,$!==L&&$.alias.push(L),S&&g.name&&!Ir(L)&&s(g.name)),ns(L)&&a(L),A.children){const et=A.children;for(let U=0;U<et.length;U++)i(et[U],L,m&&m.children[U])}m=m||L}return $?()=>{s($)}:ee}function s(g){if(Yi(g)){const h=o.get(g);h&&(o.delete(g),e.splice(e.indexOf(h),1),h.children.forEach(s),h.alias.forEach(s))}else{const h=e.indexOf(g);h>-1&&(e.splice(h,1),g.record.name&&o.delete(g.record.name),g.children.forEach(s),g.alias.forEach(s))}}function l(){return e}function a(g){const h=yc(g,e);e.splice(h,0,g),g.record.name&&!Ir(g)&&o.set(g.record.name,g)}function p(g,h){let m,S={},A,T;if("name"in g&&g.name){if(m=o.get(g.name),!m)throw jn(1,{location:g});T=m.record.name,S=X(Mr(h.params,m.keys.filter($=>!$.optional).concat(m.parent?m.parent.keys.filter($=>$.optional):[]).map($=>$.name)),g.params&&Mr(g.params,m.keys.map($=>$.name))),A=m.stringify(S)}else if(g.path!=null)A=g.path,m=e.find($=>$.re.test(A)),m&&(S=m.parse(A),T=m.record.name);else{if(m=h.name?o.get(h.name):e.find($=>$.re.test(h.path)),!m)throw jn(1,{location:g,currentLocation:h});T=m.record.name,S=X({},h.params,g.params),A=m.stringify(S)}const O=[];let L=m;for(;L;)O.unshift(L.record),L=L.parent;return{name:T,path:A,params:S,matched:O,meta:xc(O)}}t.forEach(g=>i(g));function d(){e.length=0,o.clear()}return{addRoute:i,resolve:p,removeRoute:s,clearRoutes:d,getRoutes:l,getRecordMatcher:r}}function Mr(t,n){const e={};for(const o of n)o in t&&(e[o]=t[o]);return e}function Tr(t){const n={path:t.path,redirect:t.redirect,name:t.name,meta:t.meta||{},aliasOf:t.aliasOf,beforeEnter:t.beforeEnter,props:_c(t),children:t.children||[],instances:{},leaveGuards:new Set,updateGuards:new Set,enterCallbacks:{},components:"components"in t?t.components||null:t.component&&{default:t.component}};return Object.defineProperty(n,"mods",{value:{}}),n}function _c(t){const n={},e=t.props||!1;if("component"in t)n.default=e;else for(const o in t.components)n[o]=typeof e=="object"?e[o]:e;return n}function Ir(t){for(;t;){if(t.record.aliasOf)return!0;t=t.parent}return!1}function xc(t){return t.reduce((n,e)=>X(n,e.meta),{})}function Er(t,n){const e={};for(const o in t)e[o]=o in n?n[o]:t[o];return e}function yc(t,n){let e=0,o=n.length;for(;e!==o;){const i=e+o>>1;ts(t,n[i])<0?o=i:e=i+1}const r=wc(t);return r&&(o=n.lastIndexOf(r,o-1)),o}function wc(t){let n=t;for(;n=n.parent;)if(ns(n)&&ts(t,n)===0)return n}function ns({record:t}){return!!(t.name||t.components&&Object.keys(t.components).length||t.redirect)}function Cc(t){const n={};if(t===""||t==="?")return n;const o=(t[0]==="?"?t.slice(1):t).split("&");for(let r=0;r<o.length;++r){const i=o[r].replace(Gi," "),s=i.indexOf("="),l=ce(s<0?i:i.slice(0,s)),a=s<0?null:ce(i.slice(s+1));if(l in n){let p=n[l];$t(p)||(p=n[l]=[p]),p.push(a)}else n[l]=a}return n}function Lr(t){let n="";for(let e in t){const o=t[e];if(e=Na(e),o==null){o!==void 0&&(n+=(n.length?"&":"")+e);continue}($t(o)?o.map(i=>i&&mo(i)):[o&&mo(o)]).forEach(i=>{i!==void 0&&(n+=(n.length?"&":"")+e,i!=null&&(n+="="+i))})}return n}function Sc(t){const n={};for(const e in t){const o=t[e];o!==void 0&&(n[e]=$t(o)?o.map(r=>r==null?null:""+r):o==null?o:""+o)}return n}const kc=Symbol(""),Or=Symbol(""),Ke=Symbol(""),Bo=Symbol(""),vo=Symbol("");function qn(){let t=[];function n(o){return t.push(o),()=>{const r=t.indexOf(o);r>-1&&t.splice(r,1)}}function e(){t=[]}return{add:n,list:()=>t.slice(),reset:e}}function fn(t,n,e,o,r,i=s=>s()){const s=o&&(o.enterCallbacks[r]=o.enterCallbacks[r]||[]);return()=>new Promise((l,a)=>{const p=h=>{h===!1?a(jn(4,{from:e,to:n})):h instanceof Error?a(h):cc(h)?a(jn(2,{from:n,to:h})):(s&&o.enterCallbacks[r]===s&&typeof h=="function"&&s.push(h),l())},d=i(()=>t.call(o&&o.instances[r],n,e,p));let g=Promise.resolve(d);t.length<3&&(g=g.then(p)),g.catch(h=>a(h))})}function ro(t,n,e,o,r=i=>i()){const i=[];for(const s of t)for(const l in s.components){let a=s.components[l];if(!(n!=="beforeRouteEnter"&&!s.instances[l]))if(Ki(a)){const d=(a.__vccOpts||a)[n];d&&i.push(fn(d,e,o,s,l,r))}else{let p=a();i.push(()=>p.then(d=>{if(!d)throw new Error(`Couldn't resolve component "${l}" at "${s.path}"`);const g=Ea(d)?d.default:d;s.mods[l]=d,s.components[l]=g;const m=(g.__vccOpts||g)[n];return m&&fn(m,e,o,s,l,r)()}))}}return i}function Fr(t){const n=Ht(Ke),e=Ht(Bo),o=at(()=>{const a=Z(t.to);return n.resolve(a)}),r=at(()=>{const{matched:a}=o.value,{length:p}=a,d=a[p-1],g=e.matched;if(!d||!g.length)return-1;const h=g.findIndex(Vn.bind(null,d));if(h>-1)return h;const m=zr(a[p-2]);return p>1&&zr(d)===m&&g[g.length-1].path!==m?g.findIndex(Vn.bind(null,a[p-2])):h}),i=at(()=>r.value>-1&&Tc(e.params,o.value.params)),s=at(()=>r.value>-1&&r.value===e.matched.length-1&&Qi(e.params,o.value.params));function l(a={}){if(Mc(a)){const p=n[Z(t.replace)?"replace":"push"](Z(t.to)).catch(ee);return t.viewTransition&&typeof document<"u"&&"startViewTransition"in document&&document.startViewTransition(()=>p),p}return Promise.resolve()}return{route:o,href:at(()=>o.value.href),isActive:i,isExactActive:s,navigate:l}}function Ac(t){return t.length===1?t[0]:t}const Pc=xt({name:"RouterLink",compatConfig:{MODE:3},props:{to:{type:[String,Object],required:!0},replace:Boolean,activeClass:String,exactActiveClass:String,custom:Boolean,ariaCurrentValue:{type:String,default:"page"},viewTransition:Boolean},useLink:Fr,setup(t,{slots:n}){const e=He(Fr(t)),{options:o}=Ht(Ke),r=at(()=>({[Dr(t.activeClass,o.linkActiveClass,"router-link-active")]:e.isActive,[Dr(t.exactActiveClass,o.linkExactActiveClass,"router-link-exact-active")]:e.isExactActive}));return()=>{const i=n.default&&Ac(n.default(e));return t.custom?i:ji("a",{"aria-current":e.isExactActive?t.ariaCurrentValue:null,href:e.href,onClick:e.navigate,class:r.value},i)}}}),Rc=Pc;function Mc(t){if(!(t.metaKey||t.altKey||t.ctrlKey||t.shiftKey)&&!t.defaultPrevented&&!(t.button!==void 0&&t.button!==0)){if(t.currentTarget&&t.currentTarget.getAttribute){const n=t.currentTarget.getAttribute("target");if(/\b_blank\b/i.test(n))return}return t.preventDefault&&t.preventDefault(),!0}}function Tc(t,n){for(const e in n){const o=n[e],r=t[e];if(typeof o=="string"){if(o!==r)return!1}else if(!$t(r)||r.length!==o.length||o.some((i,s)=>i!==r[s]))return!1}return!0}function zr(t){return t?t.aliasOf?t.aliasOf.path:t.path:""}const Dr=(t,n,e)=>t??n??e,Ic=xt({name:"RouterView",inheritAttrs:!1,props:{name:{type:String,default:"default"},route:Object},compatConfig:{MODE:3},setup(t,{attrs:n,slots:e}){const o=Ht(vo),r=at(()=>t.route||o.value),i=Ht(Or,0),s=at(()=>{let p=Z(i);const{matched:d}=r.value;let g;for(;(g=d[p])&&!g.components;)p++;return p}),l=at(()=>r.value.matched[s.value]);ve(Or,at(()=>s.value+1)),ve(kc,l),ve(vo,r);const a=ct();return kn(()=>[a.value,l.value,t.name],([p,d,g],[h,m,S])=>{d&&(d.instances[g]=p,m&&m!==d&&p&&p===h&&(d.leaveGuards.size||(d.leaveGuards=m.leaveGuards),d.updateGuards.size||(d.updateGuards=m.updateGuards))),p&&d&&(!m||!Vn(d,m)||!h)&&(d.enterCallbacks[g]||[]).forEach(A=>A(p))},{flush:"post"}),()=>{const p=r.value,d=t.name,g=l.value,h=g&&g.components[d];if(!h)return Hr(e.default,{Component:h,route:p});const m=g.props[d],S=m?m===!0?p.params:typeof m=="function"?m(p):m:null,T=ji(h,X({},S,n,{onVnodeUnmounted:O=>{O.component.isUnmounted&&(g.instances[d]=null)},ref:a}));return Hr(e.default,{Component:T,route:p})||T}}});function Hr(t,n){if(!t)return null;const e=t(n);return e.length===1?e[0]:e}const Ec=Ic;function Lc(t){const n=vc(t.routes,t),e=t.parseQuery||Cc,o=t.stringifyQuery||Lr,r=t.history,i=qn(),s=qn(),l=qn(),a=$s(un);let p=un;On&&t.scrollBehavior&&"scrollRestoration"in history&&(history.scrollRestoration="manual");const d=eo.bind(null,v=>""+v),g=eo.bind(null,Ua),h=eo.bind(null,ce);function m(v,E){let R,z;return Yi(v)?(R=n.getRecordMatcher(v),z=E):z=v,n.addRoute(z,R)}function S(v){const E=n.getRecordMatcher(v);E&&n.removeRoute(E)}function A(){return n.getRoutes().map(v=>v.record)}function T(v){return!!n.getRecordMatcher(v)}function O(v,E){if(E=X({},E||a.value),typeof v=="string"){const f=oo(e,v,E.path),b=n.resolve({path:f.path},E),x=r.createHref(f.fullPath);return X(f,b,{params:h(b.params),hash:ce(f.hash),redirectedFrom:void 0,href:x})}let R;if(v.path!=null)R=X({},v,{path:oo(e,v.path,E.path).path});else{const f=X({},v.params);for(const b in f)f[b]==null&&delete f[b];R=X({},v,{params:g(f)}),E.params=g(E.params)}const z=n.resolve(R,E),ot=v.hash||"";z.params=d(h(z.params));const c=Wa(o,X({},v,{hash:ja(ot),path:z.path})),u=r.createHref(c);return X({fullPath:c,hash:ot,query:o===Lr?Sc(v.query):v.query||{}},z,{redirectedFrom:void 0,href:u})}function L(v){return typeof v=="string"?oo(e,v,a.value.path):X({},v)}function $(v,E){if(p!==v)return jn(8,{from:E,to:v})}function I(v){return U(v)}function K(v){return I(X(L(v),{replace:!0}))}function et(v){const E=v.matched[v.matched.length-1];if(E&&E.redirect){const{redirect:R}=E;let z=typeof R=="function"?R(v):R;return typeof z=="string"&&(z=z.includes("?")||z.includes("#")?z=L(z):{path:z},z.params={}),X({query:v.query,hash:v.hash,params:z.path!=null?{}:v.params},z)}}function U(v,E){const R=p=O(v),z=a.value,ot=v.state,c=v.force,u=v.replace===!0,f=et(R);if(f)return U(X(L(f),{state:typeof f=="object"?X({},ot,f.state):ot,force:c,replace:u}),E||R);const b=R;b.redirectedFrom=E;let x;return!c&&Xa(o,z,R)&&(x=jn(16,{to:b,from:z}),Nt(z,z,!0,!1)),(x?Promise.resolve(x):Vt(b,z)).catch(_=>nn(_)?nn(_,2)?_:dn(_):W(_,b,z)).then(_=>{if(_){if(nn(_,2))return U(X({replace:u},L(_.to),{state:typeof _.to=="object"?X({},ot,_.to.state):ot,force:c}),E||b)}else _=xn(b,z,!0,u,ot);return cn(b,z,_),_})}function Et(v,E){const R=$(v,E);return R?Promise.reject(R):Promise.resolve()}function Bt(v){const E=In.values().next().value;return E&&typeof E.runWithContext=="function"?E.runWithContext(v):v()}function Vt(v,E){let R;const[z,ot,c]=Oc(v,E);R=ro(z.reverse(),"beforeRouteLeave",v,E);for(const f of z)f.leaveGuards.forEach(b=>{R.push(fn(b,v,E))});const u=Et.bind(null,v,E);return R.push(u),Lt(R).then(()=>{R=[];for(const f of i.list())R.push(fn(f,v,E));return R.push(u),Lt(R)}).then(()=>{R=ro(ot,"beforeRouteUpdate",v,E);for(const f of ot)f.updateGuards.forEach(b=>{R.push(fn(b,v,E))});return R.push(u),Lt(R)}).then(()=>{R=[];for(const f of c)if(f.beforeEnter)if($t(f.beforeEnter))for(const b of f.beforeEnter)R.push(fn(b,v,E));else R.push(fn(f.beforeEnter,v,E));return R.push(u),Lt(R)}).then(()=>(v.matched.forEach(f=>f.enterCallbacks={}),R=ro(c,"beforeRouteEnter",v,E,Bt),R.push(u),Lt(R))).then(()=>{R=[];for(const f of s.list())R.push(fn(f,v,E));return R.push(u),Lt(R)}).catch(f=>nn(f,8)?f:Promise.reject(f))}function cn(v,E,R){l.list().forEach(z=>Bt(()=>z(v,E,R)))}function xn(v,E,R,z,ot){const c=$(v,E);if(c)return c;const u=E===un,f=On?history.state:{};R&&(z||u?r.replace(v.fullPath,X({scroll:u&&f&&f.scroll},ot)):r.push(v.fullPath,ot)),a.value=v,Nt(v,E,R,u),dn()}let jt;function Nn(){jt||(jt=r.listen((v,E,R)=>{if(!fe.listening)return;const z=O(v),ot=et(z);if(ot){U(X(ot,{replace:!0,force:!0}),z).catch(ee);return}p=z;const c=a.value;On&&oc(Sr(c.fullPath,R.delta),Ne()),Vt(z,c).catch(u=>nn(u,12)?u:nn(u,2)?(U(X(L(u.to),{force:!0}),z).then(f=>{nn(f,20)&&!R.delta&&R.type===de.pop&&r.go(-1,!1)}).catch(ee),Promise.reject()):(R.delta&&r.go(-R.delta,!1),W(u,z,c))).then(u=>{u=u||xn(z,c,!1),u&&(R.delta&&!nn(u,8)?r.go(-R.delta,!1):R.type===de.pop&&nn(u,20)&&r.go(-1,!1)),cn(z,c,u)}).catch(ee)}))}let Mn=qn(),pt=qn(),nt;function W(v,E,R){dn(v);const z=pt.list();return z.length?z.forEach(ot=>ot(v,E,R)):console.error(v),Promise.reject(v)}function Zt(){return nt&&a.value!==un?Promise.resolve():new Promise((v,E)=>{Mn.add([v,E])})}function dn(v){return nt||(nt=!v,Nn(),Mn.list().forEach(([E,R])=>v?R(v):E()),Mn.reset()),v}function Nt(v,E,R,z){const{scrollBehavior:ot}=t;if(!On||!ot)return Promise.resolve();const c=!R&&rc(Sr(v.fullPath,0))||(z||!R)&&history.state&&history.state.scroll||null;return To().then(()=>ot(v,E,c)).then(u=>u&&ec(u)).catch(u=>W(u,v,E))}const Ct=v=>r.go(v);let Tn;const In=new Set,fe={currentRoute:a,listening:!0,addRoute:m,removeRoute:S,clearRoutes:n.clearRoutes,hasRoute:T,getRoutes:A,resolve:O,options:t,push:I,replace:K,go:Ct,back:()=>Ct(-1),forward:()=>Ct(1),beforeEach:i.add,beforeResolve:s.add,afterEach:l.add,onError:pt.add,isReady:Zt,install(v){const E=this;v.component("RouterLink",Rc),v.component("RouterView",Ec),v.config.globalProperties.$router=E,Object.defineProperty(v.config.globalProperties,"$route",{enumerable:!0,get:()=>Z(a)}),On&&!Tn&&a.value===un&&(Tn=!0,I(r.location).catch(ot=>{}));const R={};for(const ot in un)Object.defineProperty(R,ot,{get:()=>a.value[ot],enumerable:!0});v.provide(Ke,E),v.provide(Bo,li(R)),v.provide(vo,a);const z=v.unmount;In.add(v),v.unmount=function(){In.delete(v),In.size<1&&(p=un,jt&&jt(),jt=null,a.value=un,Tn=!1,nt=!1),z()}}};function Lt(v){return v.reduce((E,R)=>E.then(()=>Bt(R)),Promise.resolve())}return fe}function Oc(t,n){const e=[],o=[],r=[],i=Math.max(n.matched.length,t.matched.length);for(let s=0;s<i;s++){const l=n.matched[s];l&&(t.matched.find(p=>Vn(p,l))?o.push(l):e.push(l));const a=t.matched[s];a&&(n.matched.find(p=>Vn(p,a))||r.push(a))}return[e,o,r]}function Vo(){return Ht(Ke)}function es(t){return Ht(Bo)}const Fc={class:"nav-container tabs-container"},zc={class:"nav nav-pills"},Dc={role:"presentation"},Hc={role:"presentation"},$c={role:"presentation"},Bc={role:"presentation"},Vc={role:"presentation"},jc=xt({__name:"AppHeader",setup(t){const n=es();return(e,o)=>{const r=Rn("router-link");return F(),B("nav",null,[o[5]||(o[5]=y("div",{class:"nav-container brand-container"},[y("span",{class:"brand"},"Welcome to my website!")],-1)),y("div",Fc,[y("ul",zc,[y("li",Dc,[J(r,{to:"/",class:on({active:Z(n).path==="/"})},{default:mt(()=>o[0]||(o[0]=[Pt(" Home ",-1)])),_:1,__:[0]},8,["class"])]),y("li",Hc,[J(r,{to:"/biography",class:on({active:Z(n).path==="/biography"})},{default:mt(()=>o[1]||(o[1]=[Pt(" Resume ",-1)])),_:1,__:[1]},8,["class"])]),y("li",$c,[J(r,{to:"/project",class:on({active:Z(n).path==="/project"})},{default:mt(()=>o[2]||(o[2]=[Pt(" Projects ",-1)])),_:1,__:[2]},8,["class"])]),y("li",Bc,[J(r,{to:"/blog",class:on({active:Z(n).path==="/blog"})},{default:mt(()=>o[3]||(o[3]=[Pt(" Blogs ",-1)])),_:1,__:[3]},8,["class"])]),y("li",Vc,[J(r,{to:"/album",class:on({active:Z(n).path==="/album"})},{default:mt(()=>o[4]||(o[4]=[Pt(" Album ",-1)])),_:1,__:[4]},8,["class"])])])]),o[6]||(o[6]=y("div",{class:"nav-spacer","aria-hidden":"true"},null,-1))])}}}),Rt=(t,n)=>{const e=t.__vccOpts||t;for(const[o,r]of n)e[o]=r;return e},Nc=Rt(jc,[["__scopeId","data-v-857ca258"]]),Kc={class:"app-layout"},Uc={class:"main-content"},Gc=xt({__name:"AppLayout",setup(t){return(n,e)=>{const o=Rn("router-view");return F(),B("div",Kc,[J(Nc),y("main",Uc,[J(o)])])}}}),qc=Rt(Gc,[["__scopeId","data-v-90f01ffa"]]),Wc=xt({__name:"App",setup(t){return(n,e)=>(F(),Qt(qc))}}),Xc="/images/myphoto.jpg",Qc="/icons/email.png",Jc="/icons/github.png",Yc="/icons/gitee.png",Zc="/icons/feishu.png",td={class:"my-box"},nd=xt({__name:"HomeView",setup(t){return(n,e)=>(F(),B("div",td,e[0]||(e[0]=[$i('<div class="container" data-v-509c37d8><div class="sidebar" data-v-509c37d8><div class="sidebar-image" data-v-509c37d8><img src="'+Xc+'" alt="个人照片" data-v-509c37d8></div><div class="sidebar-text" data-v-509c37d8><b data-v-509c37d8>Add:</b> Hangzhou Dianzi University, No.1158, the 2nd Street in Baiyang Street, Hangzhou Economic Development Zone, Hangzhou, China <br data-v-509c37d8><b data-v-509c37d8>E-mail:</b> haolanhe@hdu.edu.cn </div></div><div class="main-content" data-v-509c37d8><div class="head" data-v-509c37d8><span data-v-509c37d8>HaoLan He</span><span data-v-509c37d8>（何昊蓝）</span></div><div class="subhead" data-v-509c37d8><i data-v-509c37d8>AI Research Student • ENFJ </i></div><ul class="related-link" data-v-509c37d8><li data-v-509c37d8><a href="https://www.cs.zju.edu.cn/" target="_blank" data-v-509c37d8> Zhejiang University（浙江大学） </a></li><li data-v-509c37d8><a href="https://www.cst.zju.edu.cn/" target="_blank" data-v-509c37d8> College of Software（软件学院） </a></li></ul><div class="introduction" data-v-509c37d8><b style="font-size:24px;" data-v-509c37d8>Self-introduction: </b><ul data-v-509c37d8><li style="margin:2% 0;" data-v-509c37d8> I graduated from Hangzhou Dianzi University with a degree in Intelligent Science and Technology, ranking <b data-v-509c37d8>#1</b> in my major and securing a recommended place at Zhejiang University. </li><li style="margin:2% 0;" data-v-509c37d8> Currently, I am a graduate student in Artificial Intelligence at the <b data-v-509c37d8>College of Software, Zhejiang University</b>. My research focuses on <b data-v-509c37d8>AI Agent</b> and <b data-v-509c37d8>HCI</b>, with additional interests in <b data-v-509c37d8>CV</b> and <b data-v-509c37d8>AR&amp;VR</b>. </li><li style="margin:2% 0;" data-v-509c37d8> I always aspire to <i data-v-509c37d8>&quot;build valuable, warm products and technologies that truly serve people.&quot;</i></li></ul></div></div></div>',1),y("div",{class:"my-links"},[y("div",{class:"link-butt"},[y("a",{href:"mailto:haolanhe@hdu.edu.cn"},[y("img",{src:Qc,alt:"Email",style:{height:"40px",width:"40px"}})])]),y("div",{class:"link-butt"},[y("a",{href:"https://github.com/BLUE-coconut"},[y("img",{src:Jc,alt:"GitHub",style:{height:"40px",width:"40px"}})])]),y("div",{class:"link-butt"},[y("a",{href:"https://gitee.com/bluecoconut"},[y("img",{src:Yc,alt:"Gitee",style:{height:"40px",width:"40px"}})])]),y("div",{class:"link-butt"},[y("a",{href:"javascript:void(0);",onclick:"openImagePopup()"},[y("img",{src:Zc,alt:"Feishu",style:{height:"40px",width:"40px"}})])])],-1)])))}}),ed=Rt(nd,[["__scopeId","data-v-509c37d8"]]),od={},rd={class:"my-box"};function id(t,n){return F(),B("div",rd,n[0]||(n[0]=[$i('<div class="container" data-v-505a7856><div class="two-column resume" data-v-505a7856><section class="resume__section resume__header" data-v-505a7856><div class="resume__content" data-v-505a7856><h1 data-v-505a7856>Haolan He (何昊蓝)</h1><div class="info-item" data-v-505a7856><span class="info-label" data-v-505a7856><i class="fa fa-location-arrow" data-v-505a7856></i></span><span class="info-text" data-v-505a7856>Hangzhou Dianzi University, No.1158, the 2nd Street in Baiyang Street, Hangzhou Economic Development Zone, Hangzhou, China</span></div><div class="info-item" data-v-505a7856><span class="info-label" data-v-505a7856><i class="fa fa-envelope" data-v-505a7856></i></span><span class="info-text" data-v-505a7856>haolanhe@hdu.edu.cn</span></div></div></section><div class="resume__columns" data-v-505a7856><div class="resume__main" data-v-505a7856><section class="resume__section resume__summary" data-v-505a7856><div class="resume__content" data-v-505a7856><div class="resume__section-title" data-v-505a7856><i class="fa fa-pencil-square-o" data-v-505a7856></i><h2 data-v-505a7856>Professional Summary</h2></div><div class="other" data-v-505a7856><div class="other-info" data-v-505a7856><p data-v-505a7856> Computer science learner and resercher. Researching interests include artificial intellegence, computer vision and human computer interaction. </p></div></div></div></section><section class="resume__section resume__summary" data-v-505a7856><div class="resume__content" data-v-505a7856><div class="resume__section-title" data-v-505a7856><i class="fa fa-mortar-board" data-v-505a7856></i><h2 data-v-505a7856>Education</h2></div><div class="xp-item" data-v-505a7856><div class="xp-job" data-v-505a7856> HangzhouDianzi University, Zhuoyue Honors College </div><span data-v-505a7856>Undergraduate</span><div class="xp-date" style="float:right;font-weight:400;" data-v-505a7856>Sept. 2021 – June 2025</div><div class="xp-detail" data-v-505a7856><ul data-v-505a7856><li data-v-505a7856>Major: Intelligent science and technology</li><li data-v-505a7856>GPA: 4.79/5.0</li><li data-v-505a7856>Rank: 1/114</li></ul></div></div><div class="xp-item" data-v-505a7856><div class="xp-job" data-v-505a7856> Zhejiang University </div><span data-v-505a7856>Master</span><div class="xp-date" style="float:right;font-weight:400;" data-v-505a7856>Pre-admission for Recommended Exemption</div><div class="xp-detail" data-v-505a7856><ul data-v-505a7856><li data-v-505a7856>Major: Artificial intellegence</li></ul></div></div></div></section><section class="resume__section resume__experience" data-v-505a7856><div class="resume__content" data-v-505a7856><div class="resume__section-title" data-v-505a7856><i class="fa fa-briefcase" data-v-505a7856></i><h2 data-v-505a7856>Researches</h2></div><div class="xp-item" data-v-505a7856><div class="xp-job" data-v-505a7856> Interactive Fusion and Correlation Network for Three-Modal Images Few-Shot Semantic Segmentation </div><div class="xp-detail" data-v-505a7856><b data-v-505a7856>Haolan He</b>; Xianguo Dong; Xiaofei Zhou; Bo Wang; Jiyong Zhang; <ul data-v-505a7856><li data-v-505a7856> Published in IEEE Signal Processing Letters, 2024 [<a href="https://ieeexplore.ieee.org/document/10669915/authors#authors" data-v-505a7856>Paper</a>] [<a href="https://github.com/BLUE-coconut/Fewshot-VDT" data-v-505a7856>Code</a>] </li></ul></div></div><div class="xp-item" data-v-505a7856><div class="xp-job" data-v-505a7856> Efficient Object Detection Based on Multimodal Remote Sensing Images <small data-v-505a7856>, &quot;Xinmiao&quot; Talents Plan of Zhejiang Province</small></div><div class="xp-detail" data-v-505a7856><b data-v-505a7856>Project Leader</b><div class="xp-date" style="float:right;font-weight:400;" data-v-505a7856>ongoing</div></div></div></div></section><section class="resume__section resume__experience" data-v-505a7856><div class="resume__content" data-v-505a7856><div class="resume__section-title" data-v-505a7856><i class="fa fa-trophy" data-v-505a7856></i><h2 data-v-505a7856>Scholarships &amp; Awards</h2></div><div class="xp-item" data-v-505a7856><ul data-v-505a7856><li class="list-item" data-v-505a7856> National Scholarships, <span class="date" data-v-505a7856>2024</span></li><li class="list-item" data-v-505a7856> Zhejiang Provincial Government Scholarship, <span class="date" data-v-505a7856>2023</span></li><li class="list-item" data-v-505a7856> Zhejiang Provincial Government Scholarship, <span class="date" data-v-505a7856>2022</span></li><li class="list-item" data-v-505a7856> Outstanding Individual of the 19th Asian Games, <span class="date" data-v-505a7856>2024</span></li></ul></div></div></section></div><div class="resume__side" data-v-505a7856><section class="resume__section resume__skills" data-v-505a7856><div class="resume__content" data-v-505a7856><div class="resume__section-title" data-v-505a7856><i class="fa fa-align-center" data-v-505a7856></i><h2 data-v-505a7856>Skills</h2></div><div class="resume__text" data-v-505a7856><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>Python</div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:95%;" data-v-505a7856></div></div></div><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>Deeplearning<br data-v-505a7856><small data-v-505a7856>ML · DL · CV · NLP</small></div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:80%;" data-v-505a7856></div></div></div><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>AI framework<br data-v-505a7856><small data-v-505a7856>Pytorch · Tensflow · Mindspore · Paddle</small></div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:75%;" data-v-505a7856></div></div></div><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>HTML</div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:90%;" data-v-505a7856></div></div></div><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>CSS</div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:75%;" data-v-505a7856></div></div></div><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>JavaScript<br data-v-505a7856><small data-v-505a7856>React · Vue</small></div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:50%;" data-v-505a7856></div></div></div><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>IOS Development</div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:15%;" data-v-505a7856></div></div></div></div></div></section><section class="resume__section resume__languages" data-v-505a7856><div class="resume__content" data-v-505a7856><div class="resume__section-title" data-v-505a7856><i class="fa fa-globe" data-v-505a7856></i><h2 data-v-505a7856>Languages</h2></div><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>Chinese <small data-v-505a7856>(native)</small></div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:100%;" data-v-505a7856></div></div></div><div class="extra" data-v-505a7856><div class="extra-info" data-v-505a7856>English <small data-v-505a7856>(IELTS 7.5)</small></div><div class="extra-details" data-v-505a7856><div class="extra-details__progress" style="width:80%;" data-v-505a7856></div></div></div></div></section></div></div></div></div>',1)]))}const sd=Rt(od,[["render",id],["__scopeId","data-v-505a7856"]]),os=[{id:"ai-app",name:"AI 应用干货",icon:"✨",color:"#3498db",order:1,description:"Claude Code 高阶技巧、Agent Team 实操与日常 AI 提效记录"},{id:"llm-agent",name:"LLM & Agent",icon:"🧠",color:"#9b59b6",order:2,description:"RAG、MCP、KV Cache、Harness 等大模型与 Agent 底层原理"},{id:"rl",name:"强化学习",icon:"🎯",color:"#16a085",order:3,description:"MDP、策略分类、马尔可夫过程等强化学习核心概念"},{id:"dev-basics",name:"各类开发&计算机基础",icon:"💻",color:"#e67e22",order:4,description:"Dart、Flutter、Unity XR 等工程实践笔记"},{id:"english",name:"英语学习",icon:"📚",color:"#e74c3c",order:5,description:"雅思备考经验与英语学习方法论"}],Te=[{id:"claude-code-tips",categoryId:"ai-app",title:"Claude Code 高阶实用技巧",description:"/rewind、/rename、/statusline、/compact、/stats 等 6 个让 Claude Code 日常体验明显提升的高阶技巧。",coverImage:"/images/blog/claude-code-tips.png",updateTime:"2026-06-29",readTime:"12 min",tags:["Claude Code","AI 提效","工作流"],htmlPath:"./ai-app/claude-code-tips.html"},{id:"agent-team",categoryId:"ai-app",title:"Agent Team 使用实录",description:"OpenClaw SubAgent、Claude Agent Team、claude-code-bridge 三种多 Agent 协作方案实操对比。",coverImage:"/images/blog/agent-team.png",updateTime:"2026-03-08",readTime:"15 min",tags:["SubAgent","Agent Team","ccb"],htmlPath:"./ai-app/agent-team.html"},{id:"rag-concepts",categoryId:"llm-agent",title:"RAG 基本概念",description:"RAG 理论、数据爬取与预处理、向量存储与检索、RAG 链构造与测试优化的完整笔记。",coverImage:"/images/blog/rag-concepts.png",updateTime:"2025-09-20",readTime:"25 min",tags:["RAG","Embedding","向量检索"],htmlPath:"./llm-agent/rag-concepts.html"},{id:"mcp-cli-skill-plugin",categoryId:"llm-agent",title:"MCP & CLI & Skill & Plugin 概念原理辨析",description:"Claude Code 能力组合的四种机制：MCP、CLI、Skill、Plugin 的概念、原理与对比。",coverImage:"/images/blog/mcpcliskillplugin.png",updateTime:"2026-04-15",readTime:"18 min",tags:["MCP","Skill","Plugin"],htmlPath:"./llm-agent/mcp-cli-skill-plugin.html"},{id:"kv-cache",categoryId:"llm-agent",title:"缓存命中率 & KV Cache",description:"KV Cache（机制层）、Prefix Cache（工程层）、缓存命中率（指标层）三个层次的概念辨析。",coverImage:"/images/blog/kvcache.jpg",updateTime:"2026-05-15",readTime:"22 min",tags:["KV Cache","Prefix Cache","成本优化"],htmlPath:"./llm-agent/kv-cache.html"},{id:"harness-intro",categoryId:"llm-agent",title:"Harness 导论：从 LLM 到 Agent Harness",description:"从 Prompt Engineering 到 Context Engineering 再到 Harness Engineering 的方法论演进。",coverImage:"/images/blog/Harness.png",updateTime:"2026-02-20",readTime:"20 min",tags:["Harness","Agent","工程化"],htmlPath:"./llm-agent/harness-intro.html"},{id:"rl-basics",categoryId:"rl",title:"强化学习基础概念与分类",description:"强化学习定义、智能体要素、与监督学习的区别，以及 Model-Free / On-Policy / Policy-Based 等分类。",coverImage:"/images/blog/RL.png",updateTime:"2025-09-28",readTime:"18 min",tags:["MDP","策略","价值函数"],htmlPath:"./reinforcement-learning/rl-basics.html"},{id:"markov-process",categoryId:"rl",title:"马尔可夫过程",description:"从马尔可夫性到马尔可夫链、奖励过程，再到马尔可夫决策过程（MDP）的完整数学框架。",coverImage:"/images/blog/markov-process.png",updateTime:"2025-09-30",readTime:"16 min",tags:["MDP","Bellman","价值函数"],htmlPath:"./reinforcement-learning/markov-process.html"},{id:"dart",categoryId:"dev-basics",title:"Dart 语言核心要点",description:"Dart 变量定义（var / dynamic / final / const）、异步编程（Future / async / await）的核心要点。",coverImage:"/images/blog/Dart.jpg",updateTime:"2025-08-18",readTime:"15 min",tags:["Dart","异步编程","Flutter"],htmlPath:"./dev-basics/dart.html"},{id:"flutter",categoryId:"dev-basics",title:"Flutter 跨平台开发笔记",description:"Widget 四棵树、状态管理、路由管理、Key 原理、Provider 状态共享等 Flutter 核心模块。",coverImage:"/images/blog/Flutter.png",updateTime:"2025-08-25",readTime:"22 min",tags:["Flutter","Widget","Provider"],htmlPath:"./dev-basics/flutter.html"},{id:"unity-xr",categoryId:"dev-basics",title:"Unity XR 开发笔记",description:"XRI（XR Interaction Toolkit）、Input System、物理模拟的 Unity XR 开发核心模块笔记。",coverImage:"/images/blog/unity-xr.png",updateTime:"2025-04-25",readTime:"15 min",tags:["Unity","OpenXR","XRI"],htmlPath:"./dev-basics/unity-xr.html"},{id:"ielts",categoryId:"english",title:"雅思备考经验分享",description:"听力、阅读、写作、口语四科的备考方法与应试技巧总结。",coverImage:"/images/blog/IELTS.jpg",updateTime:"2023-04-25",readTime:"12 min",tags:["IELTS","English","备考"],htmlPath:"./english/ielts.html"}];function Ue(t){return os.find(n=>n.id===t)}function rs(t){return Te.filter(n=>n.categoryId===t).sort((n,e)=>e.updateTime.localeCompare(n.updateTime))}function ld(t,n){const e=rs(t),o=e.findIndex(r=>r.id===n);return{prev:o>0?e[o-1]:null,next:o>=0&&o<e.length-1?e[o+1]:null}}const ad={class:"post-card__cover"},cd=["src","alt"],dd={key:1,class:"post-card__placeholder"},ud={class:"post-card__meta"},pd={key:0,class:"post-card__category"},gd={class:"post-card__date"},fd={class:"post-card__readtime"},hd={class:"post-card__title"},md={key:0,class:"post-card__desc"},bd=xt({__name:"BlogCard",props:{post:{}},setup(t){const n=t,e=Vo(),o=at(()=>Ue(n.post.categoryId));function r(){e.push(`/blog/${n.post.categoryId}/${n.post.id}`)}return(i,s)=>(F(),B("article",{class:"post-card",onClick:r},[y("div",ad,[i.post.coverImage?(F(),B("img",{key:0,src:i.post.coverImage,alt:i.post.title,loading:"lazy"},null,8,cd)):(F(),B("div",dd,s[0]||(s[0]=[y("span",{class:"post-card__placeholder-text"},"No Cover",-1)])))]),y("div",ud,[o.value?(F(),B("span",pd,tt(o.value.name),1)):gt("",!0),s[2]||(s[2]=y("span",{class:"post-card__sep"},"·",-1)),y("time",gd,tt(i.post.updateTime),1),i.post.readTime?(F(),B(ut,{key:1},[s[1]||(s[1]=y("span",{class:"post-card__sep"},"·",-1)),y("span",fd,tt(i.post.readTime),1)],64)):gt("",!0)]),y("h3",hd,tt(i.post.title),1),i.post.description?(F(),B("p",md,tt(i.post.description),1)):gt("",!0)]))}}),is=Rt(bd,[["__scopeId","data-v-172559d9"]]),vd={class:"my-box"},_d={class:"container"},xd={class:"hero"},yd={class:"hero__subtitle"},wd={class:"topics","aria-label":"Topics"},Cd={class:"latest"},Sd={class:"latest__grid"},kd=xt({__name:"BlogView",setup(t){const n=at(()=>[...os].sort((r,i)=>r.order-i.order)),e=at(()=>[...Te].sort((r,i)=>i.updateTime.localeCompare(r.updateTime))),o=at(()=>`${e.value.length} selected writings on AI, LLM, Reinforcement Learning, development, and English learning.`);return(r,i)=>{const s=Rn("router-link");return F(),B("div",vd,[y("div",_d,[y("header",xd,[i[0]||(i[0]=y("h1",{class:"hero__title"},"Blogs",-1)),y("p",yd,tt(o.value),1)]),y("nav",wd,[J(s,{to:"/blog",class:"topics__item topics__item--active"},{default:mt(()=>i[1]||(i[1]=[Pt(" All ",-1)])),_:1,__:[1]}),i[2]||(i[2]=y("span",{class:"topics__sep","aria-hidden":"true"},"·",-1)),(F(!0),B(ut,null,An(n.value,l=>(F(),Qt(s,{key:l.id,to:`/blog/${l.id}`,class:"topics__item"},{default:mt(()=>[Pt(tt(l.name),1)]),_:2},1032,["to"]))),128))]),i[4]||(i[4]=y("hr",{class:"divider"},null,-1)),y("section",Cd,[i[3]||(i[3]=y("h2",{class:"latest__heading"},"Latest",-1)),y("div",Sd,[(F(!0),B(ut,null,An(e.value,l=>(F(),Qt(is,{key:l.id,post:l},null,8,["post"]))),128))])])])])}}}),Ad=Rt(kd,[["__scopeId","data-v-aae09b52"]]),Pd={class:"my-box"},Rd={class:"container"},Md={class:"back-nav","aria-label":"Breadcrumb"},Td={key:0,class:"section"},Id={class:"hero"},Ed={class:"hero__title"},Ld={key:0,class:"hero__subtitle"},Od={class:"hero__meta"},Fd={key:0,class:"latest__grid"},zd={key:1,class:"empty"},Dd={key:1,class:"section"},Hd={class:"not-found"},$d=xt({__name:"BlogCategoryView",props:{categoryId:{}},setup(t){const n=t,e=at(()=>Ue(n.categoryId)),o=at(()=>rs(n.categoryId));return(r,i)=>{const s=Rn("router-link");return F(),B("div",Pd,[y("div",Rd,[y("nav",Md,[J(s,{to:"/blog",class:"back-nav__link"},{default:mt(()=>i[0]||(i[0]=[y("span",{class:"back-nav__arrow"},"←",-1),y("span",null,"All topics",-1)])),_:1,__:[0]})]),e.value?(F(),B("section",Td,[y("header",Id,[y("h1",Ed,tt(e.value.name),1),e.value.description?(F(),B("p",Ld,tt(e.value.description),1)):gt("",!0),y("p",Od,tt(o.value.length)+" article"+tt(o.value.length===1?"":"s"),1)]),i[2]||(i[2]=y("hr",{class:"divider"},null,-1)),o.value.length>0?(F(),B("div",Fd,[(F(!0),B(ut,null,An(o.value,l=>(F(),Qt(is,{key:l.id,post:l},null,8,["post"]))),128))])):(F(),B("div",zd,i[1]||(i[1]=[y("p",null,"该分类下暂无文章。",-1)])))])):(F(),B("section",Dd,[y("div",Hd,[i[4]||(i[4]=y("h1",{class:"not-found__title"},"Topic not found",-1)),J(s,{to:"/blog",class:"not-found__link"},{default:mt(()=>i[3]||(i[3]=[Pt(" Back to blogs → ",-1)])),_:1,__:[3]})])]))])])}}}),Bd=Rt($d,[["__scopeId","data-v-fc6867be"]]),Vd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Team 使用实录</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #3498db;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(52, 152, 219, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #2980b9;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 14px; line-height: 1.6;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: 13px; }
+    blockquote {
+      border-left: 3px solid #3498db;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #f8fafc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      本文是我近一段时间对 SubAgent、Claude Agent Team、claude-code-bridge 三种「多 Agent 协作」方案的实操记录与总结，
+      包含各类 AI CLI 的使用经验、MEMORY.md 配置范式，以及一些踩坑后的建议。
+    </p>
+
+    <h2 id="openclaw-subagent">一、OpenClaw SubAgent</h2>
+    <p>
+      闲暇之余我也开始养龙虾。最让人难受的是，<strong>小龙虾遇到复杂问题时，往往要干等很久才收到回复</strong>。
+      针对这个问题这两天我进行了一些探索，最终探出一套<strong>简单好用的方法——使用 SubAgent</strong>。
+    </p>
+    <img src="/images/blog/feishu/Mrb3b2QP7ogivnxd0a4cPowSnuf.png" alt="OpenClaw 主 Agent 阻塞问题示例">
+    <img src="/images/blog/feishu/HMcBbsWExof5ZaxLTOEcrXG2nof.png" alt="OpenClaw SubAgent 分发任务示例">
+    <p>
+      在复杂任务中，OpenClaw 长时间不回复的根因是 OpenClaw <strong>主 Agent</strong> 在复杂任务中自行进行检索、指令运行、文件编写等工作的时候，
+      默认的设置是它得到检索或者运行结论后才会进行消息回复，而<strong>在此过程中它忙于处理手头上的检索或者运行任务，是处于「阻塞」的状态</strong>，
+      即使你跟他发送新消息也无法回复。
+    </p>
+    <p>
+      所以解决复杂任务长时间不回复的关键在于<strong>把检索、指令运行、文件编写等这些具体的执行任务下发给 SubAgent</strong>，
+      主 Agent 只需接受信息进行规划并下发任务即可，<strong>在 SubAgent 执行任务的过程中，主 Agent 还可以继续向你汇报进度以及回复你的问题</strong>。
+    </p>
+    <p>
+      此外，我还做了一些流程上的优化，要求它<strong>先分辨是简单提问还是复杂任务</strong>。若为复杂任务，
+      则需要<strong>先进行实施规划（包括拆分子任务）并征求我的意见</strong>，当我批准后<strong>将任务分配给 SubAgent</strong>，
+      并且在「开始」、「任务过程中（有阶段性成果或者达到设定的时间间隔）」、「完成」时<strong>向我汇报任务进展</strong>。
+    </p>
+    <blockquote>
+      <p>需要实现上述功能，只需将规则梳理好<strong>写到 OpenClaw 的 MEMORY.md 文档中</strong>作为它的长期记忆即可，非常简单。</p>
+    </blockquote>
+
+    <h2 id="claude-agent-team">二、Claude Agent Team</h2>
+    <p>
+      Claude 团队在今年年初发布的一款实验产品——Claude Agent Team，当时技术圈讨论的很多，尤其是它的架构想法很不错。
+    </p>
+    <img src="/images/blog/feishu/L5bbbLb0Fo3ScAxJ9a0cdKGDnNd.png" alt="Claude Agent Team 架构示意图">
+    <p>
+      简而言之，原本 SubAgent 的架构，<strong>所有 SubAgent 只能和 main agent 通讯</strong>，
+      相当于几个干活的员工只跟上级汇报，员工之间无法沟通。而新的 Agent Team 则是把 SubAgent 升级成 teammate，
+      它们不再只是各自干活，<strong>teammate agent 之间也能相互交流，并且共享一个 task list</strong>。
+    </p>
+    <p>
+      我在过年放假时，就尝试配置和使用。<strong>总体来说，我觉得架构想法很好，但还有待优化。</strong>
+    </p>
+    <p>
+      主要原因是 Claude Agent Team 暂时没提供不同模型配置的功能（可能最近有三方工具支持，我没留意），
+      这导致如果使用 Claude 模型，效果是很棒，但花费也会很高，不太划算。为了节省成本，使用国产模型则效果不尽人意，
+      这种 teamwork 的模式反而加重了上下文的复杂度，整个 Agent Team 协作得很乱，需要设定 Rule 进行约束。
+    </p>
+
+    <h2 id="ccb">三、Tmux + claude-code-bridge</h2>
+    <p>
+      在 GitHub 上有个很不错的开源工具 <a href="#">claude-code-bridge</a>（简称 ccb），
+      让 Claude Code 能够调用 Codex、Gemini、OpenCode 等进行分工开发。
+      相比 Claude Agent Team 它的缺点是 main agent 目前只能是 Claude（即只能 Claude 单向询问/请求其他 CLI），
+      且其他 CLI 之间无法通讯（类似 SubAgent 那套方式），但好处在于不同 CLI 里配置不同模型进行开发，可以博采众长。
+    </p>
+
+    <h3 id="ccb-experience">我对于各 AI CLI 的使用经验如下：</h3>
+    <img src="/images/blog/feishu/DCG5b6sjWoobkBx57mXcRGaonYc.png" alt="claude-code-bridge 协作示意">
+    <ul>
+      <li><strong>Codex</strong> 擅长分析，我一般用作<strong>代码审查和方案规划与分工</strong></li>
+      <li><strong>Gemini</strong> 擅长<strong>前端开发</strong>，负责复杂的前端 UI 优化问题</li>
+      <li>一般开发任务，<strong>优先</strong>使用 OpenCode 中接入<strong>MiniMax</strong>（性价比高，降低整体开销）</li>
+      <li><strong>Claude</strong> 开发能力全面，适合解决复杂问题，作为<strong>兜底</strong>。当上述模型解决不了时，进行<strong>问题分析和修复</strong></li>
+      <li>在完成一项重大修改或者遇到难以解决的问题时，可以要求各 AI CLI 都全面分析整个项目，针对存在的问题现象给出原因分析和解决方案，整合各 CLI 的分析进行下一步规划</li>
+    </ul>
+
+    <h2 id="recommendations">四、其他建议</h2>
+
+    <h3 id="recommendations-models">1) 关于 coding 模型的推荐</h3>
+    <ul>
+      <li>我认为目前最好用且较耐用的是 Codex，可以找朋友两个人一起开个 Business 会员。最近开始限制用量了，略微有点不够用。我最近用的比较狠，差不多两三个项目同步开发在用，以及 OpenClaw 主模型也是接的 Codex，一周的配额差不多 6 天用完了。</li>
+      <li>Claude 会员不建议自己开，封号风险较大。最好是找国内中转平台购买 token，没啥缺点就是烧钱。</li>
+      <li>Gemini 可以某鱼买个一年学生号，先用着，Gemini 在前端类的开发中跟前两者差不多，但有些后端或者复杂架构、性能的问题它解决不了。</li>
+      <li>国产模型里面我用的比较多 MiniMax，在我的开发场景（Python、Flutter、Web 应用）中整体表现不错，速度也快，个人觉得是国内性价比 Top2 以内吧。</li>
+    </ul>
+
+    <h3 id="recommendations-openclaw">2) 关于 OpenClaw 的使用</h3>
+    <p>
+      因为没个人主机，我是部署在腾讯云服务器上，之前搞活动服务器一年才 79¥。
+    </p>
+    <p>
+      我的配置是主模型用 OpenAI-Codex（要配置 proxy），SubAgent 使用 MiniMax（也可以选用其他模型），
+      需要注意 SubAgent 的并发数，建议同时并行不超过 3 个同一 Provider 的 SubAgent（也在 MEMORY.md 规则里进行约束），
+      否则容易触发限流，导致 OpenClaw 的 cooldown（不是模型服务商的问题，而是 OpenClaw 设定的机制）。
+    </p>
+
+    <h3 id="memory-md">3) MEMORY.md 范式</h3>
+    <p>我在 AGENTS.md 中的设定如下：</p>
+    <pre><code># MEMORY.md - Your LongTerm Memory
+
+## Main Rules
+
+Before doing anything in Main Session (direct chat with your human):
+
+1. First determine whether the task is **simple** or **complex** based on the rules in **Scope of Application**.
+   - **Complex tasks** are long-running, exploratory, or multi-step.
+   - **Simple tasks** can be completed quickly and safely in the main session.
+
+2. Always provide an **opening report before execution**, including the objective, approach, task breakdown, risks, and acceptance criteria.
+   - For complex tasks, wait for user confirmation before starting.
+
+3. Use **sub-agent-first orchestration** for any complex task, including search/research, local tool execution, development/coding/debugging, environment setup, build/run/deploy, and other multi-step workflows.
+   - Only handle tasks directly in the main session when they are simple and can finish quickly.
+   - The main agent is responsible for requirement clarification, task decomposition, quality control, progress reporting, and final delivery.
+
+4. Decompose complex work into **independent subtasks** that do not interfere with each other (for example, no overlapping file changes and no conflicting dependencies).
+   - Use clear task definitions with **goal, constraints, and verifiable acceptance criteria**.
+   - During execution, provide progress updates at **start**, **milestone**, and **completion**.
+   - For long tasks, report periodically based on sub-agent status (roughly every 2-3 minutes or on major state changes), instead of waiting until everything is finished.
+
+5. Prefer **MiniMax** by default for routine development, small changes, and stable implementation.
+   - Escalate to **OpenAI Codex** only when MiniMax cannot solve the issue, or when the task involves complex errors, architectural conflicts, or system/environment dependency problems.
+   - At any given time, run no more than **1 Codex sub-agent** and no more than **3 MiniMax sub-agents** in parallel.
+
+6. Do not perform potentially risky actions without explicit user approval.
+   - This includes installing or uninstalling software, changing environment configuration, deleting files, committing code, pushing changes, or any other external or destructive action.
+   - By default, first show the proposed changes or plan, then wait for approval before executing.
+
+7. When handling a complicated task, find and use relevant skills in \`skills\` whenever applicable.
+
+---
+
+## Scope of Application
+
+The following should generally be treated as **complex tasks** and executed through sub-agents with staged reporting:
+
+- **Search and research tasks**: web research, solution comparison, technical evaluation, document reading and summarization
+- **Local tool execution tasks**: multi-command troubleshooting, environment inspection, log analysis, script-based batch processing
+- **Development tasks**: coding, refactoring, debugging, testing, code review, PR preparation
+- **Engineering execution tasks**: installation, configuration, build, startup, deployment, integration, regression validation
+- **Other complex tasks**: any task expected to take more than 2 minutes or involve 3 or more major steps
+
+Only tasks that are **simple and can be completed quickly** may be handled directly by the main agent.
+
+---
+
+## Reporting Format
+
+Every progress update should follow this format:
+
+- **Status**: running / blocked / done
+- **Completed**: 1-3 completed items
+- **Current**: what is being worked on now
+- **ETA**: estimated remaining time
+- **SubAgent**: basic information about the sub-agent, including which model is being used
+- **Need you**: only fill this in when a user decision is required</code></pre>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      三种 Agent 协作方案各有取舍：
+    </p>
+    <table>
+      <thead>
+        <tr><th>方案</th><th>优势</th><th>劣势</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SubAgent</td>
+          <td>架构简单，MEMORY.md 即可配置，资源开销低</td>
+          <td>SubAgent 之间无法通信，全部依赖主 Agent 中转</td>
+        </tr>
+        <tr>
+          <td>Claude Agent Team</td>
+          <td>teammate 共享 task list、可互通讯</td>
+          <td>模型选择受限于 Claude，成本高；国产模型协作混乱</td>
+        </tr>
+        <tr>
+          <td>claude-code-bridge</td>
+          <td>可接入不同模型 CLI（Codex / Gemini / OpenCode），按场景分工</td>
+          <td>main agent 只能是 Claude，CLI 之间不通讯</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      综合下来，<strong>个人开发者最实用的是 SubAgent + claude-code-bridge 组合</strong>：
+      主 Agent 用 Claude 做规划，子任务按「代码审查→Codex，前端→Gemini，日常开发→MiniMax」分流，
+      既兼顾效果又把成本压在可控范围。
+    </p>
+  </article>
+</body>
+</html>`,jd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code 高阶实用技巧</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #3498db;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(52, 152, 219, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #2980b9;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 14px; line-height: 1.6;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; }
+    blockquote {
+      border-left: 3px solid #3498db;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #f8fafc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      Claude Code 不只是「写代码的 ChatGPT」——它内置了一套成熟的会话管理、上下文控制、可观测性能力。
+      本文整理 6 个让日常体验明显提升的高阶技巧：撤销、重命名、洞察、状态栏、压缩、配额。
+    </p>
+
+    <h2 id="rewind">一、撤销对话与代码（/rewind）</h2>
+    <p>
+      写到一半发现「刚才那个改动方向错了」——以前只能 <code>git checkout</code>，
+      现在 Claude Code 自带会话级时光机。
+    </p>
+
+    <h3 id="rewind-trigger">触发方式（任选其一）</h3>
+    <ul>
+      <li>连按两次 <code>Esc</code>（最快）</li>
+      <li>输入 <code>/rewind</code>（别名 <code>/checkpoint</code>、<code>/undo</code>）</li>
+    </ul>
+    <p>
+      打开一个可滚动菜单，列出会话中你的每一条消息作为 checkpoint，选中后有四种回退方式：
+    </p>
+    <table>
+      <thead>
+        <tr><th>选项</th><th>行为</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Restore code and conversation</td><td>对话和代码都回到该点</td></tr>
+        <tr><td>Restore conversation</td><td>只回退对话，代码保留</td></tr>
+        <tr><td>Restore code</td><td>只回退代码，对话保留</td></tr>
+        <tr><td>Summarize from here</td><td>从该点起，把后续消息压缩成摘要（保留上文完整）</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="rewind-pitfalls">重要陷阱</h3>
+    <ul>
+      <li>只追踪 Claude 用编辑工具改的文件。<strong>Bash 命令改动的文件（rm、mv、脚本生成）不会被追踪</strong>——这种场景仍要靠 git</li>
+      <li>Checkpoint 默认 30 天后自动清理（可在 settings 里改）</li>
+      <li>Checkpoint ≠ Git。它是会话内的本地撤销，不是版本控制；离开会话后，git 才是唯一靠谱的历史</li>
+    </ul>
+
+    <h2 id="rename">二、会话重命名（/rename）</h2>
+    <p>
+      默认 session 在 <code>/resume</code> 里只有 UUID 和首条消息预览，多了之后完全分不清谁是谁。
+      <code>/rename</code> 命令能够自行定义会话名称，可以将一些重要会话进行标识，方便后续 <code>/resume</code> 时快速找到。
+    </p>
+    <img src="/images/blog/feishu/XtIDbG0RQoAUMjxkQShc9guHnUf.png" alt="/rename 会话重命名示例">
+
+    <h3 id="rename-usage">用法</h3>
+    <pre><code># 会话中
+/rename                     # 不带参数：基于内容自动生成
+/rename feishu-doc-refactor # 显式指定名字
+
+# 启动时
+claude -n "feishu-doc-refactor"
+claude --name "feishu-doc-refactor"</code></pre>
+
+    <h3 id="rename-locations">显示位置</h3>
+    <ul>
+      <li>prompt bar 顶端</li>
+      <li><code>/resume</code> 选择器列表（在选择器中按 <code>R</code> 也能快速重命名）</li>
+      <li>statusline JSON 字段 <code>session_name</code>（可被自定义状态栏脚本读取）</li>
+    </ul>
+    <blockquote>
+      <p>小技巧：重要的会话记得 <code>/rename</code>，方便后续定位找到要继续的对话。</p>
+    </blockquote>
+
+    <h2 id="insights">三、会话洞察（/insights）</h2>
+    <p>这是个相对冷门但很有意思的功能：让 Claude 分析你最近的使用习惯。</p>
+
+    <h3 id="insights-trigger">触发</h3>
+    <pre><code>/insights</code></pre>
+
+    <h3 id="insights-content">做什么</h3>
+    <p>
+      扫描本地最近 30 天的会话历史，生成一份<strong>交互式 HTML 报告</strong>，
+      会放在 <code>~/.claude/usage-data/report.html</code>（若没有自动跳转，可手动打开），自动在浏览器打开。
+      报告内容大致有：
+    </p>
+    <ul>
+      <li>你最常处理的项目区域</li>
+      <li>高频交互模式</li>
+      <li>「摩擦点」——比如某类指令反复需要 3-5 轮纠正才能达到目的</li>
+      <li>建议：把重复出现的指令沉淀进 CLAUDE.md</li>
+    </ul>
+    <img src="/images/blog/feishu/DCnWbczxOoWIdDxWeTgcEjyOn8c.png" alt="/insights 报告示例">
+    <blockquote>
+      <p>纯本地处理，不上传任何数据。每月/每季度回顾一次，能发现自己没意识到的习惯，进而沉淀成 CLAUDE.md 或 skills。</p>
+    </blockquote>
+
+    <h2 id="statusline">四、自定义状态栏（/statusline）</h2>
+    <p>
+      可自定义终端对话输入框下方的状态栏所陈列的信息，例如 token 用量、当前模型、上下文用量等。
+    </p>
+
+    <h3 id="statusline-quick">最快配置：自然语言让 Claude Code 自行生成</h3>
+    <pre><code>/statusline show model name, context usage percentage, git branch, and total cost</code></pre>
+    <p>Claude 会自动写一个脚本并更新 <code>~/.claude/settings.json</code>。</p>
+
+    <h3 id="statusline-manual">手动配置</h3>
+    <p>在 <code>~/.claude/settings.json</code> 里加：</p>
+    <pre><code>{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "padding": 2,
+    "refreshInterval": 5
+  }
+}</code></pre>
+
+    <h3 id="statusline-fields">脚本能拿到的关键 JSON 字段</h3>
+    <table>
+      <thead>
+        <tr><th>字段</th><th>含义</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>model.display_name</code></td><td>当前模型名</td></tr>
+        <tr><td><code>cwd</code> / <code>workspace.project_dir</code></td><td>当前目录</td></tr>
+        <tr><td><code>cost.total_cost_usd</code></td><td>累计花费</td></tr>
+        <tr><td><code>context_window.used_percentage</code></td><td>上下文已用百分比（看是否该 /compact 的关键指标）</td></tr>
+        <tr><td><code>rate_limits.five_hour.used_percentage</code></td><td>5 小时配额使用率</td></tr>
+        <tr><td><code>session_id</code> / <code>session_name</code></td><td>会话 ID 和你 /rename 设置的名字</td></tr>
+      </tbody>
+    </table>
+    <blockquote>
+      <p>状态栏脚本会在每条新消息后跑一次，避免里面调慢命令。git 之类的输出建议加缓存。</p>
+    </blockquote>
+
+    <h2 id="compact">五、上下文压缩（/compact）</h2>
+    <p><code>/compact</code> 和 <code>/clear</code> 经常被混用，但行为完全不同。</p>
+    <table>
+      <thead>
+        <tr><th>命令</th><th>对话历史</th><th>代码改动</th><th>适用场景</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>/clear</code></td><td><strong>完全清空</strong>重开</td><td>不动</td><td>任务彻底切换、和当前没有上下文关联</td></tr>
+        <tr><td><code>/compact [指令]</code></td><td><strong>压缩成摘要</strong>保留要点</td><td>不动</td><td>同一任务继续做，但上下文已经吃紧</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="compact-manual">手动用法</h3>
+    <pre><code>/compact 重点保留架构决策和未完成的 TODO，可以丢弃中间调试细节</code></pre>
+    <p>带参数会指导摘要的侧重点，不带参数走默认策略。</p>
+    <blockquote>
+      <p>上下文用到约 <strong>83.5%</strong> 时（剩约 33K tokens 缓冲区）会自动 compact。</p>
+    </blockquote>
+
+    <h3 id="compact-best-practice">最佳实践</h3>
+    <ul>
+      <li>别等自动触发——质量会明显下滑。<strong>养成在 ~60% 主动 /compact 的习惯</strong>（看状态栏百分比）</li>
+      <li>关键规则放在 CLAUDE.md，不要只口头告诉 Claude——<code>/compact</code> 后口头指令可能丢失，但 CLAUDE.md 永远在</li>
+      <li>单文件过大时频繁 compact 会引发 thrashing，这种情况下 <code>/clear</code> 更干脆</li>
+    </ul>
+
+    <h2 id="stats">六、查看用量与配额（/stats）</h2>
+    <p><code>/stats</code> 查看 Claude Code 近期活动统计：</p>
+    <img src="/images/blog/feishu/BhlGbcItNodRmJx7wfacVjxbnVd.png" alt="/stats 用量统计示例">
+    <ul>
+      <li><strong>所用对话</strong>累计成本（API 计费用户看 USD 数字；订阅用户看不到具体金额）</li>
+      <li><strong>5 小时配额</strong>已用百分比 + 下次重置时间</li>
+      <li><strong>7 天配额</strong>已用百分比（订阅用户最重要的指标）</li>
+      <li><strong>活动统计</strong>：消息数、各模型的 token 分布、工具调用次数</li>
+    </ul>
+    <blockquote>
+      <p>输入 <code>r</code> 可切换统计的时间段</p>
+    </blockquote>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      Claude Code 的这些「隐形功能」反映出一个核心设计哲学：<strong>把可观测性和可回滚性做进工具本身</strong>。
+      习惯使用 <code>/rewind</code>、<code>/rename</code>、<code>/statusline</code>、<code>/compact</code> 这四条之后，
+      日常开发的「摩擦成本」会明显降低——尤其是复杂长任务场景。
+    </p>
+    <p>
+      最后，把重复指令沉淀进 CLAUDE.md、每季度跑一次 <code>/insights</code> 复盘自己的工作流，
+      是真正能让 Claude Code 从「能用的工具」变成「值得托付的工具」的两个关键习惯。
+    </p>
+  </article>
+</body>
+</html>`,Nd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dart 语言核心要点</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #e67e22;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    h4 {
+      font-size: 17px; font-weight: 600;
+      margin: 24px 0 8px;
+      color: #2c3e50;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(230, 126, 34, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #af601a;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #e67e22;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #fdf6ee;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      Dart 是 Flutter 的底层语言。本文整理 Dart 中最易混淆的<strong>变量定义</strong>（var / dynamic / final / const）和<strong>异步编程</strong>（Future / async / await）的核心要点，
+      并附带 Flutter 场景下的最佳实践。
+    </p>
+
+    <h2 id="variables">一、变量定义</h2>
+    <p>Dart 提供了四种变量声明方式：<code>var</code>、<code>dynamic</code>、<code>const</code>、<code>final</code>，关键区分如下：</p>
+
+    <h3 id="var-vs-dynamic">var vs dynamic</h3>
+    <p>简单来说，<strong><code>var</code> 是「类型推断」，而 <code>dynamic</code> 是「关闭类型检查」</strong>。</p>
+
+    <h4>var 的使用场景（首选）</h4>
+    <p>在绝大多数情况下使用 <code>var</code> 来声明局部变量，前提是你能从赋值中清晰地看出变量的类型。这让代码更简洁，同时保持了类型安全。</p>
+    <pre><code>@override
+Widget build(BuildContext context) {
+  // 类型清晰，使用 var
+  var title = 'My Awesome App';
+  // title = 123; // 编译时报错
+
+  // 从 Flutter API 获取的对象
+  var theme = Theme.of(context);  // 推断为 ThemeData
+
+  var numbers = [10.0, 20.0, 30.0];
+  for (var number in numbers) {
+    // number 被推断为 double
+    print(number.toStringAsFixed(1));
+  }
+
+  return Scaffold(
+    appBar: AppBar(title: Text(title)),
+    body: Container(color: theme.primaryColor),
+  );
+}</code></pre>
+
+    <h4>dynamic 的使用场景（慎用）</h4>
+    <p>只有当你<strong>无法在编译时确定变量的类型</strong>时，才应该使用 <code>dynamic</code>。最常见的场景是处理来自外部的数据，比如 JSON。</p>
+    <pre><code>import 'dart:convert';
+
+void processResponse(String jsonString) {
+  // 这里使用 Map&lt;String, dynamic&gt; 是更规范的写法
+  Map&lt;String, dynamic&gt; decodedJson = json.decode(jsonString);
+
+  // data 的类型不确定，所以它是 dynamic
+  dynamic data = decodedJson['data'];
+
+  // 在运行时检查 data 的实际类型
+  if (data is String) {
+    print('Data is a string: $data');
+  } else if (data is List) {
+    print('Data is a list with \${data.length} items.');
+  }
+
+  // 错误示范：不检查直接当 String 用，可能运行时崩溃
+  // print(data.toUpperCase()); // 如果 data 是 List，这里会 Crash!
+}</code></pre>
+
+    <h3 id="final-vs-const">final vs const：初始化时机不同</h3>
+    <p>这两者都用于声明<strong>不可变变量</strong>，但核心区别在于：<strong><code>const</code> 必须在编译时确定其值，而 <code>final</code> 可以在运行时确定其值</strong>。</p>
+
+    <h4>final 的使用场景</h4>
+    <p>当一个变量只会被初始化一次，但它的值需要通过计算或在程序运行时才能得到时，就用 <code>final</code>。</p>
+    <pre><code>class UserProfile extends StatelessWidget {
+  // name 和 avatarUrl 在创建实例时才确定, 必须用 final
+  final String name;
+  final String avatarUrl;
+
+  const UserProfile({super.key, required this.name, required this.avatarUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Text(name),
+      CircleAvatar(backgroundImage: NetworkImage(avatarUrl)),
+    ]);
+  }
+}</code></pre>
+
+    <pre><code>class _MyAnimationState extends State&lt;MyAnimation&gt; with SingleTickerProviderStateMixin {
+  // controller 在运行时才被初始化,所以用 final
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: Duration(seconds: 1));
+  }
+}</code></pre>
+
+    <h4>const 的使用场景</h4>
+    <p>当一个值在写代码的时候就已经完全确定，并且永远不会改变时，就用 <code>const</code>。<strong>在 Flutter 中，<code>const</code> 是最重要的性能优化工具之一</strong>。</p>
+    <pre><code>class _MyDashboardState extends State&lt;MyDashboard&gt; {
+  int _counter = 0;
+
+  void _increment() {
+    setState(() { _counter++; });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          // 优化点 1: 常量 Widget —— setState 时 Flutter 会跳过它
+          const Text('You have pushed the button:'),
+
+          // 变量 Widget，依赖 _counter
+          Text('$_counter'),
+
+          // 优化点 2: 整个复杂 Widget 树都可以是 const
+          const FooterWidget(),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _increment,
+        // 优化点 3: 图标也是常量
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}</code></pre>
+
+    <h4>总结</h4>
+    <ul>
+      <li><strong>黄金法则</strong>：尽可能地使用 <code>const</code>。在你的 Flutter 代码中，只要 IDE 提示你可以添加 <code>const</code>（通常会显示蓝色波浪线），就毫不犹豫地加上它。</li>
+      <li><strong><code>final</code></strong> 用于那些<strong>在运行时初始化一次</strong>就不再改变的变量（如 Widget 的属性、<code>initState</code> 里的控制器）。</li>
+      <li><strong><code>const</code></strong> 用于那些<strong>在编译时就已经完全确定</strong>的值（如颜色、固定文本、边距、图标），是 Flutter 的免费性能优化器。</li>
+    </ul>
+
+    <h2 id="async">二、异步编程</h2>
+    <p>异步编程是现代编程的基石，尤其在需要网络请求和用户交互的前端/客户端开发中。掌握它不仅是学习语法，更是一种<strong>编程思维的转变</strong>。</p>
+
+    <h3 id="async-stages">Part 1：演进的三个阶段</h3>
+    <ol>
+      <li><strong>回调函数（Callbacks）</strong>：最早的方式。你发起一个任务，并传递一个函数（回调）给它，告诉它任务完成后该做什么。这会导致「回调地狱（Callback Hell）」，代码难以阅读和维护。</li>
+      <li><strong>Promise / Future</strong>：一个巨大的进步。异步任务不再直接接收回调，而是立即返回一个「凭证」对象（在 Dart/Python 中叫 <code>Future</code>，在 JavaScript 中叫 <code>Promise</code>）。它有三种状态：pending、fulfilled/resolved、rejected/rejected。</li>
+      <li><strong><code>async / await</code> 语法糖</strong>：现代的终极形态。它本质上是建立在 <code>Promise/Future</code> 之上的语法糖，让你能用<strong>看起来像同步代码的方式去编写异步代码</strong>，从而彻底告别回调地狱。</li>
+    </ol>
+
+    <h3 id="async-comparison">Part 2：四大语言横向对比</h3>
+    <p>统一的任务：<strong>模拟从服务器获取用户信息</strong>，对比四种语言的实现。</p>
+
+    <h4>Dart（用于 Flutter）</h4>
+    <pre><code>// 模拟一个耗时2秒的网络请求
+Future&lt;String&gt; fetchUserData() {
+  return Future.delayed(Duration(seconds: 2), () {
+    return '{"name": "Alice", "id": 1}';
+  });
+}
+
+// 推荐方式: async / await
+Future&lt;void&gt; displayUser() async {
+  print('开始获取用户数据...');
+  try {
+    // await 关键字"暂停"此函数的执行,但不会阻塞整个程序
+    String userDataJson = await fetchUserData();
+    print('数据获取成功: $userDataJson');
+  } catch (e) {
+    // 如果 Future 以 error 结束,await 会抛出异常,可以被 try/catch 捕获
+    print('捕获到错误: $e');
+  }
+  print('函数执行完毕。');
+}</code></pre>
+
+    <h4>Swift（用于 iOS/macOS）</h4>
+    <pre><code>import Foundation
+
+func fetchUserData() async throws -&gt; String {
+  try await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+  return "{\\"name\\": \\"Bob\\", \\"id\\": 2}"
+}
+
+func displayUser() async {
+  print("开始获取用户数据...")
+  do {
+    let userDataJson = try await fetchUserData()
+    print("数据获取成功: \\(userDataJson)")
+  } catch {
+    print("捕获到错误: \\(error)")
+  }
+  print("函数执行完毕。")
+}</code></pre>
+
+    <h4>JavaScript（用于 Web 前端 / Node.js）</h4>
+    <pre><code>function fetchUserData() {
+  return new Promise((resolve, reject) =&gt; {
+    setTimeout(() =&gt; {
+      resolve('{"name": "Charlie", "id": 3}');
+    }, 2000);
+  });
+}
+
+async function displayUser() {
+  console.log('开始获取用户数据...');
+  try {
+    const userDataJson = await fetchUserData();
+    console.log(\`数据获取成功: \${userDataJson}\`);
+  } catch (error) {
+    console.error(\`捕获到错误: \${error.message}\`);
+  }
+  console.log('函数执行完毕。');
+}</code></pre>
+
+    <h4>Python（用于后端 / 脚本）</h4>
+    <pre><code>import asyncio
+
+async def fetch_user_data() -&gt; str:
+    print("挂起任务，等待 I/O...")
+    await asyncio.sleep(2)
+    return '{"name": "David", "id": 4}'
+
+async def display_user():
+    print('开始获取用户数据...')
+    try:
+        user_data_json = await fetch_user_data()
+        print(f'数据获取成功: {user_data_json}')
+    except Exception as e:
+        print(f'捕获到错误: {e}')
+    print('函数执行完毕。')
+
+if __name__ == "__main__":
+    asyncio.run(display_user())</code></pre>
+
+    <h3 id="async-best">Part 3：最佳实现</h3>
+    <p>使用异步编程，只需记住三步：</p>
+    <ol>
+      <li><strong>识别耗时操作</strong>：任何涉及网络、文件读写、数据库访问、或者需要长时间计算的任务，都应该是异步的。</li>
+      <li><strong>封装成 <code>async</code> 函数</strong>：将这些耗时操作封装在一个函数里，并用 <code>async</code>（或 <code>async def</code>）关键字标记它。</li>
+      <li><strong>使用 <code>await</code> 调用并处理</strong>：
+        <ul>
+          <li>它会「暂停」当前函数的执行。</li>
+          <li>它会等待「凭证」兑现。</li>
+          <li>它会将结果从「凭证」中解包出来。</li>
+          <li><strong>最重要的是</strong>：用 <code>try...catch</code> 块把 <code>await</code> 包起来，处理可能发生的错误。</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h2 id="static">三、关于 static 的使用</h2>
+    <p>一句精要：<strong>「跟对象实例无关、只跟类本身有关」</strong>的东西就加 <code>static</code>——否则别加。</p>
+
+    <h3 id="static-must">必须加</h3>
+    <ol>
+      <li><strong>类变量（静态字段）</strong>——变量属于类本身</li>
+      <li><strong>类方法（静态方法）</strong>——方法内部不依赖实例字段（<code>this</code>.xxx）</li>
+      <li><strong>静态工厂构造函数</strong>——用 <code>factory</code> 返回缓存、单例时</li>
+      <li><strong>顶层入口</strong>——放在类里就必须显式 <code>static</code></li>
+    </ol>
+
+    <h3 id="static-recommend">推荐加</h3>
+    <ol>
+      <li>纯工具方法 / 全局帮助函数——比散在顶层更可读</li>
+      <li>与实例无关的常量列表 / 映射</li>
+    </ol>
+
+    <h3 id="static-never">绝不加</h3>
+    <ol>
+      <li>实例字段 / 实例方法 / 普通命名构造函数</li>
+      <li>重写父类方法（如 <code>toString</code>）</li>
+      <li>Widget 生命周期回调（如 <code>build</code> 方法）</li>
+    </ol>
+  </article>
+</body>
+</html>`,Kd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flutter 跨平台开发笔记</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #e67e22;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    h4 {
+      font-size: 17px; font-weight: 600;
+      margin: 24px 0 8px;
+      color: #2c3e50;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(230, 126, 34, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #af601a;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #e67e22;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #fdf6ee;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13.5px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      Flutter 跨端开发的核心要点整理：<strong>Widget 体系与四棵树、状态管理、路由管理、Key 原理、Provider 状态共享</strong>，
+      附上常用学习资料链接。
+    </p>
+
+    <h2 id="resources">学习资料</h2>
+    <ul>
+      <li>Flutter 环境配置：<a href="https://blog.csdn.net/z119901214/article/details/95540557">CSDN 配置教程</a></li>
+      <li>Flutter 热重载（保存时更新预览）：<a href="https://docs.flutter.cn/tools/hot-reload/">官方文档</a></li>
+      <li>Flutter 实战（第二版）：<a href="https://book.flutterchina.club/">在线阅读</a></li>
+      <li>Flutter 中文网文档：<a href="https://doc.flutterchina.club/">doc.flutterchina.club</a></li>
+      <li>Flutter 官方中文版文档：<a href="https://docs.flutter.cn/">docs.flutter.cn</a></li>
+      <li>Material Design 图标：<a href="https://material.io/tools/icons/">material.io/icons</a></li>
+    </ul>
+
+    <h2 id="widget">一、Widget 基础</h2>
+
+    <h3 id="four-trees">Flutter 中的四棵树</h3>
+    <img src="/images/blog/feishu/Vh2YbJsV1oNDH3xe6FecUAJMn1e.png" alt="Flutter 四棵树：Widget / Element / Render / Layer">
+    <ol>
+      <li><strong>Widget</strong>：描述 UI 的配置信息</li>
+      <li><strong>Element</strong>：根据 Widget 的描述生成真正的实例</li>
+      <li><strong>Render</strong>：应用界面的布局和绘制，保存了元素的大小、布局、颜色等信息</li>
+      <li><strong>Layer</strong></li>
+    </ol>
+
+    <h3 id="widget-classification">Widget 分类</h3>
+    <p>在 Flutter 中，widget 用来描述一个 UI 的配置信息（包括内容、布局信息等），是<strong>不可变的</strong>（immutable）。</p>
+    <p>Widget 有两类：</p>
+    <ul>
+      <li><strong>StatelessWidget</strong>：无状态</li>
+      <li><strong>StatefulWidget</strong>：有状态。由于 widget 是不可变的，对于有状态的组件，需要引入 <code>state</code> 来描述其布局和内容。可以跟随状态（即变量）进行变化，然后根据该 state 生成 widget，再进行页面更新。</li>
+    </ul>
+    <blockquote>
+      <p>当 widget 发生改变时，会触发框架重建 widget 树。Flutter 会遍历 widget 树中每个节点，逐一比较新的 widget 和原先的 widget：</p>
+      <ul>
+        <li>如果新老 widget 为同一类型，但配置改变，仅修改对应 RenderObject 的配置</li>
+        <li>如果新老 widget 不为同一类型，则将对应的 widget、element、RenderObject 节点从树上移除，并用新的对象替换</li>
+      </ul>
+    </blockquote>
+
+    <h2 id="state-management">二、状态管理</h2>
+
+    <h3 id="state-management-ways">状态管理方式</h3>
+    <ol>
+      <li><strong>组件管理自己的状态</strong>：一个组件的颜色、动画等外观属性最好采取这种方式</li>
+      <li><strong>由父组件管理状态</strong>：全局的用户信息（例如：表单中复选框的选中状态、滑块的位置）&amp; 有些状态需要几个组件共享使用的情况</li>
+      <li><strong>混合管理</strong>：既有自己管理的部分，也有父组件管理的部分</li>
+    </ol>
+
+    <h3 id="state-management-impl">状态管理实现</h3>
+    <ol>
+      <li>管理自身状态：使用 <code>setState()</code> 更新 UI 状态</li>
+      <li>管理子组件状态：用<strong>回调函数</strong>。将包含状态更新（即 <code>setState</code>）功能的函数传递给子组件，让子组件在合适的地方调用。</li>
+    </ol>
+
+    <h4>关于回调函数</h4>
+    <p>除了使用普通的 <code>Function(传参类型)</code> 外，Flutter 中有以下预定义的回调函数类型：</p>
+    <table>
+      <thead>
+        <tr><th>类型（typedef）</th><th>实际签名</th><th>典型场景举例</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>VoidCallback</strong></td><td><code>void Function()</code></td><td>按钮点击、动画完成</td></tr>
+        <tr><td><strong>ValueChanged&lt;T&gt;</strong></td><td><code>void Function(T value)</code></td><td>值变化回传（如 <code>Switch.onChanged</code>）</td></tr>
+        <tr><td><strong>ValueSetter&lt;T&gt;</strong></td><td><code>void Function(T value)</code></td><td>语义上强调「设置」而非「变化」</td></tr>
+        <tr><td><strong>ValueGetter&lt;T&gt;</strong></td><td><code>T Function()</code></td><td>懒取值</td></tr>
+        <tr><td><strong>AsyncCallback</strong></td><td><code>Future&lt;void&gt; Function()</code></td><td>异步操作完成回调</td></tr>
+        <tr><td><strong>GestureTapCallback</strong></td><td><code>void Function()</code></td><td>点击手势回调</td></tr>
+        <tr><td><strong>GestureLongPressCallback</strong></td><td><code>void Function()</code></td><td>长按手势回调</td></tr>
+        <tr><td><strong>GestureDragStartCallback</strong></td><td><code>void Function(DragStartDetails)</code></td><td>拖动开始</td></tr>
+        <tr><td><strong>GestureDragUpdateCallback</strong></td><td><code>void Function(DragUpdateDetails)</code></td><td>拖动中</td></tr>
+        <tr><td><strong>GestureDragEndCallback</strong></td><td><code>void Function(DragEndDetails)</code></td><td>拖动结束</td></tr>
+        <tr><td><strong>RouteFactory</strong></td><td><code>Route&lt;dynamic&gt; Function(RouteSettings)</code></td><td>路由生成器</td></tr>
+        <tr><td><strong>LocaleChangedCallback</strong></td><td><code>void Function(Locale? locale)</code></td><td>语言切换监听</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="routing">三、路由管理</h2>
+
+    <h3 id="route-basic">使用路由跳转页面</h3>
+    <ol>
+      <li>Navigator 是路由管理组件，提供打开和退出路由的方法：
+        <ul>
+          <li><code>Navigator.push(context, route)</code>：路由入栈，打开一个新页面，返回值是一个 Future 对象</li>
+          <li><code>Navigator.pop(context, [result])</code>：路由出栈，关闭页面</li>
+        </ul>
+      </li>
+      <li><code>MaterialPageRoute</code> 继承自 <code>PageRoute</code>，定义了路由构建及切换时过渡动画的相关接口。能够针对不同平台实现与平台页面切换动画风格一致的过渡：Android 是上下滑动，iOS 是左右滑动。</li>
+    </ol>
+
+    <h4>示例</h4>
+    <pre><code>class TipRoute extends StatelessWidget {
+  TipRoute({Key key, required this.text}) : super(key: key);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("提示")),
+      body: Padding(
+        padding: EdgeInsets.all(18),
+        child: Center(
+          child: Column(
+            children: &lt;Widget&gt;[
+              Text(text),
+              ElevatedButton(
+                onPressed: () =&gt; Navigator.pop(context, "我是返回值"),
+                child: Text("返回"),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}</code></pre>
+
+    <h3 id="named-route">命名路由</h3>
+    <p>注册路由表：</p>
+    <pre><code>MaterialApp(
+  title: 'Flutter Demo',
+  initialRoute: "/",
+  theme: ThemeData(primarySwatch: Colors.blue),
+  routes: {
+    "new_page": (context) =&gt; NewRoute(),
+    "/": (context) =&gt; MyHomePage(title: 'Flutter Demo Home Page'),
+  }
+);</code></pre>
+
+    <p>用路由名打开页面：</p>
+    <pre><code>onPressed: () {
+  Navigator.pushNamed(context, "new_page");
+},</code></pre>
+
+    <h3 id="route-args">路由传参</h3>
+    <p>对于命名路由，通过 <code>arguments</code> 传参：</p>
+    <pre><code>Navigator.of(context).pushNamed("new_page", arguments: "hi");
+
+class EchoRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // 获取路由参数
+    var args = ModalRoute.of(context).settings.arguments;
+    // ...
+  }
+}</code></pre>
+
+    <h3 id="route-guard">路由跳转前置处理</h3>
+    <p>典型适用场景：访问需要登录的页面，在 <code>onGenerateRoute</code> 中判断并拦截：</p>
+    <pre><code>MaterialApp(
+  initialRoute: "index",
+  onGenerateRoute: myGenerateRoute,
+);
+
+String routeBeforeHook(RouteSettings settings) {
+  final token = Global.prefs.getString('token') ?? '';
+  if (token != '') {
+    if (settings.name == 'login') return 'index';
+    return settings.name;
+  }
+  return 'login';
+}
+
+Route&lt;dynamic&gt; myGenerateRoute(RouteSettings settings) {
+  String routeName = routeBeforeHook(settings);
+  return MaterialPageRoute(builder: (context) {
+    switch (routeName) {
+      case "index": return MyHomePage();
+      case "login": return LoginScreen();
+      default: return Scaffold(body: Center(child: Text("页面不存在")));
+    }
+  });
+}</code></pre>
+
+    <h2 id="key">四、Key 的原理和用法</h2>
+
+    <h3 id="key-purpose">Key 的作用</h3>
+    <p>每个 widget 都有一个 Key，能够解决类似「不同 widget 混淆」的问题。</p>
+
+    <h3 id="key-types">Key 的种类</h3>
+    <ul>
+      <li><strong>LocalKey（局部键）</strong>：在同一级中（对于 widget）要唯一，可以理解为「同级唯一性」。
+        <ul>
+          <li><code>ValueKey</code>、<code>ObjectKey</code>、<code>UniqueKey</code></li>
+        </ul>
+      </li>
+      <li><strong>GlobalKey（全局键）</strong>：在整个 App 中必须唯一。即使 widget 树的节点改变，其内容（GlobalKey 定义的变量）不改变。</li>
+    </ul>
+    <blockquote>
+      <p>使用 <code>GlobalKey</code> 不应该在每次 <code>build</code> 的时候重建 <code>GlobalKey</code>，它应该是 State 拥有的长期存在的对象。</p>
+    </blockquote>
+
+    <h4>获取对应的 State</h4>
+    <pre><code>// 获取当前组件的 count 变量
+floatingActionButton: FloatingActionButton(
+  onPressed: () {
+    print((_globalKey.currentState as _BoxState).count);
+  },
+  child: Icon(Icons.wifi_protected_setup),
+)
+
+// 修改组件的 count 变量
+onPressed: () {
+  final state = _globalKey.currentState as _BoxState;
+  state.setState(() {
+    state.count++;
+  });
+}</code></pre>
+    <p><strong>注意</strong>：修改 state 时，记得使用 setState 来触发 UI 的刷新。</p>
+
+    <h4>获取对应的 context（用于获取 widget 的尺寸、位置）</h4>
+    <pre><code>final renderBox = _globalKey.currentContext!.findRenderObject() as RenderBox;
+renderBox.size;                        // 获取尺寸
+renderBox.localToGlobal(Offset.zero);  // 获取位置</code></pre>
+
+    <h4>获取对应的 widget（如颜色等属性）</h4>
+    <pre><code>onPressed: () {
+  final widget = _globalKey.currentWidget as Box;
+  print(widget.color);
+}</code></pre>
+
+    <h2 id="provider">五、Provider 库的使用</h2>
+
+    <p>Provider 库用于「<strong>跨页面、跨组件共享 + 会变化</strong>」的场景。</p>
+
+    <h3 id="provider-scenarios">典型场景</h3>
+    <ol>
+      <li><strong>全局状态 / 会话级</strong>
+        <ul>
+          <li>用户登录态（AuthProvider）</li>
+          <li>主题 / 国际化（ThemeProvider、LocaleProvider）</li>
+          <li>环境配置（FlavorProvider、FeatureFlagProvider）</li>
+        </ul>
+      </li>
+      <li><strong>页面级共享</strong>
+        <ul>
+          <li>购物车（CartProvider）</li>
+          <li>筛选条件（FilterProvider）</li>
+          <li>分页列表控制器（PagingProvider）</li>
+        </ul>
+      </li>
+      <li><strong>复杂表单 / 多步向导</strong>
+        <ul>
+          <li>表单数据模型（FormProvider）</li>
+          <li>步骤状态机（WizardProvider）</li>
+        </ul>
+      </li>
+      <li><strong>异步一次性数据</strong>
+        <ul>
+          <li>网络请求结果（FutureProvider）</li>
+          <li>WebSocket 消息流（StreamProvider）</li>
+        </ul>
+      </li>
+      <li><strong>需要 dispose 的资源</strong>
+        <ul>
+          <li>蓝牙连接（BleClient）</li>
+          <li>数据库 DAO（AppDatabase）</li>
+          <li>计时器 / 动画控制器</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3 id="provider-usage">三种使用方法</h3>
+    <pre><code>// 1. Consumer —— 监听状态变化，自动重建
+Consumer&lt;VocabularyProvider&gt;(
+  builder: (context, provider, child) {
+    return Text('单词数量: \${provider.words.length}');
+  },
+)
+
+// 2. context.watch —— 简洁的监听方式
+Widget build(BuildContext context) {
+  final provider = context.watch&lt;VocabularyProvider&gt;();
+  return Text('单词数量: \${provider.words.length}');
+}
+
+// 3. context.read —— 不监听，只获取实例（用于事件处理）
+void _addWord() {
+  final provider = context.read&lt;VocabularyProvider&gt;();
+  provider.addWord(newWord); // 不会重建当前 Widget
+}</code></pre>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      Flutter 的核心心智模型可以总结为「<strong>声明式 UI + 不可变 Widget + 状态驱动重建</strong>」。
+      理解四棵树（Widget / Element / Render / Layer）以及它们之间的对应关系，是理解 Flutter 性能与渲染管线的基础；
+      状态管理的关键不在于选择哪种库（<code>setState</code>、<code>Provider</code>、<code>Riverpod</code> 等），而在于「<strong>状态属于谁、由谁负责更新</strong>」的设计划分。
+    </p>
+  </article>
+</body>
+</html>`,Ud=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unity XR 开发笔记</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #e67e22;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    h4 {
+      font-size: 17px; font-weight: 600;
+      margin: 24px 0 8px;
+      color: #2c3e50;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(230, 126, 34, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #af601a;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #e67e22;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #fdf6ee;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      本文整理 Unity XR 开发中的核心模块：<strong>基本操作、XR Interaction Toolkit（XRI）、Input System、物理模拟</strong>，
+      附上常用学习资料链接。
+    </p>
+
+    <h2 id="resources">一、学习资料</h2>
+    <ul>
+      <li>Unity 基本操作学习：<a href="https://www.bilibili.com/video/BV1gQ4y1e7SS">B 站视频链接</a></li>
+      <li>HTC 环境配置：<a href="https://www.bilibili.com/video/BV1mS421R7be">B 站视频链接</a></li>
+      <li>Vision Pro 开发配置：<a href="https://www.bilibili.com/cheese/play/ep1120469">B 站视频链接</a></li>
+      <li>XRI 参考视频：<a href="https://www.bilibili.com/video/BV14pSbYsEPz">B 站视频链接</a></li>
+    </ul>
+
+    <h2 id="xri">二、XR Interaction Toolkit（XRI）</h2>
+
+    <h3 id="xr-origin">XR Origin（玩家原点）</h3>
+    <p>
+      XR Origin 是 XR 场景中<strong>代表玩家的坐标原点</strong>，承载相机、手柄等设备的位置与朝向。
+      所有的交互（射线、抓取、传送）都基于 XR Origin 坐标系计算。
+    </p>
+
+    <h3 id="input-system-xr">输入系统</h3>
+    <p>Unity 推荐使用新的 <strong>Input System Package</strong> 来处理 XR 设备输入：</p>
+    <img src="/images/blog/feishu/OCekbz53do0AcIxEHxDcA1OVnec.png" alt="XR Interaction Toolkit 输入系统">
+    <ul>
+      <li>Unity Input System 使用方法：<a href="https://docs.unity3d.com/Packages/com.unity.inputsystem@1.14/manual/index.html">官方文档</a></li>
+      <li>Unity XR 输入设备信息：<a href="https://docs.unity.cn/Manual/xr_input.html">官方文档</a></li>
+      <li>Unity VR + XRI 3 输入系统配置：<a href="https://blog.csdn.net/qq_46044366/article/details/132319756">CSDN 博客</a></li>
+    </ul>
+    <img src="/images/blog/feishu/UlQ5bHl3xoCBAHxDwf6cdgtwnog.png" alt="XR 输入设备绑定示意">
+    <img src="/images/blog/feishu/ZLWHbtEKgo4B83x3vX9cgMMinnh.png" alt="XR 控制器按键映射">
+    <p>
+      在 XR 场景中，常见的输入需求包括：
+    </p>
+    <ul>
+      <li>手柄按钮（Trigger / Grip / Menu）</li>
+      <li>手柄摇杆（Thumbstick）</li>
+      <li>手柄位姿（Position + Rotation）</li>
+      <li>手势识别（Hand Tracking）</li>
+    </ul>
+
+    <h3 id="htc-vive">HTC VIVE Basic Input for OpenXR</h3>
+    <p>通过 OpenXR 接入 VIVE 头显与手柄，参考：<a href="https://developer.vive.com/resources/openxr/unity/tutorials/basic-input-for-openxr/">HTC VIVE Basic Input for OpenXR</a>。</p>
+    <blockquote>
+      <p>
+        XRI（XR Interaction Toolkit）封装了常见的 XR 交互模式：<strong>近距抓取（Near Grab）、远距射线抓取（Far Ray Grab）、UI 交互、传送（Teleport）</strong>等，
+        大幅简化了 XR 应用开发。
+      </p>
+    </blockquote>
+
+    <h2 id="input-system">三、Input System（输入系统）</h2>
+
+    <h3 id="input-action">Input Action Asset</h3>
+    <p>
+      建议使用 <strong>Input Action Asset</strong>（.inputactions 文件）来统一管理输入配置，把输入「数据化」：
+    </p>
+    <ul>
+      <li><strong>Action Map</strong>：按场景/角色分组（如 Player、UI）</li>
+      <li><strong>Action</strong>：具体的输入动作（如 Jump、Move）</li>
+      <li><strong>Binding</strong>：动作到具体输入设备的映射（如键盘 Space、XRI 手柄 Trigger）</li>
+    </ul>
+
+    <h3 id="xr-input-types">XR 输入类型</h3>
+    <table>
+      <thead>
+        <tr><th>输入类型</th><th>XR 中的获取方式</th><th>典型用途</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Vector2</td><td>Thumbstick / Touchpad</td><td>移动、转向</td></tr>
+        <tr><td>Button</td><td>Trigger / Grip / Face Button</td><td>抓取、确认、射击</td></tr>
+        <tr><td>Pose</td><td>设备位姿 (Position + Rotation)</td><td>射线、手部 IK</td></tr>
+        <tr><td>Trigger (float)</td><td>扳机按压程度</td><td>力度交互、握力反馈</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="physics">四、Unity 物理模拟</h2>
+    <img src="/images/blog/feishu/PyjJbekQnob2tyxnuA9cWpdcn7d.png" alt="Unity 碰撞与触发条件示意图">
+
+    <h3 id="collision-conditions">产生碰撞的条件</h3>
+    <ol>
+      <li>若要产生碰撞，<strong>双方都要有碰撞器</strong></li>
+      <li>运动的一方<strong>一定要有刚体</strong>，另一方有无刚体无所谓</li>
+    </ol>
+    <blockquote>
+      <p>注：如果运动的一方无刚体，它去碰撞静止的刚体，相当于没撞上。</p>
+    </blockquote>
+
+    <h3 id="contact-types">接触的两种方式</h3>
+    <ol>
+      <li><strong>Collision 碰撞</strong>：造成物理碰撞，可以在碰撞时执行 <code>OnCollision</code> 事件</li>
+      <li><strong>Trigger 触发</strong>：取消所有的物理碰撞，可以在触发时执行 <code>OnTrigger</code> 事件</li>
+    </ol>
+    <blockquote>
+      <p>注：两个物体接触不可能同时产生碰撞 + 接触，最多产生一种。但是可以 A、B 产生碰撞，A、C 产生触发。</p>
+    </blockquote>
+
+    <h3 id="condition-detail">产生不同方式接触的条件</h3>
+    <table>
+      <thead>
+        <tr><th>方式</th><th>条件</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Collision 碰撞</strong></td>
+          <td>
+            1. 双方都有碰撞体<br>
+            2. 运动的一方必须有刚体<br>
+            3. 双方不可同时勾选 Kinematic 运动学<br>
+            4. 双方都不可勾选 Trigger 触发器
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Trigger 触发</strong></td>
+          <td>
+            1. 双方都有碰撞体<br>
+            2. 运动的一方必须是刚体<br>
+            3. 至少一方勾选 Trigger 触发器
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>参考：<a href="https://blog.csdn.net/renatqiang/article/details/47682449">CSDN 博客</a></p>
+
+    <h2 id="xr-tips">五、XR 开发小贴士</h2>
+    <ul>
+      <li><strong>性能优先</strong>：XR 应用对帧率要求严格（一般要求 90 FPS），场景多边形数、shader 复杂度都要严格控制</li>
+      <li><strong>空间音频</strong>：XR 体验强烈依赖空间音频，建议尽早集成 <code>AudioSource</code> 的 Spatial Blend 设置</li>
+      <li><strong>舒适度</strong>：避免强制瞬移、避免持续高速运动、避免立体视觉冲突</li>
+      <li><strong>输入抽象</strong>：用 Input Action Asset 抽象所有输入，方便跨平台（Quest / Vision Pro / PC VR）切换</li>
+    </ul>
+  </article>
+</body>
+</html>`,Gd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雅思备考经验分享</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #e74c3c;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    h4 {
+      font-size: 17px; font-weight: 600;
+      margin: 24px 0 8px;
+      color: #2c3e50;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(231, 76, 60, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #c0392b;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #e74c3c;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #fdf2ef;
+      border-radius: 0 8px 8px 0;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      分享一些雅思<strong>纸笔考试</strong>的技巧和准备方法，按照考试顺序来讲：听力 → 阅读 → 写作 → 口语。
+      本文以经验总结为主，适合「英语基础尚可但需要冲刺 7+」的同学参考。
+    </p>
+
+    <h2 id="listening">一、听力（40 题）</h2>
+
+    <h3 id="listening-sense">1. 听感反应：需日常积累</h3>
+    <ul>
+      <li>推荐王陆的《<strong>雅思王听力</strong>》，跟着音频进行默写，训练听到词语的快速反应，并且能够巩固单词拼写。内容很多，都是以前雅思听力真题出现的单词，可以有针对性地练。比如：对英语数字反应不行，就专门练数字专题。</li>
+      <li>平时碎片时间多听英语：每日英语听力 app、Podcast、英语电台、英语公众号（中国日报学霸课堂）等都有很好的英语音频资源，而且内容也挺有趣的。这一过程可以锻炼抓住或者推测听力核心内容的能力。</li>
+      <li>考试前保持听力做题手感。做错很多的篇章可以进行<strong>精听训练</strong>——循环播放语句 3-5 遍，进行默写。精听默写的过程追求准确复现原文，这样才能锻炼听语篇细节的能力。</li>
+    </ul>
+
+    <h3 id="listening-scan">2. 审题</h3>
+    <p>以前我做题最难受的地方在于来不及把题目读完就开始了，以至于做的时候又要看题又要听题，很难做到抓住关键。对于这一问题，一方面要锻炼阅读的速度，另一方面要学会抓关键词。</p>
+
+    <h4>对于选择题</h4>
+    <ul>
+      <li>先看题干问的对象是关于什么（人？事？物？），问的是什么方面（Why/reason？How？Who？When？....）</li>
+      <li>再看选项，根据选项的内容可以大致推断听力所述事件的一个情景</li>
+    </ul>
+    <blockquote>
+      <p>时间紧张的情况下，选项短的题目我会先不看选项，因为在听的时候同步进行短的选项阅读我的脑子还是能够 handle 的。而选项比较长的建议在听力给的间隙时间中阅读。注意：不要忽略一些表示时间或者程度等的词语，可能会成为混淆项。</p>
+    </blockquote>
+
+    <h4>对于填空题</h4>
+    <ul>
+      <li>先看最上方要求，是要填几个词？大部分是 <code>no more than one word</code>，也有 <code>no more than two words AND/OR a number</code>。</li>
+      <li>先阅读前后语句，大致看一下此处所讲的内容</li>
+      <li>根据前后文以及篇章的主题推测该空大概关于什么。比如，说到砍树破坏生态，使得 XX 丧失 habitat，那么很有可能这个 XX 就是 bird 之类的动物。</li>
+      <li>注意关注空前后的词语，从而推断该空的词性。比如，空后面是一个物品，那么这个空估计是个形容词。</li>
+    </ul>
+
+    <h4>所有题型通用的技巧：抓 keyword 用于定位</h4>
+    <p>keyword 是一句话的核心对象。此外，时间节点、人名、专有名词往往也是重要的 keyword。听的时候可以根据这些词来知道，目前音频讲到哪里了（雅思听力的题目答案是按顺序出现在音频中的）。</p>
+
+    <h3 id="listening-practice">3. 做题</h3>
+    <ul>
+      <li>只做<strong>剑桥雅思官方真题集</strong>，每年会出一本。可以从最新的开始做。音频可以在「小站雅思」app 上听，这个 app 可以进行精听训练等，可以计算和记录得分，还是很好用的。</li>
+      <li>对于做得很不好的几篇，建议进行<strong>精听</strong>，一句循环播放 3-5 遍，默写下来再对照原文，看看自己容易听漏什么内容。是因为连读、口音等听不清，还是单词不熟，有针对性地去改进。</li>
+      <li>听力这个是需要磨练的，阅读也是。考前的冲刺阶段，每天早上抽 30 分钟做一篇听力或阅读。限时完成，提升速度和专注度。</li>
+    </ul>
+
+    <h2 id="reading">二、阅读（40 题）</h2>
+    <p>阅读主要是篇幅比较大，题也比较多，对我来说<strong>做题速度是主要的挑战</strong>。方法就是多练 + 技巧。</p>
+
+    <h3 id="reading-skill">做题技巧</h3>
+    <ul>
+      <li><strong>找定位词和关键词</strong>。我是先看题再看文章的。以前是先把题目全看完，但后来发现划不来，做到后面忘了之前读的题。所以我现在是看一部分题读一下文章做掉一部分再往下看。</li>
+      <li>要注意的是雅思阅读有的题型答案是按顺序出现在文章中的（填空题、判断题），但有些不是（人名段落匹配题、段落小标题匹配题）。</li>
+      <li>定位词有些不是一模一样地出现在文中，很有可能是用了近义词或者替换的表达，这种就比较难，需要仔细读。有些定位词是非常 nice 的，比如：时间节点、人名、专有名词等，这种数字、大写的东东之类的，眼睛扫过去就能找到在文中的位置。</li>
+    </ul>
+
+    <h3 id="reading-prep">备考方法</h3>
+    <ul>
+      <li>关于词汇量，实话说我没有坚持背完任何一本单词书，我就有时候刷刷百词斩。总体上，雅思词汇比托福少而且相对简单一些（都说托福有好多是学术词语）。英语基础不错的同学在词汇上可以少花时间。</li>
+      <li>关于刷题，建议做<strong>剑桥雅思真题 9-17</strong>，再往前就太老了。</li>
+      <li>和听力一样，错题很多的文章建议做<strong>精读</strong>，把关键的语句进行对照翻译，看看自己是由于句式复杂看不懂，还是单词理解上出问题等等。然后吸取经验，争取下一次不犯同样的错误。</li>
+    </ul>
+
+    <h2 id="writing">三、写作（小作文 + 大作文）</h2>
+    <p>写作时间蛮紧张的，反正对我这种脑子慢的人很不友好。需要加强训练，熟练掌握审题和答题技巧。</p>
+
+    <h3 id="writing-prep">备考方法</h3>
+    <ul>
+      <li>不同类型有不同的答题技巧，可以看一些网上资料。</li>
+      <li>考前可以准备的一是<strong>固定表达</strong>，比如小作文中如何描述数据震荡或者趋于平稳、大作文的一些固搭词组等；二是<strong>大作文语料</strong>，即常见话题有哪些观点是可以作为论点的；三是<strong>句型</strong>，要牢记常用的句式用法，最好能够熟练地交替运用在作文中，句式的变化也是雅思作文的一个踩分点。</li>
+      <li><strong>不建议背模板</strong>，雅思考官看够了大陆考生的模板句式，有一些他们非常不喜欢见到。</li>
+      <li>有些不是地道的书面语，是雅思写作的忌讳。比如：<code>more and more people</code> 错错错，用 <code>an increasing number of people</code> 比较好。</li>
+      <li>小作文出现地图和流程图的概率虽然较小，但是备考时也需要积累一些固定句型和搭配。</li>
+      <li>备考的时候建议写作也要像阅读和听力一样多练手，最好掐时间做。刚开始了解写作题型的时候可以分题型进行练习，掌握各类题型的套路。</li>
+      <li>考试时，一定要先审清楚题目，看看问题的核心是什么，到底要讨论的有哪几个问题（大作文可能是只问观点类型，也有可能是既问原因、又问措施......），构思一个大纲。虽然写作没有提供草稿纸，但是可以在问卷上大致地先写一下框架。</li>
+      <li>推荐资料：《<strong>顾家北手把手教你雅思写作</strong>》、《<strong>顾家北词伙</strong>》</li>
+    </ul>
+
+    <h2 id="speaking">四、口语</h2>
+
+    <h3 id="speaking-practice">练习和备考方法</h3>
+    <ul>
+      <li>我们<strong>缺乏语言环境</strong>是口语训练的主要问题。我是在备考期间根据口语话题库自己对自己说（可以对镜子，会比较有感觉），觉得难的问题就去网上搜一搜相关的分享视频等。如果能够找到 partner 对练是最好的。</li>
+      <li>自己练习的时候可以<strong>录下来</strong>，后续回放去了解自己的问题。</li>
+      <li>各种类型的题，回答也是有一定的技巧的，可以上网查。</li>
+      <li>关于准备口语题库。每 <strong>4 个月</strong>口语换一次新题，题库在网上都能找到，各大机构也都有。准备的策略是<strong>串题</strong>，尤其是 part 2 的问题，要求考生 describe 一个人/事/物，可以根据自身经历把题库中几个相关的问题当成一个话题来准备，这样就只需要想好一件经历，准备好相应的语料就可以解决好几个问题。（比如，1-4 月有几个 part 2 题分别是：Describe an interesting old person you met、Describe an interesting neighbor、Describe a person you know who loves to grow vegetables/fruits，就可以构思一个有趣的老年邻居，而且他喜欢侍弄花草）。只是个例子，串题主要看自己喜好，怎么舒服怎么来。</li>
+      <li>事实上，<strong>雅思考试考官不会追究你说的内容真不真实</strong>，只要是积极向上、不涉及政治敏感都可以。这也就意味着对于一些奇奇怪怪的问题我们可能真的没什么相关经历，那准备的时候可以虚构一个情景，到时候能够表述出来即可。</li>
+      <li>考试时为了表现出你用语的自然，可以多一些 <strong>facial expression</strong>，表情开心点、丰富点，我觉得也能够给考官留下比较好的印象，毕竟口语的给分还是比较主观的。</li>
+      <li>另外，口语讲的内容最好是比较 special，应该是能够突出你的个性的回答，这样一来能够给考官深刻的印象，二来也能让考官确定你不是在背百搭模板。</li>
+      <li>推荐资料和平台：微信公众号——「早安英文」、「跟杨帅说英语」，B 站 up 主视频（好多分享新题高分回答）</li>
+    </ul>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      雅思备考的核心是<strong>「方法 + 持续」</strong>：
+      听力靠精听与反应训练、阅读靠限时刷题与定位、写作靠句型与语料积累、口语靠录音回放与串题。
+      没有捷径，但每一项都可以<strong>通过刻意练习在 2-3 个月内显著提升</strong>。
+    </p>
+    <p>祝各位烤鸭收获满意的成绩！</p>
+  </article>
+</body>
+</html>`,qd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harness 导论：从 LLM 到 Agent Harness</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #9b59b6;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(155, 89, 182, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #7d3c98;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #9b59b6;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #faf6fc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      单次调用能解决的不上 Workflow，Workflow 能解决的不上 Agent。
+      每一级复杂度都带来更高的延迟、成本和调试难度。
+      选择依据是任务是否真正需要那个级别的自主性。
+    </p>
+    <blockquote>
+      <p>"Start with the simplest solution possible, and only increase complexity when needed." — Anthropic</p>
+    </blockquote>
+
+    <h2 id="evolution">一、方法论的演进：从 Prompt Engineering 到 Harness Engineering</h2>
+    <p>LLM 应用工程经历了三个阶段，每个阶段的出现都由新的任务需求催生。</p>
+
+    <h3 id="prompt-eng">1.1 Prompt Engineering（2022—2023）</h3>
+    <p>
+      Prompt Engineering 关注<strong>优化单次调用 LLM 的文本指令</strong>：Role 设定、few-shot 示例、Chain-of-Thought 引导。
+    </p>
+    <p>
+      <strong>局限</strong>：随着 Agent 进入多轮交互、工具调用、长会话，「一段精心写好的 prompt」不再够用——
+      模型在不同步骤需要的信息是<strong>动态变化</strong>的。
+    </p>
+
+    <h3 id="context-eng">1.2 Context Engineering（2025 上半年）</h3>
+    <p>
+      2025 年 6 月，Tobi Lütke（Shopify CEO）和 Andrej Karpathy 几乎同时提出 "Context Engineering"，
+      随后被 Simon Willison、LangChain（Harrison Chase）、Anthropic 共同认可。
+      Anthropic 在 <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Effective Context Engineering for AI Agents</a>（2025-09-29）中给出权威定义：
+    </p>
+    <blockquote>
+      <p>"the set of strategies for curating and maintaining the optimal set of tokens (information) during LLM inference"</p>
+    </blockquote>
+    <p>
+      Context Engineering 关注<strong>整个上下文窗口的内容</strong>：系统提示、工具定义、检索结果、历史消息、状态、压缩策略——
+      确保模型在每一步都看到「刚好够用的信息」。
+    </p>
+    <p>
+      <strong>局限</strong>：上下文工程仍然停留在单个上下文窗口内。而当 Agent 需要<strong>跨会话</strong>、<strong>跨上下文窗口</strong>持续执行任务时，
+      需要在复杂的任务环节中稳定地运行，只对上下文内容进行优化是不够的。
+    </p>
+
+    <h3 id="harness-eng">1.3 Harness Engineering（2025 末—2026）</h3>
+    <p>
+      2025 年 11 月，Anthropic 在 <a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Effective Harnesses for Long-Running Agents</a> 中首次将 Harness 概念体系化。
+    </p>
+    <p>
+      2026 年 2 月 5 日，Mitchell Hashimoto（HashiCorp 创始人）在 <a href="https://mitchellh.com/writing/my-ai-adoption-journey">My AI Adoption Journey</a> 中给出了 Harness Engineering 的实践哲学：
+    </p>
+    <blockquote>
+      <p>"anytime you find an agent makes a mistake, you take the time to engineer a solution such that the agent never makes that mistake again."</p>
+    </blockquote>
+    <p>
+      6 天后，OpenAI 的 Ryan Lopopolo 发表 <a href="https://openai.com/index/harness-engineering/">Harness Engineering: Leveraging Codex in an Agent-First World</a>，
+      记录用 Codex 写出约 100 万行代码、零人类编写的实验，从工程实践层面正式确立 Harness Engineering 的地位。
+    </p>
+    <p>
+      Harness Engineering 关注<strong>模型外围的整套基础设施</strong>：工具集、AGENTS.md、结构性测试、验证脚本、子 Agent 编排、运行环境、权限边界、跨会话状态。
+      <strong>目的是「让 Agent 长期、自主、安全地运行」</strong>。
+    </p>
+    <blockquote>
+      <p>
+        Harness Engineering 仍然包括 Prompt 和 Context 的设计，只是进一步在更高层面思考问题：<br>
+        <strong>怎么让模型可以一直自主运行？怎么让出错的概率下降或者让 Agent 能够有效纠正错误？以及怎么让用户更好地能「驾驭」模型？</strong>
+      </p>
+    </blockquote>
+
+    <h2 id="two-types">二、当前 Agent 的两大类型</h2>
+
+    <h3 id="workflow-agent">2.1 编排型 Agent（Workflow Agents）</h3>
+    <p><strong>代表项目</strong>：LangChain / LangGraph、Dify、n8n、Coze</p>
+    <p>
+      <strong>特征</strong>：开发者用图（DAG / StateGraph）搭好执行路径，模型在指定节点做单步推理。
+      控制流由人为设定，模型不参与路由判断。适合用在<strong>专业性的应用</strong>中，人为搭建<strong>稳定可靠</strong>的工作流。
+    </p>
+
+    <h3 id="autonomous-agent">2.2 自主型 Agent（Autonomous Agents）</h3>
+    <p><strong>代表项目</strong>：Claude Code、OpenAI Codex、OpenClaw、Hermes Agent</p>
+    <p>
+      <strong>特征</strong>：模型在一个 <strong>loop</strong> 中自主完成「plan → 调用工具 → 观察结果 → 反思 → 继续或停止」的循环。
+      控制流由模型在运行时根据任务进展动态决定。适用于<strong>探索性、开放性、灵活性强</strong>的任务场景中。
+    </p>
+
+    <h3 id="harness-relation">2.3 两者与 Harness 的关系</h3>
+    <blockquote>
+      <p>
+        个人观点：编排型 Agent 关键在于人为编排工作流和优化每个节点的执行效果——这是 Harness 的一部分实现方式，<strong>但不是 Harness 的全貌</strong>。
+        Harness Engineering 更多地是针对<strong>自主型 Agent 要如何设计其工具调用、运行环境、记忆加载、任务编排、安全权限机制</strong>等的工程性实现方法，以提升用户对 Agent 的「驾驭」。
+      </p>
+    </blockquote>
+    <ul>
+      <li>编排型 Agent 根据人为搭建的工作流做决策——<strong>把约束和流程编排人为写死在流程图里</strong>。</li>
+      <li>自主型 Agent <strong>给模型决策权</strong>——需要通过工具设计、上下文管理、权限边界、可观测性等来引导模型行为。</li>
+    </ul>
+
+    <h2 id="augmented-llm">三、Agent 构建基石：增强型 LLM（Augmented LLM）</h2>
+    <p>在讨论 Workflow 和 Agent 之前，先理解它们共同的基础构件。增强型 LLM 是在基础模型之上叠加三种能力的系统：</p>
+    <ul>
+      <li><strong>工具调用（Tool Use）</strong>：让模型能够主动调用外部函数（搜索、计算、文件操作）</li>
+      <li><strong>记忆（Memory）</strong>：会话内的短期记忆 + 跨会话的长期记忆（向量库 / 文件 / KV）</li>
+      <li><strong>检索（Retrieval）</strong>：从外部知识库中拉取与当前任务相关的信息</li>
+    </ul>
+    <p>这三种能力是 Workflow 与 Agent 的共同底座——无论上层走「编排」还是「自主」路线，都依赖它们之中的至少一种来突破「纯文本对话」的局限。</p>
+
+    <h2 id="architecture">四、架构详解</h2>
+
+    <h3 id="basic">1️⃣ 基础架构：LLM 单次调用</h3>
+    <p>
+      最简单的 LLM 应用就是一次 prompt → response 的单次调用。
+      适合<strong>单步推理任务</strong>：摘要、翻译、改写、问答、分类等。
+      <strong>优势</strong>：最简单、可预测、易调试；<strong>劣势</strong>：没有外部信息源、没有迭代修正。
+    </p>
+    <pre><code>user ──prompt──&gt; LLM ──response──&gt; user</code></pre>
+
+    <h3 id="workflow">2️⃣ 工作流（Workflows）架构</h3>
+    <p>
+      把 LLM 调用嵌入到预先设计好的执行流程中，<strong>控制流由开发者定义</strong>，模型只负责在指定节点做单步推理。
+      典型范式包括：Prompt Chaining、Parallelization、Orchestrator-Workers、Evaluator-Optimizer。
+    </p>
+    <pre><code>            ┌─→ LLM ──┐
+input ──→   ├─→ LLM ──┼──→ aggregator ──→ output
+            └─→ LLM ──┘
+   (Parallelization 示意)</code></pre>
+    <p><strong>适用场景</strong>：流程固定、可拆解、可验证的任务，例如多阶段文档处理、并行多角度分析等。</p>
+
+    <h3 id="autonomous">3️⃣ 自主 Agent（Agents）架构</h3>
+    <p>
+      模型在一个 <strong>loop</strong> 中自主完成「plan → 调用工具 → 观察结果 → 反思 → 继续或停止」的循环。
+      工具调用、状态推进、终止决策全部交给模型。
+    </p>
+    <pre><code>            ┌──────────────────────────┐
+            ↓                          │
+goal ──→ LLM ──plan──→ tool call ──→ env
+            ↑                          │
+            └────── observation ←──────┘
+                  (until stop or done)</code></pre>
+    <p><strong>适用场景</strong>：开放式、探索性、步骤不可预知的任务，例如代码 Agent、调研 Agent 等。</p>
+
+    <h3 id="hybrid">4️⃣ 两者的结合</h3>
+    <p>
+      实践中两者经常<strong>混合使用</strong>：外层是 Workflow（保证主流程可控），内层关键决策用自主 Agent（处理开放子任务）。
+      这种 hybrid 模式能兼顾<strong>稳定性</strong>与<strong>灵活性</strong>，是大多数生产级 Agent 系统的真实形态。
+    </p>
+
+    <h2 id="outlook">五、Harness 展望</h2>
+
+    <h3 id="two-paths">5.1 两条方法路径</h3>
+    <ul>
+      <li><strong>Orchestration-first（编排优先）</strong>：通过更精细的流程设计来约束 Agent 行为，LangGraph 是代表</li>
+      <li><strong>Harness-first（Harness 优先）</strong>：通过 AGENTS.md、Skills、结构化测试、运行环境等基础设施来引导 Agent 行为，Claude Code / OpenAI Codex 是代表</li>
+    </ul>
+    <p>两条路径并非对立，而是<strong>互补</strong>——前者解决「流程的稳定性」，后者解决「长会话的自主性」。</p>
+
+    <h3 id="consensus">5.2 Agent 架构的设计共识</h3>
+    <ol>
+      <li><strong>简单优先</strong>：能单次调用解决的不上 Workflow，能 Workflow 解决的不上 Agent</li>
+      <li><strong>可观测性</strong>：任何 Agent 决策都必须能被 trace、复现、回滚</li>
+      <li><strong>权限最小化</strong>：默认禁止 destructive / external action，需显式批准</li>
+      <li><strong>上下文可控</strong>：Prefix Cache、压缩、摘要等机制保证上下文不爆炸</li>
+      <li><strong>错误纠正</strong>：让 Agent 在出错时能识别、汇报、修复，而不是崩溃</li>
+    </ol>
+
+    <h3 id="my-view">5.3 个人理解</h3>
+    <p>
+      Harness Engineering 不是取代 Prompt 或 Context Engineering，而是<strong>在更高层面回答同一个问题</strong>：
+      「怎么让 LLM 真正有用？」Prompt 解决单次调用质量，Context 解决单次会话质量，Harness 解决长期、自主、安全运行的质量。
+    </p>
+    <p>
+      对开发者来说，把「Agent 会犯错」这件事<strong>当作可工程化问题</strong>（而非随机事件）来对待，是 Harness Engineering 的核心心态——
+      每一次错误都问：「是 prompt 不够好？是上下文不够？还是缺少工具/验证/权限设计？」
+      然后用工程手段让它<strong>下次不会再犯</strong>。
+    </p>
+
+    <h2 id="references">六、参考资料</h2>
+    <ul>
+      <li><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic — Effective Context Engineering for AI Agents</a></li>
+      <li><a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Anthropic — Effective Harnesses for Long-Running Agents</a></li>
+      <li><a href="https://openai.com/index/harness-engineering/">OpenAI — Harness Engineering: Leveraging Codex in an Agent-First World</a></li>
+      <li><a href="https://mitchellh.com/writing/my-ai-adoption-journey">Mitchell Hashimoto — My AI Adoption Journey</a></li>
+      <li><a href="https://simonwillison.net/2025/Oct/16/claude-skills/">Simon Willison — Claude Skills are awesome</a></li>
+    </ul>
+  </article>
+</body>
+</html>`,Wd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>缓存命中率 &amp; KV Cache</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #9b59b6;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(155, 89, 182, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #7d3c98;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #9b59b6;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #faf6fc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13.5px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      「缓存命中率」和「KV Cache」涉及到<strong>三个不同层次</strong>的概念：
+      <strong>KV Cache</strong>（机制层）、<strong>Prefix Cache</strong>（工程层）和<strong>缓存命中率</strong>（指标层）。
+      本文逐一辨析这三个概念的边界与关系，并讨论影响命中率的工程因素。
+    </p>
+
+    <h2 id="concepts">一、缓存命中率 vs KV Cache：三个层次的概念边界</h2>
+
+    <h3 id="three-concepts">❓ 什么是 KV Cache、Prefix Cache 与缓存命中率</h3>
+    <p>
+      <strong>KV Cache（Key-Value Cache）</strong> 指 Transformer 在自回归生成过程中，
+      把已处理 token 的 Key 和 Value 投影张量缓存在显存中，使后续 token 的注意力计算无需对历史 token 重新做 K/V 投影。
+      它存在于<strong>单个推理请求的生命周期内</strong>，请求结束即释放。
+    </p>
+    <p>
+      <strong>Prefix Cache（前缀缓存，亦称 Prompt Cache）</strong> 指把不同请求间共享的 token 前缀对应的 KV 张量持久化保存，
+      使后续命中相同前缀的请求能跳过这部分的 Prefill 计算。它是 KV Cache 在<strong>跨请求维度</strong>的工程化延展。
+    </p>
+    <p>
+      <strong>缓存命中率（Cache Hit Rate）</strong> 指一次请求中，
+      通过 Prefix Cache 直接读取（而非重新计算）的 input token 占总 input token 的比例，
+      是衡量 Prefix Cache 复用效果的<strong>定量指标</strong>。
+    </p>
+
+    <h3 id="three-layers">➡️ 三层关系总览</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>层次</th><th>KV Cache（机制层）</th><th>Prefix Cache（工程层）</th><th>命中率（指标层）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>作用域</td><td>单个请求内</td><td>跨请求</td><td>单个请求的统计量</td></tr>
+        <tr><td>是否可选</td><td><strong>必备</strong>，所有 LLM 推理引擎默认启用</td><td>可选，需要框架/服务支持</td><td>可选，需 API 暴露</td></tr>
+        <tr><td>典型实现</td><td>HuggingFace <code>past_key_values</code>、PagedAttention</td><td>vLLM APC、SGLang RadixAttention、Anthropic Prompt Caching</td><td><code>cache_read_input_tokens</code>（Anthropic）、<code>prompt_cache_hit_tokens</code>（DeepSeek）</td></tr>
+        <tr><td>主要收益</td><td>把 Decode 复杂度从 O(n²) 降到 O(n)</td><td>跳过重复前缀的 Prefill 计算</td><td>直接折算成 token 计费折扣与 TTFT 下降</td></tr>
+        <tr><td>失效条件</td><td>请求结束</td><td>TTL 到期、被 LRU 淘汰、前缀不匹配</td><td>当次请求未命中 Prefix Cache</td></tr>
+      </tbody>
+    </table>
+    <blockquote>
+      <p>
+        「缓存命中率」对应的<strong>不是</strong> KV Cache 本身。在 KV Cache 视角下，单请求内 100% 的 token 都「命中」——这是它的定义，讨论命中率毫无意义。
+        <strong>命中率</strong>衡量的对象是 Prefix Cache，即跨请求复用的那部分 KV。
+      </p>
+    </blockquote>
+
+    <h2 id="kv-mechanism">二、KV Cache 的工作机制：单请求内的 token 间复用</h2>
+
+    <h3 id="kv-what">❓ 什么是 KV Cache</h3>
+    <p>在 Transformer Decoder 的自回归生成中，第 t 步生成 token x_t 时，需要计算注意力：</p>
+    <pre><code>Attention(t) = softmax(Q_t · K_{1:t}^T / √d_h) · V_{1:t}
+
+其中:
+  Q_t = x_t · W_Q          ← 当前 token 的 Query
+  K_{1:t} = X_{1:t} · W_K  ← 历史所有 token 的 Key
+  V_{1:t} = X_{1:t} · W_V  ← 历史所有 token 的 Value</code></pre>
+    <p>
+      由于历史 token 的 K_{1:t-1}、V_{1:t-1} 在每一步都<strong>不会发生变化</strong>，把它们缓存在显存中，
+      每一步只需对新 token 计算 K_t、V_t 并追加到缓存末尾，即可避免 O(t) 次冗余的 K/V 投影。这就是 KV Cache。
+    </p>
+
+    <h3 id="kv-memory">💻 显存占用公式</h3>
+    <p><strong>单 token KV Cache 显存公式</strong>：</p>
+    <pre><code>KV(per token) = 2 × L × H_kv × d_head × bytes
+
+      2       = K 与 V 各一份
+      L       = Transformer 层数
+      H_kv    = KV 头数(MHA 时 = H_q, MQA 时 = 1, GQA 时 = H_q / G)
+      d_head  = 单头维度
+      bytes   = 数据类型字节数(FP16 / BF16 = 2)</code></pre>
+    <p>
+      以 Llama 3-70B 为例，8K 上下文的单请求 KV Cache 约为 8192 × 320 KB ≈ 2.5 GB，直接挤占了模型权重之外的可用显存。
+      这便是提出 PagedAttention、MQA/GQA、MLA 等优化方法的根本动因。
+    </p>
+    <blockquote>
+      <p>
+        KV Cache <strong>不是显存优化技术，而是用显存换计算的技术</strong>。
+        它把「对历史 token 重复做 O(n) 次 K/V 投影」换成「在 HBM 中常驻 O(n) 字节」，
+        在 Decode 阶段反而成为 Memory-Bound 的根因——Decode 每步要把整份 KV 从 HBM 读出参与 attention，带宽即瓶颈。
+      </p>
+    </blockquote>
+    <p>
+      围绕显存压力，催生了三条主线优化：<strong>头部维度压缩</strong>（MQA/GQA/MLA，DeepSeek-V2 通过 MLA 把 KV Cache 压到原始 MHA 的 6.7%）；
+      <strong>显存管理</strong>（PagedAttention 用 OS 页式管理思路打散物理显存，vLLM 是其代表）；
+      <strong>跨请求复用</strong>（下一节将展开的 Prefix Cache）。
+    </p>
+
+    <h3 id="kv-value">⭐️ KV Cache 核心价值</h3>
+    <p>把 Decode 阶段的 attention 计算从 O(n²) 降到 O(n)，是 LLM 能做长文本推理的根基。</p>
+
+    <h2 id="prefix">三、从 KV Cache 到 Prefix Cache：跨请求复用的工程化</h2>
+
+    <h3 id="prefix-what">❓ 什么是 Prefix Cache：定义与命中条件</h3>
+    <p>
+      原生 KV Cache 的复用边界是<strong>单个请求</strong>：请求结束，KV 张量被释放，下一个请求即使带有完全相同的 system prompt，也要从零做一遍 Prefill。
+      <strong>Prefix Cache</strong> 把这个边界扩展到了请求之间——以 token 序列为 key 把 KV 张量持久化保存，
+      后续请求若前缀（prefix）与已缓存序列<strong>逐 token 完全一致</strong>，即可直接复用，跳过这部分的 Prefill 计算。
+    </p>
+    <p>这里的「前缀」严格按 token 序列从位置 0 起逐位匹配，无论语义内容是什么。</p>
+
+    <p><strong>典型应用场景</strong>：</p>
+    <ul>
+      <li><strong>多轮对话</strong>：第 N+1 轮 prompt 的前 N 轮历史已在上次请求处理过，整段可作为 prefix 命中</li>
+      <li><strong>Agent 自循环</strong>：system prompt + 工具定义 + 项目背景几乎不变，仅尾部追加新一步 observation/action</li>
+      <li><strong>RAG / Few-shot</strong>：多个用户共享同一组检索片段或 few-shot 示例，仅在尾部插入各自 query</li>
+      <li><strong>Self-consistency / Tree-of-Thought</strong>：同一 prompt 采样多次或分支多路径，分叉点之前完全一致</li>
+      <li><strong>批量评测</strong>：同一组指令配不同测试数据，指令部分跨样本共享</li>
+    </ul>
+    <p>
+      <strong>反例</strong>（会破坏前缀）：相同 system prompt 中嵌入变化的时间戳；
+      工具定义顺序被随机化；对话历史被重排——<strong>任意位置 token 不一致都会让从该位置往后的所有缓存失效</strong>。
+    </p>
+
+    <h3 id="prefix-mechanism">🔵 工作机制：缓存什么、何时工作</h3>
+    <blockquote>
+      <p><strong>两个常见误区：</strong></p>
+      <ul>
+        <li><strong>缓存的是 K/V 张量，不是答案</strong>。Prefix Cache 不像 HTTP 缓存那样直接保存「输入 → 输出」映射。它的逻辑是：当新请求的 input 前缀与先前请求完全相同时，直接复用先前请求中命中的这段前缀的 K/V 张量，从而省掉对这段相同前缀的重复 Prefill 计算。</li>
+        <li><strong>机制只在 Prefill 阶段触发</strong>。新请求进入 Prefill 时做 lookup，输入 prompt 的前缀出现命中后，把缓存的 K/V 挂载进当前工作 KV Cache。其后的 Decode 阶段不经过 Prefix Cache 的查找 / 匹配流程。</li>
+      </ul>
+    </blockquote>
+
+    <table>
+      <thead>
+        <tr><th>维度</th><th>KV Cache（单请求内）</th><th>Prefix Cache（跨请求）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>存什么</td><td>K/V 张量</td><td>K/V 张量（<strong>同一种东西</strong>）</td></tr>
+        <tr><td>数据来源</td><td>当前请求自己在 Prefill / Decode 阶段算出来的</td><td>先前请求中算出后被保留下来的</td></tr>
+        <tr><td>机制工作时机</td><td>Prefill 写入、Decode 读取并追加</td><td><strong>仅 Prefill</strong>：开始时做 lookup，命中即把缓存 K/V 挂载到工作 KV Cache</td></tr>
+        <tr><td>消除的冗余</td><td>当前请求 Decode 时不重算历史 token 的 K/V</td><td>当前请求 Prefill 时不重算与先前请求共享前缀那部分的 K/V</td></tr>
+        <tr><td>寿命</td><td>当前请求生命周期内</td><td>跨请求，受 TTL / LRU 控制</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="prefix-impl">🔧 Prefix Cache 典型实现与 API 封装</h3>
+    <p><strong>推理框架层（自动管理）</strong>：</p>
+    <ul>
+      <li><strong>vLLM Automatic Prefix Caching</strong>：基于 PagedAttention 的固定 block（默认 16 token/块）做哈希，<strong>从 prompt 起点起按 block 边界对齐</strong>才能命中。命中粒度 = block_size。</li>
+      <li><strong>SGLang RadixAttention</strong>：用 radix tree 维护已缓存 token 序列，做最长前缀匹配，命中粒度细到 token 级。在多分支场景（self-consistency、tree-of-thought）下复用率比 block-hash 更高。</li>
+    </ul>
+
+    <p><strong>API 服务层（暴露给开发者）</strong>：</p>
+    <ul>
+      <li><strong>隐式</strong>（DeepSeek、OpenAI）：自动检测前缀，用户无感，无需改 prompt 结构</li>
+      <li><strong>显式</strong>（Anthropic）：开发者通过 <code>cache_control: {type: "ephemeral"}</code> 主动标记 cache breakpoint，最多 4 个</li>
+    </ul>
+
+    <blockquote>
+      <p><strong>什么是 cache breakpoint？</strong></p>
+      <p>
+        它是开发者在 prompt 中手动插入的「缓存终点」标记——给请求体某条内容（可以是 <code>system</code>、<code>tools</code> 数组里的一项，
+        或 <code>messages</code> 中的某条 message）加上 <code>cache_control: {type: "ephemeral"}</code> 字段，
+        相当于告诉模型服务：「<strong>从 prompt 起点到这条内容为止的所有 token，我希望作为一个整体被缓存。</strong>」
+      </p>
+      <p>
+        每次请求最多打 <strong>4 个 breakpoint</strong>，每个 breakpoint 产生一份独立的、覆盖「位置 0 → 该 breakpoint 位置」的缓存条目。
+        <strong>典型用法</strong>：把 system prompt + 工具定义打一个 breakpoint（最稳定）、把固定的会话历史再打一个（次稳定），
+        而<strong>变化频繁的当前用户消息留在最后不打 breakpoint</strong>——这样既最大化命中率，又避免动态内容污染缓存。
+      </p>
+    </blockquote>
+
+    <h3 id="prefix-value">⭐️ Prefix Cache 核心价值</h3>
+    <p>
+      把「反复处理同一段 system prompt / 工具定义 / few-shot 示例」的冗余消除，
+      在<strong>稳定前缀长 + 动态尾部短</strong>的场景（Agent 多轮调用、RAG 共享检索结果、长 system prompt）下作用尤为突出——
+      这也是 Agent 系统能把单次调用成本压到 input 全价的 1/10 量级的关键工程基础。
+    </p>
+
+    <h2 id="hitrate">四、缓存命中率的量化定义：Anthropic 与 DeepSeek 字段辨析</h2>
+
+    <h3 id="hitrate-what">❓ 缓存命中率衡量的是什么</h3>
+    <p>缓存命中率衡量的是「<strong>本次请求的 input 中，有多少 token 是从 Prefix Cache 直接读取的</strong>」：</p>
+    <pre><code>hit_rate = cache_read_tokens / total_input_tokens
+
+其中:
+  cache_read_tokens   = 命中并复用 Prefix Cache 的 input token 数
+  total_input_tokens  = 本次请求总的 input token 数(含命中 + 未命中 + 写入)</code></pre>
+
+    <p>不同厂商把这套语义拆成了不同的字段。<strong>同样是「缓存命中」</strong>，Anthropic 与 DeepSeek 的 <code>usage</code> 返回字段语义不可直接互换，这是 LiteLLM 等聚合层框架最常踩的坑。</p>
+
+    <h3 id="anthropic-fields">Anthropic 的三字段模型</h3>
+    <pre><code>{
+  "input_tokens":               194,    // 既不命中也不写缓存的普通 input
+  "cache_creation_input_tokens": 9474,  // 本次写入缓存的 input（首次创建）
+  "cache_read_input_tokens":     0,     // 本次命中并读取缓存的 input
+  "output_tokens":               7      // 模型生成的 output token 数（按 output 价计费）
+}
+
+总 input = input_tokens + cache_creation_input_tokens + cache_read_input_tokens</code></pre>
+
+    <h3 id="deepseek-fields">DeepSeek 的二字段模型</h3>
+    <pre><code>{
+  "prompt_tokens":             21530,   // 总 input，等价于 hit + miss
+  "prompt_cache_hit_tokens":   320,     // 命中缓存的 input
+  "prompt_cache_miss_tokens":  21210,   // 未命中（走完整 Prefill）的 input
+  "completion_tokens":         9        // 模型生成的 output token 数
+}
+
+总 input = prompt_tokens = hit + miss（无独立"写入"字段，写入计入 miss）</code></pre>
+
+    <h3 id="fields-difference">两种字段模型的核心差异</h3>
+    <table>
+      <thead>
+        <tr><th>维度</th><th>Anthropic</th><th>DeepSeek</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>命中字段</td><td><code>cache_read_input_tokens</code></td><td><code>prompt_cache_hit_tokens</code></td></tr>
+        <tr><td>"写入"是否独立</td><td><strong>独立计费</strong>（<code>cache_creation_input_tokens</code> × 1.25）</td><td>写入计入 miss，与普通 input 同价</td></tr>
+        <tr><td>命中读取计费</td><td>基价 × <strong>0.1</strong>（节省 90%）</td><td>基价 × <strong>0.1</strong>（节省 90%）</td></tr>
+        <tr><td>控制粒度</td><td><strong>显式</strong>：用户用 <code>cache_control</code> 标记 breakpoint</td><td><strong>隐式</strong>：自动按前缀检测</td></tr>
+        <tr><td>TTL</td><td>5 分钟（默认）/ 1 小时（付费，× 2 写入溢价）</td><td>无固定 TTL，LRU 自然淘汰</td></tr>
+        <tr><td>命中率分母</td><td><code>input + creation + read</code></td><td><code>prompt_tokens</code> = <code>hit + miss</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="hitrate-value">⭐️ 命中率核心价值</h3>
+    <p>
+      命中率不仅是性能指标，<strong>更是直接的成本指标</strong>。把它纳入 SLO（Service Level Objective）监控是 LLM 服务工程化的关键一步——
+      一旦命中率从 90% 跌到 50%，意味着 input token 成本接近翻倍。
+    </p>
+
+    <h2 id="cache-friendly">五、影响命中率的工程因素：Cache-Friendly Prompt 设计</h2>
+
+    <h3 id="static-first">核心原则：静态在前、动态在后</h3>
+    <p>Prefix Cache 的命中条件是「逐 token 完全一致的前缀」，这意味着 prompt 的<strong>书写顺序</strong>直接决定了命中率。Cache-Friendly Prompt 的通用结构：</p>
+    <pre><code>① system prompt          ← 跨会话稳定,放最前面
+② tools / function 定义   ← 长期稳定,放在 system 之后
+③ 项目规则 / few-shot     ← 偶尔变更,放在工具之后
+④ 历史对话                ← 单次会话内追加,放在规则之后
+⑤ 当前用户消息            ← 每轮变化,放最后
+   ↑ cache_breakpoint     ← Anthropic 在此打 breakpoint</code></pre>
+    <p>核心规则：<strong>越靠后，变更频率越高</strong>。任何「动态内容前置」都会让该位置之后的所有静态内容跟着失效。</p>
+
+    <h3 id="anti-patterns">破坏命中的反模式</h3>
+    <table>
+      <thead>
+        <tr><th>反模式</th><th>为什么破坏命中</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>system prompt 中嵌入当前时间</td><td>每次请求时间戳都不同，整个 system prefix 失效</td></tr>
+        <tr><td>工具列表顺序随机化</td><td>token 序列改变，从工具定义之后全部 miss</td></tr>
+        <tr><td>对话历史插入到 system 之后</td><td>每轮历史增长，把工具定义和 few-shot 一起拖入失效</td></tr>
+        <tr><td>引入随机 UUID / nonce 在前缀中</td><td>每次必 miss，缓存形同虚设</td></tr>
+        <tr><td>同一会话频繁切换 system prompt</td><td>每次切换都触发一次完整 cache_creation</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="ttl">TTL 的工程含义</h3>
+    <p>
+      Anthropic 默认 TTL 为 5 分钟，意味着<strong>低频调用</strong>（如人工对话间隔超过 5 分钟）会反复触发 cache_creation，反而比无缓存更贵（写入有 1.25x 溢价）。两种应对：
+    </p>
+    <ul>
+      <li><strong>高频场景</strong>（Agent 自动循环、连续编辑会话）：默认 5min TTL 即可，实际间隔远小于 TTL</li>
+      <li><strong>低频场景</strong>（人工偶发请求）：评估「5min 内复用次数」——若 &lt; 1.25 / 0.9 ≈ 1.4 次，缓存反而亏损；若 ≥ 2 次，即便偶尔超 TTL 也大概率盈利。极低频可买 1h TTL（2x 写入溢价，但单次可摊到 12 倍读取）</li>
+    </ul>
+
+    <h3 id="monitor">命中率监控</h3>
+    <blockquote>
+      <p><strong>推荐 SLO 指标</strong>：把 <code>hit_rate = cache_read_tokens / (cache_read + cache_creation + input)</code> 作为<strong>跟 P99 延迟同级</strong>的关键指标。</p>
+      <ul>
+        <li>健康基线：Agent 类应用 ≥ 80%，长 system prompt 的 chatbot ≥ 60%</li>
+        <li>异常告警：连续多个时间窗 hit_rate 跌幅 &gt; 20%，通常意味着 prompt 模板被改坏了</li>
+        <li>成本归因：input 成本异动 → 先查 hit_rate，再查 token 量</li>
+      </ul>
+    </blockquote>
+    <blockquote>
+      <p><strong>注意：命中率并非越接近 100% 越好</strong>。100% 命中意味着所有 input 都来自缓存，通常说明系统在反复发送完全相同的请求（无新增内容），这要么是业务逻辑死循环，要么是测试桩泄漏。健康的 Agent 系统应呈现「<strong>高基线命中率</strong>（80%-95%）<strong>+ 稳定的少量新增 token</strong>」模式。</p>
+    </blockquote>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      从工程角度看，<strong>Agent 系统</strong>的成本治理本质上就是 cache hit rate 治理——
+      一段稳定的 system prompt + 工具定义动辄 10K-20K token，在 50-100 轮长会话中，
+      这部分若反复全价计算，会占据账单的 80%+；若被稳定缓存，边际成本仅是 dynamic suffix。
+      这个事实把「<strong>prompt 工程</strong>」从单纯的「写好提示词」扩展到了「<strong>设计可缓存的</strong>会话结构」，
+      成为现代 LLM 应用的基础设施级能力。
+    </p>
+  </article>
+</body>
+</html>`,Xd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP &amp; CLI &amp; Skill &amp; Plugin 概念原理辨析</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #9b59b6;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(155, 89, 182, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #7d3c98;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #9b59b6;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #faf6fc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13.5px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      Claude Code 的能力组合由多种机制叠加而成：内置 <strong>Tool</strong> 是执行底座，
+      <strong>MCP</strong> 与 <strong>CLI</strong> 分别以「结构化协议」和「shell 调用」两种方式接入外部能力，
+      <strong>Skill</strong> 为 Agent 注入程序性知识以编排上述能力，Claude Code <strong>Plugin</strong> 把多种组件打包以便分发与共享。
+    </p>
+
+    <h2 id="mcp">一、MCP —— 连接外部工具</h2>
+
+    <h3 id="mcp-what">什么是 MCP</h3>
+    <p>
+      MCP（Model Context Protocol）是一个开放标准协议，<strong>定义了 AI 应用与外部工具/数据源之间的通信方式</strong>。
+      它一般由第三方服务平台（例如 GitHub、数据库、Slack、飞书 等）提供，
+      以方便任意外部系统的能力能够快速接入 Agent 系统中被 AI 调用。
+    </p>
+
+    <h3 id="mcp-arch">基本架构：Host → Client → Server</h3>
+    <p>MCP 采用三层架构：</p>
+    <ul>
+      <li><strong>Host</strong>：AI 应用（如 Claude Code），负责协调多个 Client</li>
+      <li><strong>Client</strong>：Host 内部组件，每个 Client 维护与一个 Server 的专属连接</li>
+      <li><strong>Server</strong>：独立进程，向 Client 暴露工具（Tools）、资源（Resources）、提示词模板（Prompts）</li>
+    </ul>
+    <p>所有通信基于 <strong>JSON-RPC 2.0</strong> 协议，与传输方式无关。</p>
+
+    <h3 id="mcp-mechanism">MCP 的调用机制</h3>
+    <h4>Server 端：用 JSON Schema 声明工具</h4>
+    <p>
+      Server 在响应 <code>tools/list</code> 时返回工具列表，每项包含 <code>name</code>、<code>description</code>、<code>inputSchema</code>（标准 JSON Schema）。
+      其中，<code>description</code> 是模型决定何时调用该工具的<strong>唯一线索</strong>——写得越具体准确，误调用与漏调用越少。
+    </p>
+
+    <h4>Agent 端：加载与路由工具</h4>
+    <p>Claude Code 启动后的工具加载流程：</p>
+    <ol>
+      <li>读取 <code>.mcp.json</code> / <code>settings.json</code> 中的 Server 配置</li>
+      <li>为每个 Server 建立连接（STDIO 拉起子进程 / HTTP 建立 SSE 长连）</li>
+      <li>发送 <code>initialize</code> 协商协议版本与 capabilities</li>
+      <li>调用 <code>tools/list</code> 拉取所有工具的完整 schema</li>
+      <li>按 <code>mcp__&lt;server名&gt;__&lt;tool名&gt;</code> 重命名每个工具（避免跨 Server 冲突）</li>
+      <li>将转换后的工具列表注入到每次发往 Claude API 的 <code>tools</code> 字段中</li>
+    </ol>
+    <p><strong>特点：启动时全量加载，运行时全量注入。</strong></p>
+
+    <h4>模型调用工具的流程</h4>
+    <p>
+      返回 <code>tool_use</code> block → Claude Code 按前缀路由到对应 Server 发送 <code>tools/call</code> →
+      Server 返回 <code>content</code> → Claude Code 包装成 <code>tool_result</code> 注入下一轮对话。
+      <strong>MCP 协议只存在于 Claude Code 与 Server 之间</strong>——这种「协议在 Host 内消化」的设计，是 MCP 能成为跨厂标准的关键。
+    </p>
+    <p>
+      代价是 token 开销：所有工具的 schema 必须<strong>常驻在每次请求的 tools 字段中</strong>，
+      否则模型就「看不到」这些工具——这与下一节 CLI 的按需发现形成对比。
+    </p>
+
+    <h3 id="mcp-transport">两种连接方式</h3>
+    <p>核心区别在于：<strong>谁来管理 Server 的生命周期</strong>。</p>
+
+    <h4>STDIO — 本地子进程模式</h4>
+    <p>
+      Claude Code 在本地拉起 Server 作为子进程，通过 stdin/stdout 通信。Server 的整个生命周期由 Claude Code 管理——会话开始时启动，会话结束时终止。
+      Server 程序可以预先安装在本地，也可以通过 <code>npx</code>、<code>uvx</code> 等工具临时下载运行（无需持久安装）。
+    </p>
+    <ul>
+      <li>一个 Server 实例只服务一个 Client</li>
+      <li>无网络开销，性能最优</li>
+      <li>典型场景：日常使用的大多数 MCP Server</li>
+    </ul>
+    <pre><code>claude mcp add github -- npx -y @modelcontextprotocol/server-github</code></pre>
+
+    <h4>Streamable HTTP — 独立服务模式</h4>
+    <p>Server 是一个独立运行的 HTTP 服务，不由 Claude Code 管理生命周期。Claude Code 作为 HTTP 客户端去连接它。服务可以运行在本地、内网或云端。</p>
+    <ul>
+      <li>一个 Server 可同时服务多个 Client</li>
+      <li>支持标准 HTTP 认证和会话管理</li>
+      <li>典型场景：企业级部署、多用户共享、第三方平台集成</li>
+    </ul>
+    <pre><code>claude mcp add my-server --transport sse --url http://localhost:3001/sse</code></pre>
+
+    <h3 id="mcp-value">MCP 的价值</h3>
+    <p>
+      MCP 解决了「<strong>能力边界</strong>」问题——通过<strong>开放协议</strong>把外部系统的能力转译为 Agent 可调用的工具，
+      让任何模型供应商都能接入同一个生态。但 MCP 只提供工具，不提供使用方法——「怎么用好这些工具」是 Skill 的职责。
+    </p>
+
+    <h2 id="cli">二、CLI —— 命令行接口</h2>
+
+    <h3 id="cli-what">什么是 CLI</h3>
+    <p>
+      CLI 即服务方提供的<strong>命令行可执行接口</strong>，例如 <code>gh</code>（GitHub 命令行工具）、<code>lark-cli</code>（飞书命令行工具）等。
+      在 Agent 语境下，CLI 是另一种把「外部能力」暴露给 LLM 的工程范式：<strong>通过 shell 而非 RPC 协议</strong>。
+    </p>
+
+    <h3 id="cli-call">Agent 如何调用 CLI</h3>
+    <p>Agent 调用 CLI 不引入任何新协议——所有交互都借由 Agent 内置的 <strong>Bash Tool</strong> 完成：</p>
+    <ol>
+      <li><strong>执行</strong>：模型在响应中返回一次 <code>Bash</code> 工具调用，命令字符串作为参数</li>
+      <li><strong>捕获</strong>：Bash Tool 在子进程中执行该命令，把 stdout / stderr 文本与 exit code 一并回传给 Agent</li>
+      <li><strong>判断</strong>：Agent 把这些文本作为 <code>tool_result</code> 注入下一轮上下文，依据 exit code 决定继续推理或重试</li>
+    </ol>
+    <p>整个过程对模型而言与调用任意其它工具完全一致——它只需要会写正确的 shell 命令。</p>
+
+    <h3 id="cli-lazy">关键机制：按需发现（lazy discovery）</h3>
+    <p>
+      这是 CLI 与 MCP 在工具发现机制上的根本分歧。
+      MCP 客户端在启动时通过 <code>tools/list</code> 把所有工具的完整 schema 一次性注入系统提示；
+      CLI 则是让 Agent 通过 <code>--help</code> 在执行过程中<strong>递归</strong>探索命令树：
+    </p>
+    <pre><code>$ gh --help              # Agent 先看顶级命令分类
+$ gh pr --help           # 选定 pr 域后看 pr 的子命令
+$ gh pr create --help    # 选定 create 后看具体参数</code></pre>
+    <p>只有 Agent 当前任务真正需要的子命令的 <code>--help</code> 输出才会进入上下文。例如，在一个仅需创建 issue 的任务中，PR、release、actions 等命令的 schema 不会全部一次性传给 Agent。</p>
+    <p>这是 CLI 在 token 经济性上根本优势的来源。</p>
+
+    <h3 id="cli-vs-mcp">CLI 与 MCP 的区别</h3>
+    <p>CLI 与 MCP 在「为 Agent 提供外部能力」这一职能上是同位的，但走了不同的工程路径。最核心的差异点在于：<strong>「工具的描述」什么时候被 LLM 看到？</strong></p>
+    <ul>
+      <li><strong>MCP：会话开始时全量注入。</strong>客户端启动时调用 <code>tools/list</code> 拉取所有工具完整 schema，注入每次请求的 <code>tools</code> 字段。<strong>未在启动时加载的工具，模型完全感知不到。</strong></li>
+      <li><strong>CLI：任务真正需要时按需发现。</strong>Agent 通过 <code>--help</code> 在 Bash 调用中递归探索命令树。</li>
+    </ul>
+
+    <h3 id="cli-value">CLI 的价值</h3>
+    <p>
+      CLI 不是对 MCP 完全的替代——而是「如何让 Agent 调用外部能力」的两种工程答案：
+      <strong>MCP 通过协议把外部系统的能力结构化暴露给 LLM；而 CLI 让 LLM 用最熟悉的 shell 调用第三方服务的命令行接口</strong>。
+      前者是为 Agent 重新设计的外部系统接口标准，后者是依托 shell 这一同时服务人类与 Agent 的通用接口范式。
+    </p>
+
+    <h2 id="skill">三、Skill —— 注入领域知识</h2>
+
+    <h3 id="skill-what">什么是 Skill</h3>
+    <p>
+      Skill 是一个<strong>装载领域知识与可执行资源的目录</strong>——它不是单个 Markdown 文件，
+      而是包含 <code>SKILL.md</code> 元数据 + 可选的脚本、参考文档、模板资源的<strong>包</strong>。
+      Anthropic 工程团队对 Skill 的官方定义：
+    </p>
+    <blockquote>
+      <p>"A skill is a directory containing a SKILL.md file that contains organized folders of instructions, scripts, and resources that give agents additional capabilities."</p>
+    </blockquote>
+    <p>
+      该格式由 Anthropic 在 2025 年 10 月推出，2025 年 12 月作为<strong>开放标准</strong>发布于 <a href="https://agentskills.io">agentskills.io</a>。
+      已被 <strong>30+ 个 Agent 框架</strong> 原生支持，包括 Claude Code、OpenAI Codex CLI、Google Gemini CLI、GitHub Copilot、Cursor 等——是继 MCP 之后又一个被业界广泛接纳的 Agent 扩展标准。
+    </p>
+
+    <h3 id="skill-progressive">⭐️ 核心机制：渐进式披露</h3>
+    <p>Skill 的设计目标是解决一个根本矛盾：<strong>Agent 需要尽可能多的领域知识，但又不能让所有知识常驻在上下文中</strong>。</p>
+    <p>核心方法是 <strong>Progressive Disclosure（渐进式披露）</strong>——把信息分成三层，按需逐级加载：</p>
+    <table>
+      <thead>
+        <tr><th>层级</th><th>API 调用</th><th>加载内容</th><th>Token 消耗</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Level 0</td><td><code>skills_list()</code></td><td>所有技能的 name + description</td><td>约 3K（固定）</td></tr>
+        <tr><td>Level 1</td><td><code>skill_view(name)</code></td><td>完整 SKILL.md</td><td>按需</td></tr>
+        <tr><td>Level 2</td><td><code>skill_view(name, path)</code></td><td>特定 reference/script 文件</td><td>按需</td></tr>
+      </tbody>
+    </table>
+    <p>
+      其结果是：<strong>Skill 中可承载的知识量在工程上是无界的</strong>——
+      只要分层组织得当，Agent 总能在需要时找到需要的信息。
+    </p>
+
+    <h3 id="skill-structure">Agent Skills 标准结构</h3>
+    <p>一个技能就是一个文件夹，最简单的只需要一个 <code>SKILL.md</code> 文件：</p>
+    <pre><code>skill-name/
+├── SKILL.md              # 必需：元数据 + 指令
+├── scripts/              # 可选：可执行脚本
+├── references/           # 可选：参考文档
+└── assets/               # 可选：模板、资源文件</code></pre>
+    <p><strong>硬性约束</strong>：<code>SKILL.md</code> 文件名大小写敏感；frontmatter 中的 <code>name</code> 字段<strong>必须严格等于所在目录名</strong>。</p>
+    <p>标准 frontmatter 仅有 <strong>6 个字段</strong>，其中 2 个必需：</p>
+    <table>
+      <thead>
+        <tr><th>字段</th><th>必需</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>✓</td><td>技能名；仅小写字母 / 数字 / 连字符；<strong>必须等于目录名</strong></td></tr>
+        <tr><td><code>description</code></td><td>✓</td><td><strong>必须同时说明「做什么」和「何时使用」</strong>——是 Agent 决定调用技能的关键信息</td></tr>
+        <tr><td><code>license</code></td><td>✗</td><td>协议名或 license 文件引用，如 <code>Apache-2.0</code></td></tr>
+        <tr><td><code>compatibility</code></td><td>✗</td><td>环境要求（适配产品、系统包、网络访问等）</td></tr>
+        <tr><td><code>metadata</code></td><td>✗</td><td>通用扩展点；<code>version</code>、<code>author</code> 等放此处</td></tr>
+        <tr><td><code>allowed-tools</code></td><td>✗</td><td>预批准的工具，如 <code>Bash(git:*) Read</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="skill-value">Skill 的价值</h3>
+    <p>
+      Simon Willison 的判断是 <em>"Claude Skills are awesome, maybe a bigger deal than MCP"</em>——
+      他给出的核心理由是：<strong>Skill 把「如何做事」的工程实践外化为标准化、可移植的工件</strong>，
+      而 MCP 只解决了「能调用什么」。
+    </p>
+
+    <h2 id="plugin">四、Plugin —— 打包分发能力集合</h2>
+
+    <h3 id="plugin-what">什么是 Plugin</h3>
+    <p>Plugin 是一个 Claude code 中的<strong>「能力合集的安装包」</strong>，把 Skills、Hooks、MCP 配置、自定义 Agent 等多种组件打包成一个可安装的包。</p>
+    <table>
+      <thead>
+        <tr><th>组件</th><th>目录</th><th>作用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Skills</td><td><code>skills/</code></td><td>领域知识和操作流程</td></tr>
+        <tr><td>Agents</td><td><code>agents/</code></td><td>自定义 Subagent 人格/工具集</td></tr>
+        <tr><td>Hooks</td><td><code>hooks/</code></td><td>生命周期自动化（格式化、安全检查）</td></tr>
+        <tr><td>MCP</td><td><code>.mcp.json</code></td><td>外部工具连接配置</td></tr>
+        <tr><td>可执行文件</td><td><code>bin/</code></td><td>加入 PATH 的原生工具</td></tr>
+      </tbody>
+    </table>
+    <p>它解决的是「如何把一套能力共享给团队或社区」的问题。安装一个 Plugin，就同时获得了它包含的所有 Skill、Hook、MCP Server 等。</p>
+
+    <h3 id="plugin-dir">目录结构</h3>
+    <pre><code>my-plugin/
+├── .claude-plugin/
+│   └── plugin.json        # 清单文件（必需）
+├── skills/                # Skill 集合
+│   ├── code-review/
+│   │   └── SKILL.md
+│   └── security-audit/
+│       └── SKILL.md
+├── agents/                # 自定义 Subagent
+│   └── reviewer.md
+├── hooks/                 # Hook 配置
+│   └── hooks.json
+├── .mcp.json              # MCP Server 配置
+├── bin/                   # 可执行工具（加入 PATH）
+│   └── my-tool
+└── README.md</code></pre>
+
+    <h3 id="plugin-manifest">清单文件（plugin.json）</h3>
+    <pre><code>{
+  "name": "team-standards",
+  "description": "团队开发规范：代码审查、安全检查、提交规范",
+  "version": "1.0.0",
+  "author": { "name": "DevTeam" },
+  "tags": ["code-review", "security"]
+}</code></pre>
+
+    <h3 id="plugin-essence">Plugin 的本质</h3>
+    <p>
+      Plugin 解决的是「<strong>分发</strong>」问题——它不引入新概念，
+      只是把已有的 Skill、Hook、MCP 等组件打包在一起，加上版本管理和命名空间隔离，使其可以在团队和社区间共享。
+    </p>
+
+    <h2 id="summary">五、总结</h2>
+
+    <h3 id="comparison">综合对比</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>维度</th><th><strong>Tool</strong></th><th><strong>MCP</strong></th>
+          <th><strong>CLI</strong></th><th><strong>Skill</strong></th><th><strong>Plugin</strong></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>定义</td><td>模型可直接调用的原子能力</td><td>Agent 与外部系统通信的开放协议</td><td>服务方提供的命令行接口</td><td>装载程序性知识与可执行资源的目录</td><td>多种能力组件的打包分发单元</td></tr>
+        <tr><td>解决的核心问题</td><td>模型如何执行单步动作</td><td>Agent 能调用哪些外部能力（结构化）</td><td>Agent 如何复用既有 shell 生态</td><td>Agent 应当如何完成某类任务</td><td>能力如何在团队 / 社区间共享</td></tr>
+        <tr><td>形态载体</td><td>函数 schema + 后端实现</td><td>服务进程 + JSON-RPC 协议</td><td>二进制 / 脚本 + stdin/stdout/exit code</td><td>目录（SKILL.md + scripts/ + assets/）</td><td>目录（plugin.json + 子组件）</td></tr>
+        <tr><td>加载与触发</td><td>上下文预置 schema；模型自主调用</td><td>启动时全量加载工具 schema</td><td>不预加载；按需 <code>--help</code> 发现</td><td>元数据预加载；渐进加载</td><td>用户显式安装；子组件按各自机制触发</td></tr>
+        <tr><td>标准化程度</td><td>厂商各自定义 API</td><td>开放标准（modelcontextprotocol.io）</td><td>POSIX 命令行约定</td><td>开放标准（agentskills.io）</td><td>Claude Code 专属</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="layers">层次关系</h3>
+    <p>五者构成由「原子能力」到「分发单元」的递进层级，互补协作而非彼此替代：</p>
+    <ul>
+      <li><strong>Tool</strong> 是 Agent 的基础执行单位（Bash、Read、Edit），构成所有外部交互最终落地的「硬件层」</li>
+      <li><strong>MCP</strong> 通过开放协议把外部系统封装为结构化工具，适合需要类型安全与协议级特性的场景</li>
+      <li><strong>CLI</strong> 通过 Bash Tool 调用既有的命令行程序，是当前 Token 经济性最优、生态覆盖最广的接外部能力路径</li>
+      <li><strong>Skill</strong> 以程序性知识告诉 Agent 应当如何编排上述 Tool / MCP / CLI，沉淀为可复用工序</li>
+      <li><strong>Plugin</strong> 把若干 Skill、Hook、MCP 配置打包并加上版本与命名空间，使能力可分发到团队与社区</li>
+    </ul>
+  </article>
+</body>
+</html>`,Qd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG 基本概念</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #9b59b6;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    h4 {
+      font-size: 17px; font-weight: 600;
+      margin: 24px 0 8px;
+      color: #2c3e50;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(155, 89, 182, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #7d3c98;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #9b59b6;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #faf6fc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      RAG（Retrieval-Augmented Generation，检索增强生成）是当下 LLM 应用最主流的工程范式之一。
+      本文梳理 RAG 的基础理论、文档预处理、向量存储与检索、构造 RAG 链以及测试优化等核心内容。
+    </p>
+
+    <h2 id="theory">一、RAG 基本理论</h2>
+
+    <h3 id="definition">RAG 定义</h3>
+    <p>
+      以检索增强生成为核心，将用户问题转化为检索请求，选出相关文档片段注入上下文，再由生成模型作答。
+    </p>
+
+    <h3 id="when">何时用 RAG</h3>
+    <p>
+      知识需要可溯源、常更新、规模大且无法完全「内化」到模型；希望减少幻觉并支持引用。
+    </p>
+
+    <h3 id="why">为什么引入 RAG</h3>
+    <p>
+      检索增强生成（RAG）通过语义相似性计算从外部知识库中检索相关文档块，从而增强了 LLM。
+      通过引用外部知识，RAG 可有效减少生成与事实不符内容的问题。
+    </p>
+
+    <h3 id="classification">RAG 分类</h3>
+
+    <h4>根据技术实施阶段来分</h4>
+    <p>分为 fine-tune、pre-training、inference 三种，即在模型的不同阶段引入 RAG 技术。</p>
+
+    <h4>根据技术实施阶段来分</h4>
+    <p>分为 fine-tune、pre-training、inference 三种，即在模型的不同阶段引入 RAG 技术。</p>
+    <img src="/images/blog/feishu/BQVIbe19Io6cCVx12nVc6pW5n3e.png" alt="RAG 按技术实施阶段分类示意图">
+
+    <h4>根据方法结构来分</h4>
+    <ul>
+      <li><strong>朴素 RAG</strong>：最基础的 RAG 实施方式。
+        <ol>
+          <li>对文档进行划分</li>
+          <li>对文档分模块进行特征编码（embedding）</li>
+          <li>根据用户输入对文档内容进行检索</li>
+          <li>将匹配的文档内容取出，与用户提示词一起，形成增强的 prompt 再输给 LLM</li>
+          <li>LLM 生成答案</li>
+        </ol>
+      </li>
+      <li><strong>高级 RAG</strong>：围绕检索前和检索后提出了多种优化策略，其过程与朴素 RAG 相似，仍然遵循链状结构。</li>
+      <li><strong>模块化 RAG</strong>：有更大灵活性，引入多个特定功能模块。</li>
+    </ul>
+    <img src="/images/blog/feishu/EWRZb5vYzoCbdDx8CPccDBZNnAe.png" alt="RAG 三种方法结构对比示意图">
+
+    <h3 id="paradigms">两大实现范式</h3>
+    <ul>
+      <li><strong>Retrieval-then-Generate（最常见）</strong>：先检索再生成，把检索的 top-k 文本作为 context 传入 LLM，然后生成答案。</li>
+      <li><strong>Generate-then-Retrieve / Iterative</strong>：先生成检索提示（如检索关键词或子问题），再检索并生成（用于复杂多步检索）。</li>
+    </ul>
+
+    <h3 id="modules">RAG 基本模块</h3>
+
+    <h4>文档预处理与 chunking（切片）</h4>
+    <p>对数据进行清洗，然后把大文档分成合理大小的片段。</p>
+    <ul>
+      <li>把大文档分成合理大小的片段（chunk），常见策略：
+        <ul>
+          <li>固定 token/字符长度（例如 200-600 tokens）并重叠（overlap 50-100 tokens）</li>
+          <li>基于语义边界（段落 / 小节 / 句子聚合）</li>
+        </ul>
+      </li>
+      <li>目标：每个 chunk 能保持语义完整且适配 LLM 的上下文窗口与检索精度</li>
+      <li>注意：过短会丢失语义，过长会增加向量相似性噪音与 cost</li>
+    </ul>
+
+    <h4>Embeddings</h4>
+    <p>将文本映射为向量。</p>
+    <ul>
+      <li>常用模型：<code>sentence-transformers</code> 系列（如 all-MiniLM-L6-v2）、OpenAI embedding（text-embedding-3-small）、Mistral/Anthropic embedding 等</li>
+      <li>选择 embedding 时要考虑：语义质量、吞吐、GPU/CPU 适配、成本</li>
+      <li>批量向量化时注意并发、batch-size、token 限制</li>
+    </ul>
+
+    <h4>Vector Store</h4>
+    <p>向量存储方法。</p>
+    <ul>
+      <li>常见选项：FAISS（本地，高性能）、Chroma（易用）、Milvus（分布式）、Pinecone（托管）、Weaviate</li>
+      <li>选择原则：数据量、延迟要求、是否需要持久化/并发、预算</li>
+      <li>Index 类型：flat / HNSW / IVF 等，通常 HNSW 适合低延迟高召回</li>
+    </ul>
+
+    <h4>Retriever</h4>
+    <p>封装检索策略。</p>
+    <ul>
+      <li><strong>Dense Retriever（向量检索）</strong>：基于向量相似度（cosine / dot）匹配，MMR 最大边际相关性</li>
+      <li><strong>Sparse Retriever（词袋/BM25）</strong>：基于关键字匹配，常用于初筛或混合策略</li>
+      <li><strong>Hybrid Retriever</strong>：词袋 + 向量混合，兼顾精确与泛化</li>
+      <li><strong>Cross-encoder Re-ranker</strong>（可选）：用 cross-encoder 模型对 top-n 再打分，提高精确度（代价大）</li>
+    </ul>
+
+    <h4>Context Injection</h4>
+    <p>将检索的内容注入上下文，引导 LLM 生成回答。</p>
+    <ul>
+      <li>Prompt 需约束「只用给定上下文」</li>
+      <li>要确保注入的上下文 + query 不超模型上下文窗口。使用摘要或压缩上下文的方法来解决</li>
+    </ul>
+    <pre><code>SYSTEM: 你是雅思教师...
+USER: {query}
+CONTEXT: 【1】{doc1_summary} ... 【k】{dock_summary}
+INSTRUCTIONS: 基于 above context 回答，并在答案末尾给出来源编号。</code></pre>
+
+    <h4>LLM Generator 的 tips</h4>
+    <ul>
+      <li>直接生成（让 LLM 基于注入内容回答）</li>
+      <li>验证/二次检索（LLM 回答后，再检索确认或补充）</li>
+      <li>引用标注：使用「指令 + 强制引用」或「要求给出来源句子/段落」</li>
+    </ul>
+
+    <h3 id="challenges">常见挑战与解决策略</h3>
+    <table>
+      <thead>
+        <tr><th>挑战</th><th>策略</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>上下文太长 / Token 超限</td>
+          <td>对 chunks 摘要、优先保留高置信段落、动态截断；或检索-生成分步策略</td>
+        </tr>
+        <tr>
+          <td>信息冗余 vs 噪声</td>
+          <td>引入 re-ranker；或者把 chunk 中的关键句抽取后再注入</td>
+        </tr>
+        <tr>
+          <td>低召回</td>
+          <td>增大 chunk 多样性、使用 hybrid retriever、调节 embedding 模型</td>
+        </tr>
+        <tr>
+          <td>Hallucination（编造）</td>
+          <td>强制模型只基于 context 回答、要求「仅基于下列来源回答」，并在回答中附上来源句子或编号</td>
+        </tr>
+        <tr>
+          <td>延迟</td>
+          <td>本地 FAISS + HNSW，减少 re-ranker；缓存常见 query 的检索结果或生成结果</td>
+        </tr>
+        <tr>
+          <td>成本</td>
+          <td>减少 prompt 长度、减少 LLM token 使用、使用小模型在生成前做初筛/摘要</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="crawl">二、数据爬取</h2>
+
+    <h3 id="robots">Step1：检查可抓取性（Robots 协议）</h3>
+    <p>
+      Robots 协议（Robots Exclusion Protocol）用来告诉爬虫和搜索引擎哪些页面可以抓取、哪些不可以。
+      一般放在网站根目录下的 <code>robots.txt</code> 中。
+    </p>
+    <pre><code>import urllib.robotparser as rp
+
+def can_fetch(base_url: str, path: str, ua="Mozilla/5.0 (Macintosh; Intel Mac OS X)"):
+    robots = rp.RobotFileParser()
+    robots.set_url(base_url.rstrip("/") + "/robots.txt")
+    try:
+        robots.read()
+    except:
+        return True
+    return robots.can_fetch(ua, path)</code></pre>
+
+    <h3 id="http">Step2：建立 http 会话，抓取页面内容</h3>
+    <pre><code>import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+def build_session():
+    session = requests.Session()
+    retry = Retry(total=4, backoff_factor=0.5,
+                  status_forcelist=[429, 500, 502, 503, 504],
+                  allowed_methods=["GET"])
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
+def fetch_page(url: str) -&gt; str:
+    session = build_session()
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X) Safari/605.1.15"}
+    resp = session.get(url, headers=headers, timeout=15)
+    resp.raise_for_status()
+    return resp.text</code></pre>
+
+    <h3 id="bs4">Step3：使用 BeautifulSoup 解析 HTML</h3>
+    <p><strong>recursive 的作用</strong>：<code>recursive=True</code> 表示递归向下遍历所有后代节点（默认）；<code>recursive=False</code> 则只在直接子节点里匹配。</p>
+    <pre><code>from bs4 import BeautifulSoup
+
+html = """
+&lt;div id="content"&gt;
+  &lt;ul class="outer"&gt;
+    &lt;li&gt;Top-level 1&lt;/li&gt;
+    &lt;li&gt;Top-level 2
+      &lt;ul class="inner"&gt;
+        &lt;li&gt;Nested A&lt;/li&gt;
+        &lt;li&gt;Nested B&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+"""
+
+soup = BeautifulSoup(html, "lxml")
+ul = soup.select_one("ul.outer")
+print([li.get_text(strip=True) for li in ul.find_all("li", recursive=False)])
+# ['Top-level 1', 'Top-level 2']
+print([li.get_text(strip=True) for li in ul.find_all("li", recursive=True)])
+# ['Top-level 1', 'Top-level 2', 'Nested A', 'Nested B']</code></pre>
+
+    <h4>常用入口与解析器</h4>
+    <ul>
+      <li><strong>构造 Soup</strong>：<code>BeautifulSoup(html, "lxml")</code> 更快更稳；<code>html.parser</code> 内置但性能稍弱</li>
+      <li><strong>find / find_all</strong>：根据标签名或属性查找元素</li>
+      <li><strong>select / select_one</strong>：根据 CSS 选择器查找（如 <code>soup.select("div.question-item")</code>）</li>
+      <li><strong>节点访问</strong>：<code>tag.name</code>、<code>tag.attrs</code>、<code>tag.parent</code>、<code>tag.children</code>、<code>tag.get_text(separator=" ", strip=True)</code></li>
+      <li><strong>提取与清理</strong>：<code>tag.decompose()</code> 从树中删除；<code>tag.extract()</code> 摘除并返回</li>
+    </ul>
+
+    <h2 id="preprocess">三、数据预处理</h2>
+    <h4>数据清洗</h4>
+    <ul>
+      <li>统一格式（去除无关序号、空格、特殊符号）</li>
+      <li>去除垃圾信息（网页中的广告、导航信息等）</li>
+      <li>可选：信息归类</li>
+    </ul>
+
+    <h4>数据 Chunk</h4>
+    <ul>
+      <li>对于独立性高的短文本（如题目）一个片段对应一段文本</li>
+      <li>段落/句子切分：对较长 sample_answer 按段落或句子分割</li>
+      <li>字符长度切分：固定 chunk_size 与 overlap（如 600/80）</li>
+      <li>Token 长度切分：用近似 token 计数控制上下文长度</li>
+      <li>语义切分（可选）：按语义边界拆分或聚类</li>
+      <li>结构切分：按 Part/Topic 建层级或聚合</li>
+    </ul>
+
+    <h2 id="vectorize">四、数据向量化、向量存储与检索</h2>
+
+    <h3 id="choose">第 1 步：选型</h3>
+    <ul>
+      <li><strong>Embedding 选项</strong>：<code>all-MiniLM-L6-v2</code>（小、快、本地）、OpenAI <code>text-embedding-3-small</code>（语义质量高但有成本）</li>
+      <li><strong>Vector DB 选项</strong>：FAISS（本地）、Chroma（易用）、Milvus/Weaviate（分布式）、Pinecone（托管）</li>
+      <li>开发建议：MiniLM + FAISS，或 OpenAI + Chroma</li>
+    </ul>
+
+    <h3 id="embed">第 2 步：文本向量化 Embedding</h3>
+    <pre><code>from sentence_transformers import SentenceTransformer
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+def chunk_batches(chunks, batch_size=32):
+    for i in range(0, len(chunks), batch_size):
+        yield chunks[i:i+batch_size]
+
+for batch in chunk_batches(chunks, batch_size=64):
+    texts = [c["text"] for c in batch]
+    embeddings = model.encode(texts, show_progress_bar=False, convert_to_numpy=True)</code></pre>
+
+    <h3 id="store">第 3 步：向量存储</h3>
+    <pre><code>import faiss, numpy as np
+
+dim = 384  # MiniLM 的维度
+index = faiss.IndexHNSWFlat(dim, 32)  # HNSW, M=32
+index = faiss.IndexIDMap(index)
+
+vectors = np.array(list_of_embeddings).astype('float32')
+ids = np.array(list_of_ids).astype('int64')
+index.add_with_ids(vectors, ids)
+
+faiss.write_index(index, "index_hnsw_ivf.bin")  # 持久化
+
+# 检索
+k = 5
+D, I = index.search(np.array([q_emb]).astype('float32'), k)</code></pre>
+
+    <h3 id="metadata">第 5 步：Metadata 设计</h3>
+    <p>向量数据库里不仅要存 embedding，还要存 metadata（用于展示与引用）。</p>
+    <pre><code>{
+  "id": "chunk-id",
+  "source": "file.pdf",
+  "page": 3,
+  "start_offset": 120,
+  "end_offset": 520,
+  "title": "Article Title",
+  "summary": "optional short summary",
+  "created_at": "2025-10-10T12:00:00"
+}</code></pre>
+
+    <h3 id="update">第 6 步：向量存储更新</h3>
+    <p>为防止数据重复导入，需要为每个 document 片段分配 id（推荐 UUID 或 hash，如 <code>sha1(source+start_offset)</code>）。</p>
+    <pre><code>collection.delete(ids=["id1", "id2"])
+# 或
+collection.delete(where={"source": "old_dataset"})
+collection.persist()</code></pre>
+
+    <h3 id="retrieve">第 7 步：数据检索方法</h3>
+
+    <h4>相似度检索</h4>
+    <pre><code>from langchain_chroma import Chroma
+from langchain.embeddings import OpenAIEmbeddings
+
+emb = OpenAIEmbeddings()
+vectordb = Chroma(persist_directory="chroma_store", embedding_function=emb)
+
+docs = vectordb.similarity_search("how to use moreover in essay?", k=5)
+docs_with_scores = vectordb.similarity_search_with_score("how to use moreover?", k=10)</code></pre>
+
+    <h4>MMR（Maximum Marginal Relevance）</h4>
+    <pre><code>retriever = vectordb.as_retriever(
+    search_type="mmr",
+    search_kwargs={"k": 5, "fetch_k": 50, "lambda_mult": 0.5}
+)
+docs = retriever.get_relevant_documents("compare affect vs effect")</code></pre>
+    <ul>
+      <li><code>fetch_k</code>：先从向量库取多少候选</li>
+      <li><code>lambda_mult</code>：多样性系数（0→只按相似度；1→更注重多样性）</li>
+    </ul>
+
+    <h2 id="chain">六、构造 RAG 链</h2>
+    <img src="/images/blog/feishu/Vmb9b8rkHoE2X0x2rULcg33snTh.png" alt="RAG 链构造流程图">
+    <pre><code>retriever = vectordb.as_retriever(search_type="similarity", search_kwargs={"k":4})
+from langchain.chains import RetrievalQA
+qa_chain = RetrievalQA.from_chain_type(llm=chat_model, chain_type="stuff", retriever=retriever)
+answer = qa_chain.run("如何在作文中使用 moreover？")</code></pre>
+
+    <h2 id="test">七、测试优化方法</h2>
+
+    <h3 id="monitor">质量检测与监控建议</h3>
+    <ul>
+      <li><strong>Sanity checks</strong>：检索返回的 top1 distance 是否在合理范围</li>
+      <li><strong>Sample verification</strong>：抽样 5% 检索结果，人工标注相关性</li>
+      <li><strong>Logging</strong>：记录 query、retrieved_ids、retrieved_scores、response_time</li>
+      <li><strong>Alerting</strong>：当平均 top1 distance &gt; 阈值 或 检索失败率上升时报警</li>
+      <li><strong>Caching</strong>：对高频 query 缓存 top-k 结果（如 Redis）</li>
+    </ul>
+
+    <h3 id="perf">性能与成本优化</h3>
+    <ul>
+      <li>减少 embedding 成本：先用小模型做 candidate filtering</li>
+      <li>降低延迟：本地 FAISS + HNSW；并发查询（注意锁与线程安全）</li>
+      <li>压缩索引：使用 PQ/IVF 进行量化</li>
+      <li>批量处理：embedding 批量化，入库批量化</li>
+      <li>GPU：FAISS-GPU 或 Milvus GPU 实例</li>
+    </ul>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      RAG 的核心价值是<strong>把检索能力嵌入生成链路</strong>——让 LLM 在生成时获得准确、可追溯、可更新的外部知识。
+      工程上的关键点不在某一个具体环节，而在于<strong>各环节之间的协同</strong>：chunking 决定 Embedding 语义质量，
+      Embedding 与 Vector Store 决定召回率，Retriever 策略决定 top-k 相关性，Context Injection 决定 LLM 能否合理利用检索结果。
+    </p>
+    <p>
+      高质量数据 + 合理切分 + 可解释的检索 + 严格的生成约束 + 持续评估，是 RAG 系统从 demo 走向生产的关键。
+    </p>
+  </article>
+</body>
+</html>`,Jd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>马尔可夫过程</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #16a085;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(22, 160, 133, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #117864;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #16a085;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #f4faf7;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    em { font-style: italic; }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      马尔可夫过程（Markov Process）是强化学习<strong>数学建模</strong>的起点。
+      从最简单的马尔可夫链到完整的马尔可夫决策过程（MDP），每一步扩展都为强化学习引入一类新的问题。
+    </p>
+
+    <h2 id="markov-property">一、马尔可夫性</h2>
+    <img src="/images/blog/feishu/SOaDbn53goONthxQZezc27Byndb.png" alt="马尔可夫性：下一状态只与当前状态有关">
+    <p>
+      <strong>马尔可夫性</strong>是指<strong>系统的下一状态仅与当前状态有关，与之前的状态无关</strong>。
+      用数学语言表述为：
+    </p>
+    <pre><code>P(S_{t+1} | S_t) = P(S_{t+1} | S_1, S_2, ..., S_t)</code></pre>
+    <p>
+      即：给定当前状态 <code>S_t</code>，下一状态 <code>S_{t+1}</code> 的条件概率与更早的历史 <code>S_1, ..., S_{t-1}</code> 无关。
+      <strong>「现在决定未来，过去不决定未来」</strong>——这是马尔可夫性的核心直觉。
+    </p>
+    <p>
+      具备马尔可夫性的<strong>状态</strong>称为<strong>马尔可夫状态</strong>。
+      在强化学习中，状态是否满足马尔可夫性，直接决定了能否套用 MDP 框架进行求解。
+    </p>
+
+    <h2 id="markov-chain">二、马尔可夫过程（Markov Process, MP）</h2>
+    <p>
+      <strong>马尔可夫过程</strong>（又叫<strong>马尔可夫链</strong>，Markov Chain）是满足<strong>马尔可夫性</strong>的<strong>随机过程</strong>，
+      由二元组 <code>&lt;S, P&gt;</code> 组成：
+    </p>
+    <ul>
+      <li><strong>S</strong>：有限状态集合</li>
+      <li><strong>P</strong>：状态转移概率矩阵，<code>P(s, s') = P(S_{t+1} = s' | S_t = s)</code></li>
+    </ul>
+    <p>从某一状态出发，根据状态转移概率生成完整的状态序列：<code>S_1, S_2, ..., S_t, ...</code>，这叫做<strong>采样（sampling）</strong>。</p>
+
+    <h3 id="mp-example">示例</h3>
+    <p>以「学生一天」为例（无动作、无奖励），状态集合与转移关系：</p>
+    <table>
+      <thead>
+        <tr><th>状态</th><th>含义</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>class 1</td><td>第一节课</td></tr>
+        <tr><td>class 2</td><td>第二节课</td></tr>
+        <tr><td>class 3</td><td>第三节课</td></tr>
+        <tr><td>sleep</td><td>睡觉</td></tr>
+      </tbody>
+    </table>
+    <p>所有状态间的转移概率构成一个 4×4 的矩阵 P，从初始状态出发反复采样，可以得到无数条「状态序列」。</p>
+
+    <h2 id="mrp">三、马尔可夫奖励过程（Markov Reward Process, MRP）</h2>
+    <p>
+      在马尔可夫过程的基础上<strong>加入奖励函数 R 和折扣因子 γ</strong>，得到四元组 <code>&lt;S, P, R, γ&gt;</code>：
+    </p>
+    <ul>
+      <li><strong>R</strong>：奖励函数，<code>R(s) = E[R_{t+1} | S_t = s]</code>，表示在某状态下获得的即时奖励的期望</li>
+      <li><strong>γ</strong>：折扣因子，<code>γ ∈ [0, 1]</code>，权衡「即时奖励」与「未来奖励」的重要性</li>
+    </ul>
+
+    <h3 id="return">回报（Return）</h3>
+    <p>
+      从时刻 t 开始到过程结束的所有奖励的<strong>折扣累加和</strong>称为<strong>回报</strong> <em>G_t</em>：
+    </p>
+    <pre><code>G_t = R_{t+1} + γ · R_{t+2} + γ² · R_{t+3} + ...
+    = Σ_{k=0}^∞ γ^k · R_{t+k+1}</code></pre>
+    <p>
+      γ 接近 0：更关注「即时奖励」（短视）<br>
+      γ 接近 1：更关注「长期奖励」（远视）
+    </p>
+
+    <h3 id="value-function-mrp">价值函数（Value Function）</h3>
+    <p>
+      状态 s 的<strong>价值</strong>定义为从该状态出发的<strong>回报的期望</strong>：
+    </p>
+    <img src="/images/blog/feishu/K38ebVzz0otpE3xXsYFcMqiQndh.png" alt="采样多条轨迹计算平均回报">
+    <img src="/images/blog/feishu/OdsabKeseoFdwkxSsmmcsKmcn1s.png" alt="价值函数与回报的关系">
+    <pre><code>V(s) = E[G_t | S_t = s]</code></pre>
+    <p>它满足<strong>贝尔曼方程（Bellman Equation）</strong>：</p>
+    <pre><code>V(s) = R(s) + γ · Σ_{s'∈S} P(s, s') · V(s')</code></pre>
+    <p>
+      即：当前状态的价值 = 即时奖励 + 折扣后的下一状态价值的期望。
+      通过联立所有状态的方程可以求解出 V(s)，但实际中常用迭代法（动态规划 / 蒙特卡洛 / TD 学习）。
+    </p>
+
+    <h2 id="mdp">四、马尔可夫决策过程（MDP）</h2>
+    <img src="/images/blog/feishu/KzI3buy1loMtKaxY4N9cotevnkg.png" alt="马尔可夫决策过程示意">
+    <p>
+      在 MRP 的基础上<strong>再加入动作 A</strong>，就得到了<strong>马尔可夫决策过程</strong>，由五元组 <code>&lt;S, A, P, R, γ&gt;</code> 组成：
+    </p>
+    <ul>
+      <li><strong>S</strong>：状态集合</li>
+      <li><strong>A</strong>：动作集合</li>
+      <li><strong>P</strong>：状态转移概率，<code>P(s'|s, a) = P(S_{t+1}=s' | S_t=s, A_t=a)</code></li>
+      <li><strong>R</strong>：奖励函数，<code>R(s, a) = E[R_{t+1} | S_t=s, A_t=a]</code></li>
+      <li><strong>γ</strong>：折扣因子</li>
+    </ul>
+    <p>
+      MDP 是强化学习<strong>最经典、最核心</strong>的数学框架。
+      在 MDP 中，<strong>策略 π</strong> 决定智能体在不同状态下如何选择动作：
+    </p>
+    <pre><code>π(a | s) = P(A_t = a | S_t = s)</code></pre>
+    <p>给定策略 π 后，MDP 就退化为一个 MRP，因此<strong>策略 + MRP = 采样轨迹</strong>。</p>
+
+    <h3 id="policy-value">策略下的价值函数</h3>
+    <p>
+      在策略 π 下，状态价值函数和行为价值函数定义为：
+    </p>
+    <pre><code>V_π(s) = E_π[G_t | S_t = s]
+Q_π(s, a) = E_π[G_t | S_t = s, A_t = a]</code></pre>
+    <p>两者满足关系：</p>
+    <pre><code>V_π(s) = Σ_{a∈A} π(a|s) · Q_π(s, a)
+Q_π(s, a) = R(s, a) + γ · Σ_{s'∈S} P(s'|s, a) · V_π(s')</code></pre>
+
+    <h3 id="bellman-optimality">贝尔曼最优方程</h3>
+    <p>
+      强化学习的最终目标是找到<strong>最优策略</strong> π*，使得价值最大化。最优价值函数满足<strong>贝尔曼最优方程</strong>：
+    </p>
+    <pre><code>V*(s) = max_a [ R(s, a) + γ · Σ_{s'∈S} P(s'|s, a) · V*(s') ]
+Q*(s, a) = R(s, a) + γ · Σ_{s'∈S} P(s'|s, a) · max_{a'} Q*(s', a')</code></pre>
+    <p>
+      一旦解出 V* 或 Q*，最优策略可以立即给出：
+    </p>
+    <pre><code>π*(a|s) = 1  if a = argmax_a Q*(s, a)
+        0  otherwise</code></pre>
+
+    <h2 id="evolution">五、概念演进总结</h2>
+    <img src="/images/blog/feishu/MA0mbCPynocpj6xX0KIc2KegnQc.png" alt="MDP 求解：策略迭代与价值迭代">
+    <img src="/images/blog/feishu/FrTAbpXxaovQvexnPONcZB5Bn3f.png" alt="动态规划求解贝尔曼方程">
+    <table>
+      <thead>
+        <tr>
+          <th>概念</th><th>组成</th><th>引入的关键要素</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>马尔可夫过程（MP）</td><td><code>&lt;S, P&gt;</code></td><td>状态 + 转移概率</td></tr>
+        <tr><td>马尔可夫奖励过程（MRP）</td><td><code>&lt;S, P, R, γ&gt;</code></td><td>+ 奖励函数、折扣因子</td></tr>
+        <tr><td>马尔可夫决策过程（MDP）</td><td><code>&lt;S, A, P, R, γ&gt;</code></td><td>+ 动作、策略</td></tr>
+      </tbody>
+    </table>
+    <img src="/images/blog/feishu/K80PbmPocoaWHRxOX7BcH8u2nRb.png" alt="策略迭代与价值迭代对比">
+    <img src="/images/blog/feishu/QeTOb6sj3oqPVuxmZsncD2twngd.png" alt="价值迭代过程示意">
+    <img src="/images/blog/feishu/SGeObDF77oBgRax2E42c4IOsnGd.png" alt="策略评估与策略提升">
+    <img src="/images/blog/feishu/NA9hbSOvSo33qdxqLgPcNbmenSb.png" alt="贝尔曼最优方程求解">
+    <p>
+      可以看到，从 MP 到 MRP 到 MDP 是一个<strong>逐步引入决策与价值</strong>的过程：
+      MP 描述「环境的随机演化」，MRP 描述「环境演化 + 目标信号」，MDP 描述「环境 + 目标 + 智能体的决策」。
+      强化学习的所有算法（Q-learning、Policy Gradient、Actor-Critic 等）本质上都是在<strong>不知道完整 P 或 R 的情况下，对贝尔曼最优方程做近似求解</strong>。
+    </p>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      马尔可夫过程为强化学习提供了<strong>形式化语言</strong>：状态、动作、奖励、折扣因子、策略、价值函数。
+      所有强化学习算法都是在<strong>这些变量的不同组合</strong>上做文章——
+      有的已知环境模型（Model-Based），有的未知模型只能与环境交互（Model-Free）；
+      有的直接优化策略（Policy Gradient），有的先学价值再导出策略（Value-Based / Actor-Critic）。
+    </p>
+    <p>
+      理解 MDP 五元组与贝尔曼最优方程，是理解后续所有 RL 算法的<strong>地基</strong>。
+    </p>
+  </article>
+</body>
+</html>`,Yd=`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>强化学习基础概念与分类</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #16a085;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(22, 160, 133, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #117864;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #16a085;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #f4faf7;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    em { font-style: italic; }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      强化学习（Reinforcement Learning，RL）是机器学习的一个重要分支：<strong>序贯决策任务的机器学习方法——强化学习（涉及多轮交互）</strong>。
+      本文整理其基础概念、关键要素、与监督学习的区别，以及常见的学习范式分类。
+    </p>
+
+    <h2 id="definition">一、强化学习的定义</h2>
+    <p>
+      强化学习是<strong>机器通过与环境交互来实现目标的一种计算方法</strong>。
+    </p>
+    <img src="/images/blog/feishu/WlsBboLyQottAJxbyS4cUf0rnXf.png" alt="强化学习基本概念示意图">
+    <p>
+      因为决策任务是多轮的，智能体就需要在每轮做决策时考虑未来环境相应的改变，而不是单步最优决策。
+    </p>
+
+    <h3 id="agent">智能体（Agent）</h3>
+    <p>强化学习用「智能体（agent）」这个概念来表示做决策的机器。</p>
+    <img src="/images/blog/feishu/ZOdYbZrSpo5ao8xQh0ZcOj8bnSd.png" alt="智能体三要素：感知、行动、目标">
+    <ul>
+      <li><strong>每一轮交互</strong>：智能体在环境中的某一状态下做出动作决策，把这个动作用到环境中，环境发生相应的改变，并将相应的反馈和下一轮状态传回机器。</li>
+      <li><strong>优化目标</strong>：最大化在多轮交互中获得累计奖励反馈的<strong>期望</strong></li>
+    </ul>
+    <p>
+      相比于有监督学习中的「模型」，强化学习中的「智能体」强调机器<strong>不但可以感知周围的环境信息，还可以通过做决策来直接改变这个环境</strong>，
+      而不只是给出一些预测信号。
+    </p>
+
+    <h3 id="key-elements">智能体的关键要素</h3>
+    <p>智能体的关键要素可以概括为三个：<strong>感知、行动、目标</strong>。</p>
+
+    <h2 id="elements">二、强化学习系统的要素</h2>
+
+    <h3 id="history">历史（History）</h3>
+    <p>
+      历史是<strong>观察、行动和奖励的序列</strong>，即智能体到目前为止所经历的全部信息。
+      是强化学习最原始的视角——所有后续概念都是对历史的压缩。
+    </p>
+    <img src="/images/blog/feishu/QWv4buzaeoUyZUxMXfTcJEIUn9b.png" alt="历史：观察、行动、奖励序列">
+
+    <h3 id="state">状态（State）</h3>
+    <p>
+      状态是<strong>关于历史的函数</strong>，用于确定接下来会发生的事情（行动、观察、奖励）的信息。
+      状态是对历史的提炼，是决策与预测的基础。
+    </p>
+    <img src="/images/blog/feishu/Ez20barmyoa3cvxQgIWc2qtHnJe.png" alt="状态是关于历史的函数">
+
+    <h3 id="policy">策略（Policy）</h3>
+    <p>
+      策略是<strong>从状态到行动的映射</strong> <em>A = F(S)</em>，用来学习智能体在特定时间的行为方式。
+      策略有两种基本形式：
+    </p>
+    <img src="/images/blog/feishu/Xh4bbcvv2oAPPIxxB0WcuF9zn1f.png" alt="策略：状态到行动的映射">
+    <ul>
+      <li><strong>确定性策略</strong>：给定状态输出唯一动作</li>
+      <li><strong>随机策略</strong>：给定状态输出动作的概率分布</li>
+    </ul>
+
+    <h3 id="reward">奖励（Reward）</h3>
+    <p>
+      一个定义强化学习目标的<strong>标量</strong> <em>R(s, a)</em>。
+      奖励是<strong>即时的</strong>反馈信号，用来评价当前这一步动作的好坏。
+    </p>
+
+    <h3 id="value-function">价值函数（Value Function）</h3>
+    <p>
+      价值函数也是一个<strong>标量</strong>，用于对未来累积奖励的预测（对于长期来说什么是好的）。
+      与奖励的区别在于：<strong>奖励是即时的，价值是对未来收益的估计</strong>。
+    </p>
+    <img src="/images/blog/feishu/BZsWbIMxWobmvPx8W31cu34snBe.png" alt="价值函数：未来累积奖励的预测">
+
+    <h2 id="vs-sl">三、强化学习与有监督学习的区别</h2>
+    <img src="/images/blog/feishu/VKDBbWNwzoe9mUxSkGEcKDgWnKh.png" alt="有监督学习训练数据分布固定">
+    <table>
+      <thead>
+        <tr><th>维度</th><th>有监督学习</th><th>强化学习</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>训练数据分布</td><td>固定不变</td><td>随智能体的学习而改变</td></tr>
+        <tr><td>数据来源</td><td>预先标注的样本</td><td>智能体与环境交互产生</td></tr>
+        <tr><td>优化目标</td><td>在给定数据分布下使损失函数期望最小</td><td>在交互数据分布下使奖励期望最大</td></tr>
+        <tr><td>反馈形式</td><td>标签（正确答案）</td><td>奖励（仅评价，不直接告诉怎么做）</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="occupancy">占用度量（关于 RL 中数据分布的一个概念）</h3>
+    <img src="/images/blog/feishu/CK3XbdtzIoupbexOb4DcRUtBnah.png" alt="强化学习训练数据分布随智能体变化">
+    <p>
+      归一化的占用度量用于衡量在一个智能体决策与一个动态环境的交互过程中，
+      <strong>采样到一个具体的状态动作对（state-action pair）的概率分布</strong>。
+    </p>
+    <ul>
+      <li><strong>性质</strong>：给定两个策略及其与一个动态环境交互得到的两个占用度量，那么当且仅当这两个占用度量相同时，这两个策略相同。</li>
+      <li><strong>由性质推导出强化学习的本质</strong>：
+        <ul>
+          <li>强化学习的一大难点就在于，智能体看到的数据分布是<strong>随着智能体的学习而不断发生改变</strong>的。</li>
+          <li>占有度量是状态动作对的概率分布，而策略是动作到状态的映射。对智能体的策略进行优化的目标是使其奖励最大化，可以表达为一个<strong>占有度量下对应的奖励的期望</strong>。</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3 id="paradigm-diff">范式对比总结</h3>
+    <ul>
+      <li>一般的有监督学习关注寻找一个模型，使其在<strong>给定数据分布</strong>下得到的损失函数的期望最小。（数据分布确定）</li>
+      <li>强化学习关注寻找一个智能体策略，最大化其<strong>与环境交互的过程所产生的数据分布</strong>下，给定奖励函数的期望。（目标函数确定）</li>
+    </ul>
+
+    <h2 id="classification">四、强化学习分类</h2>
+    <img src="/images/blog/feishu/Sp6EbX1hgoqsFpxG9AfcySe2nwh.png" alt="强化学习分类全景图">
+
+    <h3 id="by-env">按照环境是否已知划分：免模型 vs 有模型</h3>
+    <table>
+      <thead>
+        <tr><th>类别</th><th>核心思想</th><th>典型算法</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>免模型学习（Model-Free）</strong></td>
+          <td>不去学习和理解环境，环境给出什么信息就是什么信息</td>
+          <td>Policy Optimization、Q-learning</td>
+        </tr>
+        <tr>
+          <td><strong>有模型学习（Model-Based）</strong></td>
+          <td>去学习和理解环境，学会用一个模型来模拟环境，通过模拟的环境来得到反馈</td>
+          <td>World Models、AlphaZero 等</td>
+        </tr>
+      </tbody>
+    </table>
+    <blockquote>
+      <p>一般情况下，环境都是不可知的，所以实践中<strong>主要研究无模型问题</strong>。</p>
+    </blockquote>
+
+    <h3 id="by-onoff">按照学习方式划分：在线策略 vs 离线策略</h3>
+    <table>
+      <thead>
+        <tr><th>类别</th><th>特征</th><th>典型算法</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>在线策略（On-Policy）</strong></td>
+          <td>agent 必须本人在场，并且一定是本人<strong>边玩边学习</strong></td>
+          <td>Sarsa</td>
+        </tr>
+        <tr>
+          <td><strong>离线策略（Off-Policy）</strong></td>
+          <td>agent 可以选择自己玩，也可以选择看着别人玩，从过往的经验中学习。过往的经历<strong>没必要是自己的</strong>，玩和学习的时间可以不同步</td>
+          <td>Q-learning、Deep Q Network</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="by-target">按照学习目标划分：基于策略 vs 基于价值</h3>
+    <table>
+      <thead>
+        <tr><th>类别</th><th>输出</th><th>适用动作空间</th><th>典型算法</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>基于策略（Policy-Based）</strong></td>
+          <td>下一步动作的概率，根据概率来选取动作</td>
+          <td>非连续和连续</td>
+          <td>Policy Gradients</td>
+        </tr>
+        <tr>
+          <td><strong>基于价值（Value-Based）</strong></td>
+          <td>动作的价值，选择价值最高的动作</td>
+          <td>非连续</td>
+          <td>Q-learning、Deep Q Network、Sarsa</td>
+        </tr>
+        <tr>
+          <td><strong>Actor-Critic（二者结合）</strong></td>
+          <td>Actor 根据概率做出动作，Critic 根据动作给出价值，加速学习</td>
+          <td>连续 / 非连续</td>
+          <td>A2C、A3C、DDPG</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      强化学习与有监督学习的<strong>根本分歧</strong>在于：数据分布是固定的还是随智能体变化的。
+      这一分歧导致强化学习的所有概念（策略、价值、占用度量）都围绕「在变化的数据分布下优化长期奖励」这一目标展开。
+    </p>
+    <p>
+      实际工程中，往往需要把多种范式<strong>组合使用</strong>：例如 Actor-Critic 架构结合了 Policy-Based 的动作采样能力与 Value-Based 的长期评估能力，
+      DQN 则是 Value-Based + 神经网络 + 经验回放的经典组合。理解这些范式的<strong>核心动机</strong>比记住具体公式更重要。
+    </p>
+  </article>
+</body>
+</html>`,Zd=Object.assign({"../blogs/ai-app/agent-team.html":Vd,"../blogs/ai-app/claude-code-tips.html":jd,"../blogs/dev-basics/dart.html":Nd,"../blogs/dev-basics/flutter.html":Kd,"../blogs/dev-basics/unity-xr.html":Ud,"../blogs/english/ielts.html":Gd,"../blogs/llm-agent/harness-intro.html":qd,"../blogs/llm-agent/kv-cache.html":Wd,"../blogs/llm-agent/mcp-cli-skill-plugin.html":Xd,"../blogs/llm-agent/rag-concepts.html":Qd,"../blogs/reinforcement-learning/markov-process.html":Jd,"../blogs/reinforcement-learning/rl-basics.html":Yd});function tu(t,n){const e=ct(Te.find(p=>p.categoryId===t.value&&p.id===n.value)??null),o=ct(""),r=ct([]),i=ct(!0),s=ct(null);function l(p){const d=[],g=p.replace(/^\.\//,"");return d.push(`../blogs/${g}`),d.push(`./${g}`),d.push(p),d.map(h=>Zd[h]).find(Boolean)}async function a(){i.value=!0,s.value=null,o.value="",r.value=[];try{const p=Te.find(S=>S.categoryId===t.value&&S.id===n.value);if(!p){s.value=`未找到博客：${t.value}/${n.value}`,e.value=null;return}e.value=p;const d=l(p.htmlPath);if(!d)throw new Error(`HTML 模块未找到：${p.htmlPath}`);const m=new DOMParser().parseFromString(d,"text/html").body;m.querySelectorAll("script").forEach(S=>S.remove()),o.value=m.innerHTML,r.value=Array.from(m.querySelectorAll("h1[id], h2[id], h3[id]")).map(S=>({id:S.id,text:(S.textContent??"").trim(),level:parseInt(S.tagName.charAt(1),10)}))}catch(p){const d=p instanceof Error?p.message:String(p);s.value=`加载博客失败：${d}`,console.error("[useBlogPost]",p)}finally{i.value=!1}}return kn([t,n],a,{immediate:!0}),{postMeta:e,bodyHtml:o,toc:r,loading:i,error:s,reload:a}}function nu(t,n,e){let o=null;function r(){o?.disconnect(),o=null}function i(){r(),!(!t.value||n.value.length===0)&&(o=new IntersectionObserver(l=>{const a=l.filter(p=>p.isIntersecting).sort((p,d)=>p.boundingClientRect.top-d.boundingClientRect.top);a[0]&&(e.value=a[0].target.id)},{rootMargin:"-80px 0px -75% 0px",threshold:[0,.5,1]}),n.value.forEach(l=>{const a=t.value?.querySelector(`#${CSS.escape(l.id)}`);a&&o.observe(a)}))}function s(){requestAnimationFrame(()=>requestAnimationFrame(i))}pe(s),kn(()=>n.value,s,{flush:"post"}),Lo(r)}const eu={key:0,class:"toc"},ou={class:"toc__list"},ru=["href","onClick"],iu=xt({__name:"TableOfContents",props:{toc:{},activeId:{}},emits:["navigate"],setup(t,{emit:n}){const e=n;function o(r){e("navigate",r)}return(r,i)=>r.toc.length>0?(F(),B("nav",eu,[i[0]||(i[0]=y("h4",{class:"toc__title"},"Contents",-1)),y("ul",ou,[(F(!0),B(ut,null,An(r.toc,s=>(F(),B("li",{key:s.id,class:on(["toc__item",`toc__item--h${s.level}`,{active:s.id===r.activeId}])},[y("a",{class:"toc__link",href:`#${s.id}`,onClick:Sa(l=>o(s.id),["prevent"])},tt(s.text),9,ru)],2))),128))])])):gt("",!0)}}),su=Rt(iu,[["__scopeId","data-v-bb4f35d1"]]);function lu(t){const n=ct(0);let e=0;function o(){e=0;const i=t.value;if(!i){n.value=0;return}const{top:s,height:l}=i.getBoundingClientRect(),a=window.innerHeight,p=Math.max(1,l-a),d=Math.min(p,Math.max(0,-s));n.value=Math.min(1,Math.max(0,d/p))}function r(){e||(e=requestAnimationFrame(o))}return pe(()=>{o(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r,{passive:!0})}),Lo(()=>{e&&cancelAnimationFrame(e),window.removeEventListener("scroll",r),window.removeEventListener("resize",r)}),{progress:n}}const au={class:"reading-progress","aria-hidden":"true"},cu=xt({__name:"ReadingProgress",props:{target:{}},setup(t){const n=t,e=at(()=>n.target),{progress:o}=lu(e),r=at(()=>({transform:`scaleX(${o.value})`}));return(i,s)=>(F(),B("div",au,[y("div",{class:"reading-progress__bar",style:ze(r.value)},null,4)]))}}),du=Rt(cu,[["__scopeId","data-v-a9d0ff0b"]]),uu={class:"breadcrumb","aria-label":"breadcrumb"},pu={key:1,class:"breadcrumb__sep"},gu={key:2,class:"breadcrumb__current"},fu=xt({__name:"PostBreadcrumb",props:{categoryId:{},postTitle:{}},setup(t){const n=t,e=at(()=>Ue(n.categoryId));return(o,r)=>{const i=Rn("router-link");return F(),B("nav",uu,[J(i,{to:"/blog",class:"breadcrumb__link"},{default:mt(()=>r[0]||(r[0]=[Pt("Blogs",-1)])),_:1,__:[0]}),r[1]||(r[1]=y("span",{class:"breadcrumb__sep"},"/",-1)),e.value?(F(),Qt(i,{key:0,to:`/blog/${e.value.id}`,class:"breadcrumb__link"},{default:mt(()=>[Pt(tt(e.value.name),1)]),_:1},8,["to"])):gt("",!0),o.postTitle?(F(),B("span",pu,"/")):gt("",!0),o.postTitle?(F(),B("span",gu,tt(o.postTitle),1)):gt("",!0)])}}}),hu=Rt(fu,[["__scopeId","data-v-822f602e"]]),mu={class:"not-found"},bu={class:"not-found__actions"},vu=xt({__name:"BlogPostNotFound",setup(t){const n=Vo();function e(){window.history.length>1?n.back():n.push("/blog")}return(o,r)=>{const i=Rn("router-link");return F(),B("div",mu,[r[1]||(r[1]=y("div",{class:"not-found__icon"},"🔍",-1)),r[2]||(r[2]=y("h2",{class:"not-found__title"},"文章未找到",-1)),r[3]||(r[3]=y("p",{class:"not-found__desc"}," 你访问的博客可能已被移除或路径错误。 ",-1)),y("div",bu,[J(i,{to:"/blog",class:"not-found__btn not-found__btn--primary"},{default:mt(()=>r[0]||(r[0]=[Pt(" 返回博客 ",-1)])),_:1,__:[0]}),y("button",{class:"not-found__btn",onClick:e},"返回上一页")])])}}}),_u=Rt(vu,[["__scopeId","data-v-a4417052"]]),xu={class:"my-box"},yu={class:"container"},wu={key:0,class:"post-loading"},Cu={key:1,class:"post-error"},Su={key:3,class:"section post-layout"},ku={class:"post-container"},Au={class:"post-hero"},Pu={class:"post-hero__meta"},Ru={class:"post-hero__date"},Mu={class:"post-hero__readtime"},Tu={class:"post-hero__title"},Iu={key:0,class:"post-hero__lead"},Eu={key:1,class:"post-hero__tags"},Lu=["innerHTML"],Ou={key:1,class:"post-pager"},Fu={class:"post-pager__title"},zu={key:1,class:"post-pager__item post-pager__item--empty"},Du={class:"post-pager__title"},Hu={key:0,class:"post-toc"},$u=xt({__name:"BlogPostView",props:{categoryId:{},postId:{}},setup(t){const n=t,e=es(),o=ct(null),r=Xo(n,"categoryId"),i=Xo(n,"postId"),{postMeta:s,bodyHtml:l,toc:a,loading:p,error:d}=tu(r,i),g=at(()=>s.value?Ue(s.value.categoryId):null),h=at(()=>s.value?ld(s.value.categoryId,s.value.id):{prev:null,next:null}),m=ct("");nu(o,a,m);function S(A){const T=document.getElementById(A);if(!T)return;const L=T.getBoundingClientRect().top+window.scrollY-80-16;window.scrollTo({top:L,behavior:"smooth"}),history.replaceState(null,"",`#${A}`),m.value=A}return pe(()=>{window.scrollTo({top:0})}),kn(()=>e.hash,A=>{A&&requestAnimationFrame(()=>{const T=document.querySelector(A);T&&S(T.id)})}),(A,T)=>{const O=Rn("router-link");return F(),B("div",xu,[y("div",yu,[Z(p)?(F(),B("div",wu,T[0]||(T[0]=[y("div",{class:"post-loading__spinner"},null,-1),y("p",null,"正在加载文章...",-1)]))):Z(d)?(F(),B("div",Cu,[T[2]||(T[2]=y("div",{class:"post-error__icon"},"⚠️",-1)),T[3]||(T[3]=y("h2",null,"加载失败",-1)),y("p",null,tt(Z(d)),1),J(O,{to:"/blog",class:"post-error__link"},{default:mt(()=>T[1]||(T[1]=[Pt("返回博客 →",-1)])),_:1,__:[1]})])):Z(s)?(F(),B("section",Su,[J(du,{target:o.value},null,8,["target"]),J(hu,{"category-id":Z(s).categoryId,"post-title":Z(s).title},null,8,["category-id","post-title"]),y("div",ku,[y("article",{ref_key:"articleRef",ref:o,class:"post-content post-body"},[y("header",Au,[y("div",Pu,[g.value?(F(),Qt(O,{key:0,to:`/blog/${g.value.id}`,class:"post-hero__category"},{default:mt(()=>[Pt(tt(g.value.name),1)]),_:1},8,["to"])):gt("",!0),T[5]||(T[5]=y("span",{class:"post-hero__sep"},"·",-1)),y("time",Ru,tt(Z(s).updateTime),1),Z(s).readTime?(F(),B(ut,{key:1},[T[4]||(T[4]=y("span",{class:"post-hero__sep"},"·",-1)),y("span",Mu,tt(Z(s).readTime),1)],64)):gt("",!0)]),y("h1",Tu,tt(Z(s).title),1),Z(s).description?(F(),B("p",Iu,tt(Z(s).description),1)):gt("",!0),Z(s).tags?.length?(F(),B("div",Eu,[(F(!0),B(ut,null,An(Z(s).tags,L=>(F(),B("span",{key:L,class:"post-hero__tag"}," #"+tt(L),1))),128))])):gt("",!0)]),Z(l)?(F(),B("div",{key:0,class:"post-body__content",innerHTML:Z(l)},null,8,Lu)):gt("",!0),h.value.prev||h.value.next?(F(),B("nav",Ou,[h.value.prev?(F(),Qt(O,{key:0,to:`/blog/${h.value.prev.categoryId}/${h.value.prev.id}`,class:"post-pager__item post-pager__item--prev"},{default:mt(()=>[T[6]||(T[6]=y("span",{class:"post-pager__direction"},"← Previous",-1)),y("span",Fu,tt(h.value.prev.title),1)]),_:1,__:[6]},8,["to"])):(F(),B("span",zu)),h.value.next?(F(),Qt(O,{key:2,to:`/blog/${h.value.next.categoryId}/${h.value.next.id}`,class:"post-pager__item post-pager__item--next"},{default:mt(()=>[T[7]||(T[7]=y("span",{class:"post-pager__direction"},"Next →",-1)),y("span",Du,tt(h.value.next.title),1)]),_:1,__:[7]},8,["to"])):gt("",!0)])):gt("",!0)],512),Z(a).length>0?(F(),B("aside",Hu,[J(su,{toc:Z(a),"active-id":m.value,onNavigate:S},null,8,["toc","active-id"])])):gt("",!0)])])):(F(),Qt(_u,{key:2}))])])}}}),Bu=Rt($u,[["__scopeId","data-v-8dbff083"]]),Vu={class:"my-box"},ju={class:"container"},Nu={class:"section"},Ku={class:"projects-grid"},Uu=["onClick"],Gu={class:"card-image"},qu=["src","alt"],Wu={class:"card-content"},Xu={class:"card-title"},Qu={class:"card-description"},Ju={class:"card-meta"},Yu={class:"project-time"},Zu=xt({__name:"ProjectView",setup(t){Vo();const n=ct([{id:2,title:"三模态Few-shot图像分割的交互式特征融合与匹配网络",description:"构建了新型交互式特征融合与匹配网络，并提出两个新模块，在VDT-2048-5i数据集上取得SOTA效果。",coverImage:"/images/project/3.png",time:"2023年11月 - 2024年8月"},{id:3,title:"Linker - 星星连连看",description:"基于图像特征匹配与自研算法绘制星座图，纪念宠物，负责前端web开发，基于 Vue 2 框架。",coverImage:"/images/project/2.png",time:"2024年6月 - 2025年7月"},{id:4,title:"Plantmon - 植物宝可梦",description:"获得Adventure-X黑客松赛道二等奖*1、三等奖*1，负责战斗模块的实现与部分前端开发。",coverImage:"/images/project/4.png",time:"2025年7月"}]);ct([{id:1,title:"Unity XR 开发",description:"Unity XR 开发的学习笔记及相关资料链接。",coverImage:"/images/blog/unityXR.png",updateTime:"2025年4月25日",url:"https://j2w8lfcfsi.feishu.cn/wiki/GeKhwi4hmipVKgknIVdcO1JXnGh?from=from_copylink"},{id:2,title:"强化学习",description:"强化学习基础理论笔记。",coverImage:"/images/blog/RL.png",updateTime:"2024年1月28日",url:"https://j2w8lfcfsi.feishu.cn/wiki/WxZ6wAsrXiDcqDkreVQcItgqnFe?from=from_copylink"},{id:3,title:"雅思IELTS",description:"雅思备考经验分享。",coverImage:"/images/blog/IELTS.jpg",updateTime:"2023年4月25日",url:"https://j2w8lfcfsi.feishu.cn/wiki/VAyLwKKykiqJTckNcUycoSTLnFd?from=from_copylink"}]);const e=o=>{console.log(`跳转到项目 ${o} 详情页`)};return(o,r)=>(F(),B("div",Vu,[y("div",ju,[y("section",Nu,[r[0]||(r[0]=y("h2",{class:"section-title"},"Projects",-1)),y("div",Ku,[(F(!0),B(ut,null,An(n.value,i=>(F(),B("div",{key:i.id,class:"project-card",onClick:s=>e(i.id)},[y("div",Gu,[y("img",{src:i.coverImage,alt:i.title},null,8,qu)]),y("div",Wu,[y("h3",Xu,tt(i.title),1),y("p",Qu,tt(i.description),1),y("div",Ju,[y("span",Yu,tt(i.time),1)])])],8,Uu))),128))])])])]))}}),tp=Rt(Zu,[["__scopeId","data-v-1aaedf96"]]),np="/assets/2-CsK4cdrb.jpg",ep=Object.freeze(Object.defineProperty({__proto__:null,default:np},Symbol.toStringTag,{value:"Module"})),op="/assets/4-BJkfqce8.jpg",rp=Object.freeze(Object.defineProperty({__proto__:null,default:op},Symbol.toStringTag,{value:"Module"})),ip="/assets/6-VrSckUP4.jpg",sp=Object.freeze(Object.defineProperty({__proto__:null,default:ip},Symbol.toStringTag,{value:"Module"})),lp="/assets/7-B2LtYpab.jpg",ap=Object.freeze(Object.defineProperty({__proto__:null,default:lp},Symbol.toStringTag,{value:"Module"})),cp="/assets/9-fwgvS8H6.jpg",dp=Object.freeze(Object.defineProperty({__proto__:null,default:cp},Symbol.toStringTag,{value:"Module"})),up={class:"container"},pp={class:"album-wrapper"},gp={key:0,class:"status"},fp={key:0,class:"status-text"},hp={key:1,class:"status-text status-error"},mp=["src","alt","decoding","loading","fetchpriority"],bp=xt({__name:"AlbumView",setup(t){const n=ct([]),e=ct(0),o=ct(0),r=ct(0),i=ct("loading"),s=at(()=>[...n.value,...n.value]),l=async()=>{try{const I=Object.assign({"/public/images/album/2.jpg":ep,"/public/images/album/4.jpg":rp,"/public/images/album/6.jpg":sp,"/public/images/album/7.jpg":ap,"/public/images/album/9.jpg":dp}),K=[];Object.keys(I).forEach(et=>{const U=et.split("/").pop();U&&K.push(U)}),K.sort((et,U)=>{const Et=parseInt(et.match(/\d+/)?.[0]||"0"),Bt=parseInt(U.match(/\d+/)?.[0]||"0");return Et-Bt}),n.value=K,e.value=K.length}catch(I){console.error("加载图片列表失败:",I),n.value=["2.jpg","4.jpg"],e.value=2}},a=()=>{r.value=e.value;const I=n.value.map(K=>new Promise(et=>{const U=new Image;U.onload=()=>et(),U.onerror=()=>{console.warn(`图片加载失败: ${K}`),et()},U.src=`/images/album/${K}`}));return Promise.all(I).then(()=>{})},p=()=>{o.value++},d=()=>{o.value++,console.warn("某张图片加载失败")},g=ct(),h=ct();let m=null,S=0,A=0;const T=ct(1),O=()=>{if(!h.value||!g.value)return;const I=h.value.scrollWidth/2;A=Math.max(0,I-g.value.clientWidth)},L=I=>{if(!g.value||i.value!=="ready"){m=requestAnimationFrame(L);return}if(I-S<16){m=requestAnimationFrame(L);return}S=I;const K=g.value.scrollLeft;T.value===1&&K>=A?T.value=-1:T.value===-1&&K<=0&&(T.value=1),g.value.scrollLeft+=T.value*1,m=requestAnimationFrame(L)},$=async()=>{await To(),O(),window.addEventListener("resize",O),m=requestAnimationFrame(L)};return pe(async()=>{await l(),await a(),i.value="ready",$()}),Oo(()=>{m!==null&&cancelAnimationFrame(m),window.removeEventListener("resize",O)}),(I,K)=>(F(),B("div",up,[y("div",pp,[i.value!=="ready"?(F(),B("div",gp,[i.value==="loading"?(F(),B("div",fp," 正在加载图片 ("+tt(o.value)+"/"+tt(r.value)+")... ",1)):i.value==="error"?(F(),B("div",hp," 图片加载失败，请刷新重试 ")):gt("",!0)])):gt("",!0),y("div",{class:"album-container",ref_key:"albumContainer",ref:g},[y("div",{class:"photos",ref_key:"photosContainer",ref:h},[(F(!0),B(ut,null,An(s.value,(et,U)=>(F(),B(ut,{key:`${et}-${U}`},[y("img",{src:`/images/album/${et}`,alt:`Image ${U+1}`,decoding:U<e.value?"auto":"async",loading:U<e.value?"eager":"lazy",fetchpriority:U===0?"high":"auto",onLoad:p,onError:d},null,40,mp),K[0]||(K[0]=y("div",{class:"margin"},null,-1))],64))),128))],512)],512)])]))}}),vp=Rt(bp,[["__scopeId","data-v-5bf334d3"]]),_p=Lc({history:ac("/"),routes:[{path:"/",name:"home",component:ed},{path:"/biography",name:"biography",component:sd},{path:"/blog",name:"blog",component:Ad},{path:"/blog/:categoryId",name:"blog-category",component:Bd,props:!0},{path:"/blog/:categoryId/:postId",name:"blog-post",component:Bu,props:!0},{path:"/project",name:"project",component:tp},{path:"/album",name:"album",component:vp}],scrollBehavior(t,n,e){if(e)return e;if(t.hash)return{el:t.hash,behavior:"smooth",top:80};if(t.path!==n.path)return{top:0}}}),jo=Pa(Wc);jo.use(Ia());jo.use(_p);jo.mount("#app");
