@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dart 语言核心要点</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #e67e22;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    h4 {
+      font-size: 17px; font-weight: 600;
+      margin: 24px 0 8px;
+      color: #2c3e50;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(230, 126, 34, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #af601a;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #e67e22;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #fdf6ee;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      Dart 是 Flutter 的底层语言。本文整理 Dart 中最易混淆的<strong>变量定义</strong>（var / dynamic / final / const）和<strong>异步编程</strong>（Future / async / await）的核心要点，
+      并附带 Flutter 场景下的最佳实践。
+    </p>
+
+    <h2 id="variables">一、变量定义</h2>
+    <p>Dart 提供了四种变量声明方式：<code>var</code>、<code>dynamic</code>、<code>const</code>、<code>final</code>，关键区分如下：</p>
+
+    <h3 id="var-vs-dynamic">var vs dynamic</h3>
+    <p>简单来说，<strong><code>var</code> 是「类型推断」，而 <code>dynamic</code> 是「关闭类型检查」</strong>。</p>
+
+    <h4>var 的使用场景（首选）</h4>
+    <p>在绝大多数情况下使用 <code>var</code> 来声明局部变量，前提是你能从赋值中清晰地看出变量的类型。这让代码更简洁，同时保持了类型安全。</p>
+    <pre><code>@override
+Widget build(BuildContext context) {
+  // 类型清晰，使用 var
+  var title = 'My Awesome App';
+  // title = 123; // 编译时报错
+
+  // 从 Flutter API 获取的对象
+  var theme = Theme.of(context);  // 推断为 ThemeData
+
+  var numbers = [10.0, 20.0, 30.0];
+  for (var number in numbers) {
+    // number 被推断为 double
+    print(number.toStringAsFixed(1));
+  }
+
+  return Scaffold(
+    appBar: AppBar(title: Text(title)),
+    body: Container(color: theme.primaryColor),
+  );
+}</code></pre>
+
+    <h4>dynamic 的使用场景（慎用）</h4>
+    <p>只有当你<strong>无法在编译时确定变量的类型</strong>时，才应该使用 <code>dynamic</code>。最常见的场景是处理来自外部的数据，比如 JSON。</p>
+    <pre><code>import 'dart:convert';
+
+void processResponse(String jsonString) {
+  // 这里使用 Map&lt;String, dynamic&gt; 是更规范的写法
+  Map&lt;String, dynamic&gt; decodedJson = json.decode(jsonString);
+
+  // data 的类型不确定，所以它是 dynamic
+  dynamic data = decodedJson['data'];
+
+  // 在运行时检查 data 的实际类型
+  if (data is String) {
+    print('Data is a string: $data');
+  } else if (data is List) {
+    print('Data is a list with ${data.length} items.');
+  }
+
+  // 错误示范：不检查直接当 String 用，可能运行时崩溃
+  // print(data.toUpperCase()); // 如果 data 是 List，这里会 Crash!
+}</code></pre>
+
+    <h3 id="final-vs-const">final vs const：初始化时机不同</h3>
+    <p>这两者都用于声明<strong>不可变变量</strong>，但核心区别在于：<strong><code>const</code> 必须在编译时确定其值，而 <code>final</code> 可以在运行时确定其值</strong>。</p>
+
+    <h4>final 的使用场景</h4>
+    <p>当一个变量只会被初始化一次，但它的值需要通过计算或在程序运行时才能得到时，就用 <code>final</code>。</p>
+    <pre><code>class UserProfile extends StatelessWidget {
+  // name 和 avatarUrl 在创建实例时才确定, 必须用 final
+  final String name;
+  final String avatarUrl;
+
+  const UserProfile({super.key, required this.name, required this.avatarUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Text(name),
+      CircleAvatar(backgroundImage: NetworkImage(avatarUrl)),
+    ]);
+  }
+}</code></pre>
+
+    <pre><code>class _MyAnimationState extends State&lt;MyAnimation&gt; with SingleTickerProviderStateMixin {
+  // controller 在运行时才被初始化,所以用 final
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: Duration(seconds: 1));
+  }
+}</code></pre>
+
+    <h4>const 的使用场景</h4>
+    <p>当一个值在写代码的时候就已经完全确定，并且永远不会改变时，就用 <code>const</code>。<strong>在 Flutter 中，<code>const</code> 是最重要的性能优化工具之一</strong>。</p>
+    <pre><code>class _MyDashboardState extends State&lt;MyDashboard&gt; {
+  int _counter = 0;
+
+  void _increment() {
+    setState(() { _counter++; });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          // 优化点 1: 常量 Widget —— setState 时 Flutter 会跳过它
+          const Text('You have pushed the button:'),
+
+          // 变量 Widget，依赖 _counter
+          Text('$_counter'),
+
+          // 优化点 2: 整个复杂 Widget 树都可以是 const
+          const FooterWidget(),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _increment,
+        // 优化点 3: 图标也是常量
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}</code></pre>
+
+    <h4>总结</h4>
+    <ul>
+      <li><strong>黄金法则</strong>：尽可能地使用 <code>const</code>。在你的 Flutter 代码中，只要 IDE 提示你可以添加 <code>const</code>（通常会显示蓝色波浪线），就毫不犹豫地加上它。</li>
+      <li><strong><code>final</code></strong> 用于那些<strong>在运行时初始化一次</strong>就不再改变的变量（如 Widget 的属性、<code>initState</code> 里的控制器）。</li>
+      <li><strong><code>const</code></strong> 用于那些<strong>在编译时就已经完全确定</strong>的值（如颜色、固定文本、边距、图标），是 Flutter 的免费性能优化器。</li>
+    </ul>
+
+    <h2 id="async">二、异步编程</h2>
+    <p>异步编程是现代编程的基石，尤其在需要网络请求和用户交互的前端/客户端开发中。掌握它不仅是学习语法，更是一种<strong>编程思维的转变</strong>。</p>
+
+    <h3 id="async-stages">Part 1：演进的三个阶段</h3>
+    <ol>
+      <li><strong>回调函数（Callbacks）</strong>：最早的方式。你发起一个任务，并传递一个函数（回调）给它，告诉它任务完成后该做什么。这会导致「回调地狱（Callback Hell）」，代码难以阅读和维护。</li>
+      <li><strong>Promise / Future</strong>：一个巨大的进步。异步任务不再直接接收回调，而是立即返回一个「凭证」对象（在 Dart/Python 中叫 <code>Future</code>，在 JavaScript 中叫 <code>Promise</code>）。它有三种状态：pending、fulfilled/resolved、rejected/rejected。</li>
+      <li><strong><code>async / await</code> 语法糖</strong>：现代的终极形态。它本质上是建立在 <code>Promise/Future</code> 之上的语法糖，让你能用<strong>看起来像同步代码的方式去编写异步代码</strong>，从而彻底告别回调地狱。</li>
+    </ol>
+
+    <h3 id="async-comparison">Part 2：四大语言横向对比</h3>
+    <p>统一的任务：<strong>模拟从服务器获取用户信息</strong>，对比四种语言的实现。</p>
+
+    <h4>Dart（用于 Flutter）</h4>
+    <pre><code>// 模拟一个耗时2秒的网络请求
+Future&lt;String&gt; fetchUserData() {
+  return Future.delayed(Duration(seconds: 2), () {
+    return '{"name": "Alice", "id": 1}';
+  });
+}
+
+// 推荐方式: async / await
+Future&lt;void&gt; displayUser() async {
+  print('开始获取用户数据...');
+  try {
+    // await 关键字"暂停"此函数的执行,但不会阻塞整个程序
+    String userDataJson = await fetchUserData();
+    print('数据获取成功: $userDataJson');
+  } catch (e) {
+    // 如果 Future 以 error 结束,await 会抛出异常,可以被 try/catch 捕获
+    print('捕获到错误: $e');
+  }
+  print('函数执行完毕。');
+}</code></pre>
+
+    <h4>Swift（用于 iOS/macOS）</h4>
+    <pre><code>import Foundation
+
+func fetchUserData() async throws -&gt; String {
+  try await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+  return "{\"name\": \"Bob\", \"id\": 2}"
+}
+
+func displayUser() async {
+  print("开始获取用户数据...")
+  do {
+    let userDataJson = try await fetchUserData()
+    print("数据获取成功: \(userDataJson)")
+  } catch {
+    print("捕获到错误: \(error)")
+  }
+  print("函数执行完毕。")
+}</code></pre>
+
+    <h4>JavaScript（用于 Web 前端 / Node.js）</h4>
+    <pre><code>function fetchUserData() {
+  return new Promise((resolve, reject) =&gt; {
+    setTimeout(() =&gt; {
+      resolve('{"name": "Charlie", "id": 3}');
+    }, 2000);
+  });
+}
+
+async function displayUser() {
+  console.log('开始获取用户数据...');
+  try {
+    const userDataJson = await fetchUserData();
+    console.log(`数据获取成功: ${userDataJson}`);
+  } catch (error) {
+    console.error(`捕获到错误: ${error.message}`);
+  }
+  console.log('函数执行完毕。');
+}</code></pre>
+
+    <h4>Python（用于后端 / 脚本）</h4>
+    <pre><code>import asyncio
+
+async def fetch_user_data() -&gt; str:
+    print("挂起任务，等待 I/O...")
+    await asyncio.sleep(2)
+    return '{"name": "David", "id": 4}'
+
+async def display_user():
+    print('开始获取用户数据...')
+    try:
+        user_data_json = await fetch_user_data()
+        print(f'数据获取成功: {user_data_json}')
+    except Exception as e:
+        print(f'捕获到错误: {e}')
+    print('函数执行完毕。')
+
+if __name__ == "__main__":
+    asyncio.run(display_user())</code></pre>
+
+    <h3 id="async-best">Part 3：最佳实现</h3>
+    <p>使用异步编程，只需记住三步：</p>
+    <ol>
+      <li><strong>识别耗时操作</strong>：任何涉及网络、文件读写、数据库访问、或者需要长时间计算的任务，都应该是异步的。</li>
+      <li><strong>封装成 <code>async</code> 函数</strong>：将这些耗时操作封装在一个函数里，并用 <code>async</code>（或 <code>async def</code>）关键字标记它。</li>
+      <li><strong>使用 <code>await</code> 调用并处理</strong>：
+        <ul>
+          <li>它会「暂停」当前函数的执行。</li>
+          <li>它会等待「凭证」兑现。</li>
+          <li>它会将结果从「凭证」中解包出来。</li>
+          <li><strong>最重要的是</strong>：用 <code>try...catch</code> 块把 <code>await</code> 包起来，处理可能发生的错误。</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h2 id="static">三、关于 static 的使用</h2>
+    <p>一句精要：<strong>「跟对象实例无关、只跟类本身有关」</strong>的东西就加 <code>static</code>——否则别加。</p>
+
+    <h3 id="static-must">必须加</h3>
+    <ol>
+      <li><strong>类变量（静态字段）</strong>——变量属于类本身</li>
+      <li><strong>类方法（静态方法）</strong>——方法内部不依赖实例字段（<code>this</code>.xxx）</li>
+      <li><strong>静态工厂构造函数</strong>——用 <code>factory</code> 返回缓存、单例时</li>
+      <li><strong>顶层入口</strong>——放在类里就必须显式 <code>static</code></li>
+    </ol>
+
+    <h3 id="static-recommend">推荐加</h3>
+    <ol>
+      <li>纯工具方法 / 全局帮助函数——比散在顶层更可读</li>
+      <li>与实例无关的常量列表 / 映射</li>
+    </ol>
+
+    <h3 id="static-never">绝不加</h3>
+    <ol>
+      <li>实例字段 / 实例方法 / 普通命名构造函数</li>
+      <li>重写父类方法（如 <code>toString</code>）</li>
+      <li>Widget 生命周期回调（如 <code>build</code> 方法）</li>
+    </ol>
+  </article>
+</body>
+</html>

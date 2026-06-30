@@ -59,7 +59,7 @@ const sortedPosts = computed(() =>
 // Hero 副标题：根据文章数量动态生成
 const subtitle = computed(() => {
   const count = sortedPosts.value.length
-  return `${count} selected writings on AI, Reinforcement Learning, Game & XR, and language learning.`
+  return `${count} selected writings on AI, LLM, Reinforcement Learning, development, and English learning.`
 })
 </script>
 

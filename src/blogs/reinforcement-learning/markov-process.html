@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>马尔可夫过程</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #16a085;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(22, 160, 133, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #117864;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #16a085;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #f4faf7;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    em { font-style: italic; }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      马尔可夫过程（Markov Process）是强化学习<strong>数学建模</strong>的起点。
+      从最简单的马尔可夫链到完整的马尔可夫决策过程（MDP），每一步扩展都为强化学习引入一类新的问题。
+    </p>
+
+    <h2 id="markov-property">一、马尔可夫性</h2>
+    <img src="/images/blog/feishu/SOaDbn53goONthxQZezc27Byndb.png" alt="马尔可夫性：下一状态只与当前状态有关">
+    <p>
+      <strong>马尔可夫性</strong>是指<strong>系统的下一状态仅与当前状态有关，与之前的状态无关</strong>。
+      用数学语言表述为：
+    </p>
+    <pre><code>P(S_{t+1} | S_t) = P(S_{t+1} | S_1, S_2, ..., S_t)</code></pre>
+    <p>
+      即：给定当前状态 <code>S_t</code>，下一状态 <code>S_{t+1}</code> 的条件概率与更早的历史 <code>S_1, ..., S_{t-1}</code> 无关。
+      <strong>「现在决定未来，过去不决定未来」</strong>——这是马尔可夫性的核心直觉。
+    </p>
+    <p>
+      具备马尔可夫性的<strong>状态</strong>称为<strong>马尔可夫状态</strong>。
+      在强化学习中，状态是否满足马尔可夫性，直接决定了能否套用 MDP 框架进行求解。
+    </p>
+
+    <h2 id="markov-chain">二、马尔可夫过程（Markov Process, MP）</h2>
+    <p>
+      <strong>马尔可夫过程</strong>（又叫<strong>马尔可夫链</strong>，Markov Chain）是满足<strong>马尔可夫性</strong>的<strong>随机过程</strong>，
+      由二元组 <code>&lt;S, P&gt;</code> 组成：
+    </p>
+    <ul>
+      <li><strong>S</strong>：有限状态集合</li>
+      <li><strong>P</strong>：状态转移概率矩阵，<code>P(s, s') = P(S_{t+1} = s' | S_t = s)</code></li>
+    </ul>
+    <p>从某一状态出发，根据状态转移概率生成完整的状态序列：<code>S_1, S_2, ..., S_t, ...</code>，这叫做<strong>采样（sampling）</strong>。</p>
+
+    <h3 id="mp-example">示例</h3>
+    <p>以「学生一天」为例（无动作、无奖励），状态集合与转移关系：</p>
+    <table>
+      <thead>
+        <tr><th>状态</th><th>含义</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>class 1</td><td>第一节课</td></tr>
+        <tr><td>class 2</td><td>第二节课</td></tr>
+        <tr><td>class 3</td><td>第三节课</td></tr>
+        <tr><td>sleep</td><td>睡觉</td></tr>
+      </tbody>
+    </table>
+    <p>所有状态间的转移概率构成一个 4×4 的矩阵 P，从初始状态出发反复采样，可以得到无数条「状态序列」。</p>
+
+    <h2 id="mrp">三、马尔可夫奖励过程（Markov Reward Process, MRP）</h2>
+    <p>
+      在马尔可夫过程的基础上<strong>加入奖励函数 R 和折扣因子 γ</strong>，得到四元组 <code>&lt;S, P, R, γ&gt;</code>：
+    </p>
+    <ul>
+      <li><strong>R</strong>：奖励函数，<code>R(s) = E[R_{t+1} | S_t = s]</code>，表示在某状态下获得的即时奖励的期望</li>
+      <li><strong>γ</strong>：折扣因子，<code>γ ∈ [0, 1]</code>，权衡「即时奖励」与「未来奖励」的重要性</li>
+    </ul>
+
+    <h3 id="return">回报（Return）</h3>
+    <p>
+      从时刻 t 开始到过程结束的所有奖励的<strong>折扣累加和</strong>称为<strong>回报</strong> <em>G_t</em>：
+    </p>
+    <pre><code>G_t = R_{t+1} + γ · R_{t+2} + γ² · R_{t+3} + ...
+    = Σ_{k=0}^∞ γ^k · R_{t+k+1}</code></pre>
+    <p>
+      γ 接近 0：更关注「即时奖励」（短视）<br>
+      γ 接近 1：更关注「长期奖励」（远视）
+    </p>
+
+    <h3 id="value-function-mrp">价值函数（Value Function）</h3>
+    <p>
+      状态 s 的<strong>价值</strong>定义为从该状态出发的<strong>回报的期望</strong>：
+    </p>
+    <img src="/images/blog/feishu/K38ebVzz0otpE3xXsYFcMqiQndh.png" alt="采样多条轨迹计算平均回报">
+    <img src="/images/blog/feishu/OdsabKeseoFdwkxSsmmcsKmcn1s.png" alt="价值函数与回报的关系">
+    <pre><code>V(s) = E[G_t | S_t = s]</code></pre>
+    <p>它满足<strong>贝尔曼方程（Bellman Equation）</strong>：</p>
+    <pre><code>V(s) = R(s) + γ · Σ_{s'∈S} P(s, s') · V(s')</code></pre>
+    <p>
+      即：当前状态的价值 = 即时奖励 + 折扣后的下一状态价值的期望。
+      通过联立所有状态的方程可以求解出 V(s)，但实际中常用迭代法（动态规划 / 蒙特卡洛 / TD 学习）。
+    </p>
+
+    <h2 id="mdp">四、马尔可夫决策过程（MDP）</h2>
+    <img src="/images/blog/feishu/KzI3buy1loMtKaxY4N9cotevnkg.png" alt="马尔可夫决策过程示意">
+    <p>
+      在 MRP 的基础上<strong>再加入动作 A</strong>，就得到了<strong>马尔可夫决策过程</strong>，由五元组 <code>&lt;S, A, P, R, γ&gt;</code> 组成：
+    </p>
+    <ul>
+      <li><strong>S</strong>：状态集合</li>
+      <li><strong>A</strong>：动作集合</li>
+      <li><strong>P</strong>：状态转移概率，<code>P(s'|s, a) = P(S_{t+1}=s' | S_t=s, A_t=a)</code></li>
+      <li><strong>R</strong>：奖励函数，<code>R(s, a) = E[R_{t+1} | S_t=s, A_t=a]</code></li>
+      <li><strong>γ</strong>：折扣因子</li>
+    </ul>
+    <p>
+      MDP 是强化学习<strong>最经典、最核心</strong>的数学框架。
+      在 MDP 中，<strong>策略 π</strong> 决定智能体在不同状态下如何选择动作：
+    </p>
+    <pre><code>π(a | s) = P(A_t = a | S_t = s)</code></pre>
+    <p>给定策略 π 后，MDP 就退化为一个 MRP，因此<strong>策略 + MRP = 采样轨迹</strong>。</p>
+
+    <h3 id="policy-value">策略下的价值函数</h3>
+    <p>
+      在策略 π 下，状态价值函数和行为价值函数定义为：
+    </p>
+    <pre><code>V_π(s) = E_π[G_t | S_t = s]
+Q_π(s, a) = E_π[G_t | S_t = s, A_t = a]</code></pre>
+    <p>两者满足关系：</p>
+    <pre><code>V_π(s) = Σ_{a∈A} π(a|s) · Q_π(s, a)
+Q_π(s, a) = R(s, a) + γ · Σ_{s'∈S} P(s'|s, a) · V_π(s')</code></pre>
+
+    <h3 id="bellman-optimality">贝尔曼最优方程</h3>
+    <p>
+      强化学习的最终目标是找到<strong>最优策略</strong> π*，使得价值最大化。最优价值函数满足<strong>贝尔曼最优方程</strong>：
+    </p>
+    <pre><code>V*(s) = max_a [ R(s, a) + γ · Σ_{s'∈S} P(s'|s, a) · V*(s') ]
+Q*(s, a) = R(s, a) + γ · Σ_{s'∈S} P(s'|s, a) · max_{a'} Q*(s', a')</code></pre>
+    <p>
+      一旦解出 V* 或 Q*，最优策略可以立即给出：
+    </p>
+    <pre><code>π*(a|s) = 1  if a = argmax_a Q*(s, a)
+        0  otherwise</code></pre>
+
+    <h2 id="evolution">五、概念演进总结</h2>
+    <img src="/images/blog/feishu/MA0mbCPynocpj6xX0KIc2KegnQc.png" alt="MDP 求解：策略迭代与价值迭代">
+    <img src="/images/blog/feishu/FrTAbpXxaovQvexnPONcZB5Bn3f.png" alt="动态规划求解贝尔曼方程">
+    <table>
+      <thead>
+        <tr>
+          <th>概念</th><th>组成</th><th>引入的关键要素</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>马尔可夫过程（MP）</td><td><code>&lt;S, P&gt;</code></td><td>状态 + 转移概率</td></tr>
+        <tr><td>马尔可夫奖励过程（MRP）</td><td><code>&lt;S, P, R, γ&gt;</code></td><td>+ 奖励函数、折扣因子</td></tr>
+        <tr><td>马尔可夫决策过程（MDP）</td><td><code>&lt;S, A, P, R, γ&gt;</code></td><td>+ 动作、策略</td></tr>
+      </tbody>
+    </table>
+    <img src="/images/blog/feishu/K80PbmPocoaWHRxOX7BcH8u2nRb.png" alt="策略迭代与价值迭代对比">
+    <img src="/images/blog/feishu/QeTOb6sj3oqPVuxmZsncD2twngd.png" alt="价值迭代过程示意">
+    <img src="/images/blog/feishu/SGeObDF77oBgRax2E42c4IOsnGd.png" alt="策略评估与策略提升">
+    <img src="/images/blog/feishu/NA9hbSOvSo33qdxqLgPcNbmenSb.png" alt="贝尔曼最优方程求解">
+    <p>
+      可以看到，从 MP 到 MRP 到 MDP 是一个<strong>逐步引入决策与价值</strong>的过程：
+      MP 描述「环境的随机演化」，MRP 描述「环境演化 + 目标信号」，MDP 描述「环境 + 目标 + 智能体的决策」。
+      强化学习的所有算法（Q-learning、Policy Gradient、Actor-Critic 等）本质上都是在<strong>不知道完整 P 或 R 的情况下，对贝尔曼最优方程做近似求解</strong>。
+    </p>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      马尔可夫过程为强化学习提供了<strong>形式化语言</strong>：状态、动作、奖励、折扣因子、策略、价值函数。
+      所有强化学习算法都是在<strong>这些变量的不同组合</strong>上做文章——
+      有的已知环境模型（Model-Based），有的未知模型只能与环境交互（Model-Free）；
+      有的直接优化策略（Policy Gradient），有的先学价值再导出策略（Value-Based / Actor-Critic）。
+    </p>
+    <p>
+      理解 MDP 五元组与贝尔曼最优方程，是理解后续所有 RL 算法的<strong>地基</strong>。
+    </p>
+  </article>
+</body>
+</html>

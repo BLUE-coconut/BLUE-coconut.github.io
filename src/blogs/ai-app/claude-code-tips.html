@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code 高阶实用技巧</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #3498db;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(52, 152, 219, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #2980b9;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 14px; line-height: 1.6;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; }
+    blockquote {
+      border-left: 3px solid #3498db;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #f8fafc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      Claude Code 不只是「写代码的 ChatGPT」——它内置了一套成熟的会话管理、上下文控制、可观测性能力。
+      本文整理 6 个让日常体验明显提升的高阶技巧：撤销、重命名、洞察、状态栏、压缩、配额。
+    </p>
+
+    <h2 id="rewind">一、撤销对话与代码（/rewind）</h2>
+    <p>
+      写到一半发现「刚才那个改动方向错了」——以前只能 <code>git checkout</code>，
+      现在 Claude Code 自带会话级时光机。
+    </p>
+
+    <h3 id="rewind-trigger">触发方式（任选其一）</h3>
+    <ul>
+      <li>连按两次 <code>Esc</code>（最快）</li>
+      <li>输入 <code>/rewind</code>（别名 <code>/checkpoint</code>、<code>/undo</code>）</li>
+    </ul>
+    <p>
+      打开一个可滚动菜单，列出会话中你的每一条消息作为 checkpoint，选中后有四种回退方式：
+    </p>
+    <table>
+      <thead>
+        <tr><th>选项</th><th>行为</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Restore code and conversation</td><td>对话和代码都回到该点</td></tr>
+        <tr><td>Restore conversation</td><td>只回退对话，代码保留</td></tr>
+        <tr><td>Restore code</td><td>只回退代码，对话保留</td></tr>
+        <tr><td>Summarize from here</td><td>从该点起，把后续消息压缩成摘要（保留上文完整）</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="rewind-pitfalls">重要陷阱</h3>
+    <ul>
+      <li>只追踪 Claude 用编辑工具改的文件。<strong>Bash 命令改动的文件（rm、mv、脚本生成）不会被追踪</strong>——这种场景仍要靠 git</li>
+      <li>Checkpoint 默认 30 天后自动清理（可在 settings 里改）</li>
+      <li>Checkpoint ≠ Git。它是会话内的本地撤销，不是版本控制；离开会话后，git 才是唯一靠谱的历史</li>
+    </ul>
+
+    <h2 id="rename">二、会话重命名（/rename）</h2>
+    <p>
+      默认 session 在 <code>/resume</code> 里只有 UUID 和首条消息预览，多了之后完全分不清谁是谁。
+      <code>/rename</code> 命令能够自行定义会话名称，可以将一些重要会话进行标识，方便后续 <code>/resume</code> 时快速找到。
+    </p>
+    <img src="/images/blog/feishu/XtIDbG0RQoAUMjxkQShc9guHnUf.png" alt="/rename 会话重命名示例">
+
+    <h3 id="rename-usage">用法</h3>
+    <pre><code># 会话中
+/rename                     # 不带参数：基于内容自动生成
+/rename feishu-doc-refactor # 显式指定名字
+
+# 启动时
+claude -n "feishu-doc-refactor"
+claude --name "feishu-doc-refactor"</code></pre>
+
+    <h3 id="rename-locations">显示位置</h3>
+    <ul>
+      <li>prompt bar 顶端</li>
+      <li><code>/resume</code> 选择器列表（在选择器中按 <code>R</code> 也能快速重命名）</li>
+      <li>statusline JSON 字段 <code>session_name</code>（可被自定义状态栏脚本读取）</li>
+    </ul>
+    <blockquote>
+      <p>小技巧：重要的会话记得 <code>/rename</code>，方便后续定位找到要继续的对话。</p>
+    </blockquote>
+
+    <h2 id="insights">三、会话洞察（/insights）</h2>
+    <p>这是个相对冷门但很有意思的功能：让 Claude 分析你最近的使用习惯。</p>
+
+    <h3 id="insights-trigger">触发</h3>
+    <pre><code>/insights</code></pre>
+
+    <h3 id="insights-content">做什么</h3>
+    <p>
+      扫描本地最近 30 天的会话历史，生成一份<strong>交互式 HTML 报告</strong>，
+      会放在 <code>~/.claude/usage-data/report.html</code>（若没有自动跳转，可手动打开），自动在浏览器打开。
+      报告内容大致有：
+    </p>
+    <ul>
+      <li>你最常处理的项目区域</li>
+      <li>高频交互模式</li>
+      <li>「摩擦点」——比如某类指令反复需要 3-5 轮纠正才能达到目的</li>
+      <li>建议：把重复出现的指令沉淀进 CLAUDE.md</li>
+    </ul>
+    <img src="/images/blog/feishu/DCnWbczxOoWIdDxWeTgcEjyOn8c.png" alt="/insights 报告示例">
+    <blockquote>
+      <p>纯本地处理，不上传任何数据。每月/每季度回顾一次，能发现自己没意识到的习惯，进而沉淀成 CLAUDE.md 或 skills。</p>
+    </blockquote>
+
+    <h2 id="statusline">四、自定义状态栏（/statusline）</h2>
+    <p>
+      可自定义终端对话输入框下方的状态栏所陈列的信息，例如 token 用量、当前模型、上下文用量等。
+    </p>
+
+    <h3 id="statusline-quick">最快配置：自然语言让 Claude Code 自行生成</h3>
+    <pre><code>/statusline show model name, context usage percentage, git branch, and total cost</code></pre>
+    <p>Claude 会自动写一个脚本并更新 <code>~/.claude/settings.json</code>。</p>
+
+    <h3 id="statusline-manual">手动配置</h3>
+    <p>在 <code>~/.claude/settings.json</code> 里加：</p>
+    <pre><code>{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "padding": 2,
+    "refreshInterval": 5
+  }
+}</code></pre>
+
+    <h3 id="statusline-fields">脚本能拿到的关键 JSON 字段</h3>
+    <table>
+      <thead>
+        <tr><th>字段</th><th>含义</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>model.display_name</code></td><td>当前模型名</td></tr>
+        <tr><td><code>cwd</code> / <code>workspace.project_dir</code></td><td>当前目录</td></tr>
+        <tr><td><code>cost.total_cost_usd</code></td><td>累计花费</td></tr>
+        <tr><td><code>context_window.used_percentage</code></td><td>上下文已用百分比（看是否该 /compact 的关键指标）</td></tr>
+        <tr><td><code>rate_limits.five_hour.used_percentage</code></td><td>5 小时配额使用率</td></tr>
+        <tr><td><code>session_id</code> / <code>session_name</code></td><td>会话 ID 和你 /rename 设置的名字</td></tr>
+      </tbody>
+    </table>
+    <blockquote>
+      <p>状态栏脚本会在每条新消息后跑一次，避免里面调慢命令。git 之类的输出建议加缓存。</p>
+    </blockquote>
+
+    <h2 id="compact">五、上下文压缩（/compact）</h2>
+    <p><code>/compact</code> 和 <code>/clear</code> 经常被混用，但行为完全不同。</p>
+    <table>
+      <thead>
+        <tr><th>命令</th><th>对话历史</th><th>代码改动</th><th>适用场景</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>/clear</code></td><td><strong>完全清空</strong>重开</td><td>不动</td><td>任务彻底切换、和当前没有上下文关联</td></tr>
+        <tr><td><code>/compact [指令]</code></td><td><strong>压缩成摘要</strong>保留要点</td><td>不动</td><td>同一任务继续做，但上下文已经吃紧</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="compact-manual">手动用法</h3>
+    <pre><code>/compact 重点保留架构决策和未完成的 TODO，可以丢弃中间调试细节</code></pre>
+    <p>带参数会指导摘要的侧重点，不带参数走默认策略。</p>
+    <blockquote>
+      <p>上下文用到约 <strong>83.5%</strong> 时（剩约 33K tokens 缓冲区）会自动 compact。</p>
+    </blockquote>
+
+    <h3 id="compact-best-practice">最佳实践</h3>
+    <ul>
+      <li>别等自动触发——质量会明显下滑。<strong>养成在 ~60% 主动 /compact 的习惯</strong>（看状态栏百分比）</li>
+      <li>关键规则放在 CLAUDE.md，不要只口头告诉 Claude——<code>/compact</code> 后口头指令可能丢失，但 CLAUDE.md 永远在</li>
+      <li>单文件过大时频繁 compact 会引发 thrashing，这种情况下 <code>/clear</code> 更干脆</li>
+    </ul>
+
+    <h2 id="stats">六、查看用量与配额（/stats）</h2>
+    <p><code>/stats</code> 查看 Claude Code 近期活动统计：</p>
+    <img src="/images/blog/feishu/BhlGbcItNodRmJx7wfacVjxbnVd.png" alt="/stats 用量统计示例">
+    <ul>
+      <li><strong>所用对话</strong>累计成本（API 计费用户看 USD 数字；订阅用户看不到具体金额）</li>
+      <li><strong>5 小时配额</strong>已用百分比 + 下次重置时间</li>
+      <li><strong>7 天配额</strong>已用百分比（订阅用户最重要的指标）</li>
+      <li><strong>活动统计</strong>：消息数、各模型的 token 分布、工具调用次数</li>
+    </ul>
+    <blockquote>
+      <p>输入 <code>r</code> 可切换统计的时间段</p>
+    </blockquote>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      Claude Code 的这些「隐形功能」反映出一个核心设计哲学：<strong>把可观测性和可回滚性做进工具本身</strong>。
+      习惯使用 <code>/rewind</code>、<code>/rename</code>、<code>/statusline</code>、<code>/compact</code> 这四条之后，
+      日常开发的「摩擦成本」会明显降低——尤其是复杂长任务场景。
+    </p>
+    <p>
+      最后，把重复指令沉淀进 CLAUDE.md、每季度跑一次 <code>/insights</code> 复盘自己的工作流，
+      是真正能让 Claude Code 从「能用的工具」变成「值得托付的工具」的两个关键习惯。
+    </p>
+  </article>
+</body>
+</html>

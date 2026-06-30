@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>强化学习基础概念与分类</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #16a085;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(22, 160, 133, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #117864;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #16a085;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #f4faf7;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    em { font-style: italic; }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      强化学习（Reinforcement Learning，RL）是机器学习的一个重要分支：<strong>序贯决策任务的机器学习方法——强化学习（涉及多轮交互）</strong>。
+      本文整理其基础概念、关键要素、与监督学习的区别，以及常见的学习范式分类。
+    </p>
+
+    <h2 id="definition">一、强化学习的定义</h2>
+    <p>
+      强化学习是<strong>机器通过与环境交互来实现目标的一种计算方法</strong>。
+    </p>
+    <img src="/images/blog/feishu/WlsBboLyQottAJxbyS4cUf0rnXf.png" alt="强化学习基本概念示意图">
+    <p>
+      因为决策任务是多轮的，智能体就需要在每轮做决策时考虑未来环境相应的改变，而不是单步最优决策。
+    </p>
+
+    <h3 id="agent">智能体（Agent）</h3>
+    <p>强化学习用「智能体（agent）」这个概念来表示做决策的机器。</p>
+    <img src="/images/blog/feishu/ZOdYbZrSpo5ao8xQh0ZcOj8bnSd.png" alt="智能体三要素：感知、行动、目标">
+    <ul>
+      <li><strong>每一轮交互</strong>：智能体在环境中的某一状态下做出动作决策，把这个动作用到环境中，环境发生相应的改变，并将相应的反馈和下一轮状态传回机器。</li>
+      <li><strong>优化目标</strong>：最大化在多轮交互中获得累计奖励反馈的<strong>期望</strong></li>
+    </ul>
+    <p>
+      相比于有监督学习中的「模型」，强化学习中的「智能体」强调机器<strong>不但可以感知周围的环境信息，还可以通过做决策来直接改变这个环境</strong>，
+      而不只是给出一些预测信号。
+    </p>
+
+    <h3 id="key-elements">智能体的关键要素</h3>
+    <p>智能体的关键要素可以概括为三个：<strong>感知、行动、目标</strong>。</p>
+
+    <h2 id="elements">二、强化学习系统的要素</h2>
+
+    <h3 id="history">历史（History）</h3>
+    <p>
+      历史是<strong>观察、行动和奖励的序列</strong>，即智能体到目前为止所经历的全部信息。
+      是强化学习最原始的视角——所有后续概念都是对历史的压缩。
+    </p>
+    <img src="/images/blog/feishu/QWv4buzaeoUyZUxMXfTcJEIUn9b.png" alt="历史：观察、行动、奖励序列">
+
+    <h3 id="state">状态（State）</h3>
+    <p>
+      状态是<strong>关于历史的函数</strong>，用于确定接下来会发生的事情（行动、观察、奖励）的信息。
+      状态是对历史的提炼，是决策与预测的基础。
+    </p>
+    <img src="/images/blog/feishu/Ez20barmyoa3cvxQgIWc2qtHnJe.png" alt="状态是关于历史的函数">
+
+    <h3 id="policy">策略（Policy）</h3>
+    <p>
+      策略是<strong>从状态到行动的映射</strong> <em>A = F(S)</em>，用来学习智能体在特定时间的行为方式。
+      策略有两种基本形式：
+    </p>
+    <img src="/images/blog/feishu/Xh4bbcvv2oAPPIxxB0WcuF9zn1f.png" alt="策略：状态到行动的映射">
+    <ul>
+      <li><strong>确定性策略</strong>：给定状态输出唯一动作</li>
+      <li><strong>随机策略</strong>：给定状态输出动作的概率分布</li>
+    </ul>
+
+    <h3 id="reward">奖励（Reward）</h3>
+    <p>
+      一个定义强化学习目标的<strong>标量</strong> <em>R(s, a)</em>。
+      奖励是<strong>即时的</strong>反馈信号，用来评价当前这一步动作的好坏。
+    </p>
+
+    <h3 id="value-function">价值函数（Value Function）</h3>
+    <p>
+      价值函数也是一个<strong>标量</strong>，用于对未来累积奖励的预测（对于长期来说什么是好的）。
+      与奖励的区别在于：<strong>奖励是即时的，价值是对未来收益的估计</strong>。
+    </p>
+    <img src="/images/blog/feishu/BZsWbIMxWobmvPx8W31cu34snBe.png" alt="价值函数：未来累积奖励的预测">
+
+    <h2 id="vs-sl">三、强化学习与有监督学习的区别</h2>
+    <img src="/images/blog/feishu/VKDBbWNwzoe9mUxSkGEcKDgWnKh.png" alt="有监督学习训练数据分布固定">
+    <table>
+      <thead>
+        <tr><th>维度</th><th>有监督学习</th><th>强化学习</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>训练数据分布</td><td>固定不变</td><td>随智能体的学习而改变</td></tr>
+        <tr><td>数据来源</td><td>预先标注的样本</td><td>智能体与环境交互产生</td></tr>
+        <tr><td>优化目标</td><td>在给定数据分布下使损失函数期望最小</td><td>在交互数据分布下使奖励期望最大</td></tr>
+        <tr><td>反馈形式</td><td>标签（正确答案）</td><td>奖励（仅评价，不直接告诉怎么做）</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="occupancy">占用度量（关于 RL 中数据分布的一个概念）</h3>
+    <img src="/images/blog/feishu/CK3XbdtzIoupbexOb4DcRUtBnah.png" alt="强化学习训练数据分布随智能体变化">
+    <p>
+      归一化的占用度量用于衡量在一个智能体决策与一个动态环境的交互过程中，
+      <strong>采样到一个具体的状态动作对（state-action pair）的概率分布</strong>。
+    </p>
+    <ul>
+      <li><strong>性质</strong>：给定两个策略及其与一个动态环境交互得到的两个占用度量，那么当且仅当这两个占用度量相同时，这两个策略相同。</li>
+      <li><strong>由性质推导出强化学习的本质</strong>：
+        <ul>
+          <li>强化学习的一大难点就在于，智能体看到的数据分布是<strong>随着智能体的学习而不断发生改变</strong>的。</li>
+          <li>占有度量是状态动作对的概率分布，而策略是动作到状态的映射。对智能体的策略进行优化的目标是使其奖励最大化，可以表达为一个<strong>占有度量下对应的奖励的期望</strong>。</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3 id="paradigm-diff">范式对比总结</h3>
+    <ul>
+      <li>一般的有监督学习关注寻找一个模型，使其在<strong>给定数据分布</strong>下得到的损失函数的期望最小。（数据分布确定）</li>
+      <li>强化学习关注寻找一个智能体策略，最大化其<strong>与环境交互的过程所产生的数据分布</strong>下，给定奖励函数的期望。（目标函数确定）</li>
+    </ul>
+
+    <h2 id="classification">四、强化学习分类</h2>
+    <img src="/images/blog/feishu/Sp6EbX1hgoqsFpxG9AfcySe2nwh.png" alt="强化学习分类全景图">
+
+    <h3 id="by-env">按照环境是否已知划分：免模型 vs 有模型</h3>
+    <table>
+      <thead>
+        <tr><th>类别</th><th>核心思想</th><th>典型算法</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>免模型学习（Model-Free）</strong></td>
+          <td>不去学习和理解环境，环境给出什么信息就是什么信息</td>
+          <td>Policy Optimization、Q-learning</td>
+        </tr>
+        <tr>
+          <td><strong>有模型学习（Model-Based）</strong></td>
+          <td>去学习和理解环境，学会用一个模型来模拟环境，通过模拟的环境来得到反馈</td>
+          <td>World Models、AlphaZero 等</td>
+        </tr>
+      </tbody>
+    </table>
+    <blockquote>
+      <p>一般情况下，环境都是不可知的，所以实践中<strong>主要研究无模型问题</strong>。</p>
+    </blockquote>
+
+    <h3 id="by-onoff">按照学习方式划分：在线策略 vs 离线策略</h3>
+    <table>
+      <thead>
+        <tr><th>类别</th><th>特征</th><th>典型算法</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>在线策略（On-Policy）</strong></td>
+          <td>agent 必须本人在场，并且一定是本人<strong>边玩边学习</strong></td>
+          <td>Sarsa</td>
+        </tr>
+        <tr>
+          <td><strong>离线策略（Off-Policy）</strong></td>
+          <td>agent 可以选择自己玩，也可以选择看着别人玩，从过往的经验中学习。过往的经历<strong>没必要是自己的</strong>，玩和学习的时间可以不同步</td>
+          <td>Q-learning、Deep Q Network</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="by-target">按照学习目标划分：基于策略 vs 基于价值</h3>
+    <table>
+      <thead>
+        <tr><th>类别</th><th>输出</th><th>适用动作空间</th><th>典型算法</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>基于策略（Policy-Based）</strong></td>
+          <td>下一步动作的概率，根据概率来选取动作</td>
+          <td>非连续和连续</td>
+          <td>Policy Gradients</td>
+        </tr>
+        <tr>
+          <td><strong>基于价值（Value-Based）</strong></td>
+          <td>动作的价值，选择价值最高的动作</td>
+          <td>非连续</td>
+          <td>Q-learning、Deep Q Network、Sarsa</td>
+        </tr>
+        <tr>
+          <td><strong>Actor-Critic（二者结合）</strong></td>
+          <td>Actor 根据概率做出动作，Critic 根据动作给出价值，加速学习</td>
+          <td>连续 / 非连续</td>
+          <td>A2C、A3C、DDPG</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      强化学习与有监督学习的<strong>根本分歧</strong>在于：数据分布是固定的还是随智能体变化的。
+      这一分歧导致强化学习的所有概念（策略、价值、占用度量）都围绕「在变化的数据分布下优化长期奖励」这一目标展开。
+    </p>
+    <p>
+      实际工程中，往往需要把多种范式<strong>组合使用</strong>：例如 Actor-Critic 架构结合了 Policy-Based 的动作采样能力与 Value-Based 的长期评估能力，
+      DQN 则是 Value-Based + 神经网络 + 经验回放的经典组合。理解这些范式的<strong>核心动机</strong>比记住具体公式更重要。
+    </p>
+  </article>
+</body>
+</html>

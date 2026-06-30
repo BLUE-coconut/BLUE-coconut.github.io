@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP &amp; CLI &amp; Skill &amp; Plugin 概念原理辨析</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #9b59b6;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(155, 89, 182, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #7d3c98;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #9b59b6;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #faf6fc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13.5px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      Claude Code 的能力组合由多种机制叠加而成：内置 <strong>Tool</strong> 是执行底座，
+      <strong>MCP</strong> 与 <strong>CLI</strong> 分别以「结构化协议」和「shell 调用」两种方式接入外部能力，
+      <strong>Skill</strong> 为 Agent 注入程序性知识以编排上述能力，Claude Code <strong>Plugin</strong> 把多种组件打包以便分发与共享。
+    </p>
+
+    <h2 id="mcp">一、MCP —— 连接外部工具</h2>
+
+    <h3 id="mcp-what">什么是 MCP</h3>
+    <p>
+      MCP（Model Context Protocol）是一个开放标准协议，<strong>定义了 AI 应用与外部工具/数据源之间的通信方式</strong>。
+      它一般由第三方服务平台（例如 GitHub、数据库、Slack、飞书 等）提供，
+      以方便任意外部系统的能力能够快速接入 Agent 系统中被 AI 调用。
+    </p>
+
+    <h3 id="mcp-arch">基本架构：Host → Client → Server</h3>
+    <p>MCP 采用三层架构：</p>
+    <ul>
+      <li><strong>Host</strong>：AI 应用（如 Claude Code），负责协调多个 Client</li>
+      <li><strong>Client</strong>：Host 内部组件，每个 Client 维护与一个 Server 的专属连接</li>
+      <li><strong>Server</strong>：独立进程，向 Client 暴露工具（Tools）、资源（Resources）、提示词模板（Prompts）</li>
+    </ul>
+    <p>所有通信基于 <strong>JSON-RPC 2.0</strong> 协议，与传输方式无关。</p>
+
+    <h3 id="mcp-mechanism">MCP 的调用机制</h3>
+    <h4>Server 端：用 JSON Schema 声明工具</h4>
+    <p>
+      Server 在响应 <code>tools/list</code> 时返回工具列表，每项包含 <code>name</code>、<code>description</code>、<code>inputSchema</code>（标准 JSON Schema）。
+      其中，<code>description</code> 是模型决定何时调用该工具的<strong>唯一线索</strong>——写得越具体准确，误调用与漏调用越少。
+    </p>
+
+    <h4>Agent 端：加载与路由工具</h4>
+    <p>Claude Code 启动后的工具加载流程：</p>
+    <ol>
+      <li>读取 <code>.mcp.json</code> / <code>settings.json</code> 中的 Server 配置</li>
+      <li>为每个 Server 建立连接（STDIO 拉起子进程 / HTTP 建立 SSE 长连）</li>
+      <li>发送 <code>initialize</code> 协商协议版本与 capabilities</li>
+      <li>调用 <code>tools/list</code> 拉取所有工具的完整 schema</li>
+      <li>按 <code>mcp__&lt;server名&gt;__&lt;tool名&gt;</code> 重命名每个工具（避免跨 Server 冲突）</li>
+      <li>将转换后的工具列表注入到每次发往 Claude API 的 <code>tools</code> 字段中</li>
+    </ol>
+    <p><strong>特点：启动时全量加载，运行时全量注入。</strong></p>
+
+    <h4>模型调用工具的流程</h4>
+    <p>
+      返回 <code>tool_use</code> block → Claude Code 按前缀路由到对应 Server 发送 <code>tools/call</code> →
+      Server 返回 <code>content</code> → Claude Code 包装成 <code>tool_result</code> 注入下一轮对话。
+      <strong>MCP 协议只存在于 Claude Code 与 Server 之间</strong>——这种「协议在 Host 内消化」的设计，是 MCP 能成为跨厂标准的关键。
+    </p>
+    <p>
+      代价是 token 开销：所有工具的 schema 必须<strong>常驻在每次请求的 tools 字段中</strong>，
+      否则模型就「看不到」这些工具——这与下一节 CLI 的按需发现形成对比。
+    </p>
+
+    <h3 id="mcp-transport">两种连接方式</h3>
+    <p>核心区别在于：<strong>谁来管理 Server 的生命周期</strong>。</p>
+
+    <h4>STDIO — 本地子进程模式</h4>
+    <p>
+      Claude Code 在本地拉起 Server 作为子进程，通过 stdin/stdout 通信。Server 的整个生命周期由 Claude Code 管理——会话开始时启动，会话结束时终止。
+      Server 程序可以预先安装在本地，也可以通过 <code>npx</code>、<code>uvx</code> 等工具临时下载运行（无需持久安装）。
+    </p>
+    <ul>
+      <li>一个 Server 实例只服务一个 Client</li>
+      <li>无网络开销，性能最优</li>
+      <li>典型场景：日常使用的大多数 MCP Server</li>
+    </ul>
+    <pre><code>claude mcp add github -- npx -y @modelcontextprotocol/server-github</code></pre>
+
+    <h4>Streamable HTTP — 独立服务模式</h4>
+    <p>Server 是一个独立运行的 HTTP 服务，不由 Claude Code 管理生命周期。Claude Code 作为 HTTP 客户端去连接它。服务可以运行在本地、内网或云端。</p>
+    <ul>
+      <li>一个 Server 可同时服务多个 Client</li>
+      <li>支持标准 HTTP 认证和会话管理</li>
+      <li>典型场景：企业级部署、多用户共享、第三方平台集成</li>
+    </ul>
+    <pre><code>claude mcp add my-server --transport sse --url http://localhost:3001/sse</code></pre>
+
+    <h3 id="mcp-value">MCP 的价值</h3>
+    <p>
+      MCP 解决了「<strong>能力边界</strong>」问题——通过<strong>开放协议</strong>把外部系统的能力转译为 Agent 可调用的工具，
+      让任何模型供应商都能接入同一个生态。但 MCP 只提供工具，不提供使用方法——「怎么用好这些工具」是 Skill 的职责。
+    </p>
+
+    <h2 id="cli">二、CLI —— 命令行接口</h2>
+
+    <h3 id="cli-what">什么是 CLI</h3>
+    <p>
+      CLI 即服务方提供的<strong>命令行可执行接口</strong>，例如 <code>gh</code>（GitHub 命令行工具）、<code>lark-cli</code>（飞书命令行工具）等。
+      在 Agent 语境下，CLI 是另一种把「外部能力」暴露给 LLM 的工程范式：<strong>通过 shell 而非 RPC 协议</strong>。
+    </p>
+
+    <h3 id="cli-call">Agent 如何调用 CLI</h3>
+    <p>Agent 调用 CLI 不引入任何新协议——所有交互都借由 Agent 内置的 <strong>Bash Tool</strong> 完成：</p>
+    <ol>
+      <li><strong>执行</strong>：模型在响应中返回一次 <code>Bash</code> 工具调用，命令字符串作为参数</li>
+      <li><strong>捕获</strong>：Bash Tool 在子进程中执行该命令，把 stdout / stderr 文本与 exit code 一并回传给 Agent</li>
+      <li><strong>判断</strong>：Agent 把这些文本作为 <code>tool_result</code> 注入下一轮上下文，依据 exit code 决定继续推理或重试</li>
+    </ol>
+    <p>整个过程对模型而言与调用任意其它工具完全一致——它只需要会写正确的 shell 命令。</p>
+
+    <h3 id="cli-lazy">关键机制：按需发现（lazy discovery）</h3>
+    <p>
+      这是 CLI 与 MCP 在工具发现机制上的根本分歧。
+      MCP 客户端在启动时通过 <code>tools/list</code> 把所有工具的完整 schema 一次性注入系统提示；
+      CLI 则是让 Agent 通过 <code>--help</code> 在执行过程中<strong>递归</strong>探索命令树：
+    </p>
+    <pre><code>$ gh --help              # Agent 先看顶级命令分类
+$ gh pr --help           # 选定 pr 域后看 pr 的子命令
+$ gh pr create --help    # 选定 create 后看具体参数</code></pre>
+    <p>只有 Agent 当前任务真正需要的子命令的 <code>--help</code> 输出才会进入上下文。例如，在一个仅需创建 issue 的任务中，PR、release、actions 等命令的 schema 不会全部一次性传给 Agent。</p>
+    <p>这是 CLI 在 token 经济性上根本优势的来源。</p>
+
+    <h3 id="cli-vs-mcp">CLI 与 MCP 的区别</h3>
+    <p>CLI 与 MCP 在「为 Agent 提供外部能力」这一职能上是同位的，但走了不同的工程路径。最核心的差异点在于：<strong>「工具的描述」什么时候被 LLM 看到？</strong></p>
+    <ul>
+      <li><strong>MCP：会话开始时全量注入。</strong>客户端启动时调用 <code>tools/list</code> 拉取所有工具完整 schema，注入每次请求的 <code>tools</code> 字段。<strong>未在启动时加载的工具，模型完全感知不到。</strong></li>
+      <li><strong>CLI：任务真正需要时按需发现。</strong>Agent 通过 <code>--help</code> 在 Bash 调用中递归探索命令树。</li>
+    </ul>
+
+    <h3 id="cli-value">CLI 的价值</h3>
+    <p>
+      CLI 不是对 MCP 完全的替代——而是「如何让 Agent 调用外部能力」的两种工程答案：
+      <strong>MCP 通过协议把外部系统的能力结构化暴露给 LLM；而 CLI 让 LLM 用最熟悉的 shell 调用第三方服务的命令行接口</strong>。
+      前者是为 Agent 重新设计的外部系统接口标准，后者是依托 shell 这一同时服务人类与 Agent 的通用接口范式。
+    </p>
+
+    <h2 id="skill">三、Skill —— 注入领域知识</h2>
+
+    <h3 id="skill-what">什么是 Skill</h3>
+    <p>
+      Skill 是一个<strong>装载领域知识与可执行资源的目录</strong>——它不是单个 Markdown 文件，
+      而是包含 <code>SKILL.md</code> 元数据 + 可选的脚本、参考文档、模板资源的<strong>包</strong>。
+      Anthropic 工程团队对 Skill 的官方定义：
+    </p>
+    <blockquote>
+      <p>"A skill is a directory containing a SKILL.md file that contains organized folders of instructions, scripts, and resources that give agents additional capabilities."</p>
+    </blockquote>
+    <p>
+      该格式由 Anthropic 在 2025 年 10 月推出，2025 年 12 月作为<strong>开放标准</strong>发布于 <a href="https://agentskills.io">agentskills.io</a>。
+      已被 <strong>30+ 个 Agent 框架</strong> 原生支持，包括 Claude Code、OpenAI Codex CLI、Google Gemini CLI、GitHub Copilot、Cursor 等——是继 MCP 之后又一个被业界广泛接纳的 Agent 扩展标准。
+    </p>
+
+    <h3 id="skill-progressive">⭐️ 核心机制：渐进式披露</h3>
+    <p>Skill 的设计目标是解决一个根本矛盾：<strong>Agent 需要尽可能多的领域知识，但又不能让所有知识常驻在上下文中</strong>。</p>
+    <p>核心方法是 <strong>Progressive Disclosure（渐进式披露）</strong>——把信息分成三层，按需逐级加载：</p>
+    <table>
+      <thead>
+        <tr><th>层级</th><th>API 调用</th><th>加载内容</th><th>Token 消耗</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Level 0</td><td><code>skills_list()</code></td><td>所有技能的 name + description</td><td>约 3K（固定）</td></tr>
+        <tr><td>Level 1</td><td><code>skill_view(name)</code></td><td>完整 SKILL.md</td><td>按需</td></tr>
+        <tr><td>Level 2</td><td><code>skill_view(name, path)</code></td><td>特定 reference/script 文件</td><td>按需</td></tr>
+      </tbody>
+    </table>
+    <p>
+      其结果是：<strong>Skill 中可承载的知识量在工程上是无界的</strong>——
+      只要分层组织得当，Agent 总能在需要时找到需要的信息。
+    </p>
+
+    <h3 id="skill-structure">Agent Skills 标准结构</h3>
+    <p>一个技能就是一个文件夹，最简单的只需要一个 <code>SKILL.md</code> 文件：</p>
+    <pre><code>skill-name/
+├── SKILL.md              # 必需：元数据 + 指令
+├── scripts/              # 可选：可执行脚本
+├── references/           # 可选：参考文档
+└── assets/               # 可选：模板、资源文件</code></pre>
+    <p><strong>硬性约束</strong>：<code>SKILL.md</code> 文件名大小写敏感；frontmatter 中的 <code>name</code> 字段<strong>必须严格等于所在目录名</strong>。</p>
+    <p>标准 frontmatter 仅有 <strong>6 个字段</strong>，其中 2 个必需：</p>
+    <table>
+      <thead>
+        <tr><th>字段</th><th>必需</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>✓</td><td>技能名；仅小写字母 / 数字 / 连字符；<strong>必须等于目录名</strong></td></tr>
+        <tr><td><code>description</code></td><td>✓</td><td><strong>必须同时说明「做什么」和「何时使用」</strong>——是 Agent 决定调用技能的关键信息</td></tr>
+        <tr><td><code>license</code></td><td>✗</td><td>协议名或 license 文件引用，如 <code>Apache-2.0</code></td></tr>
+        <tr><td><code>compatibility</code></td><td>✗</td><td>环境要求（适配产品、系统包、网络访问等）</td></tr>
+        <tr><td><code>metadata</code></td><td>✗</td><td>通用扩展点；<code>version</code>、<code>author</code> 等放此处</td></tr>
+        <tr><td><code>allowed-tools</code></td><td>✗</td><td>预批准的工具，如 <code>Bash(git:*) Read</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="skill-value">Skill 的价值</h3>
+    <p>
+      Simon Willison 的判断是 <em>"Claude Skills are awesome, maybe a bigger deal than MCP"</em>——
+      他给出的核心理由是：<strong>Skill 把「如何做事」的工程实践外化为标准化、可移植的工件</strong>，
+      而 MCP 只解决了「能调用什么」。
+    </p>
+
+    <h2 id="plugin">四、Plugin —— 打包分发能力集合</h2>
+
+    <h3 id="plugin-what">什么是 Plugin</h3>
+    <p>Plugin 是一个 Claude code 中的<strong>「能力合集的安装包」</strong>，把 Skills、Hooks、MCP 配置、自定义 Agent 等多种组件打包成一个可安装的包。</p>
+    <table>
+      <thead>
+        <tr><th>组件</th><th>目录</th><th>作用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Skills</td><td><code>skills/</code></td><td>领域知识和操作流程</td></tr>
+        <tr><td>Agents</td><td><code>agents/</code></td><td>自定义 Subagent 人格/工具集</td></tr>
+        <tr><td>Hooks</td><td><code>hooks/</code></td><td>生命周期自动化（格式化、安全检查）</td></tr>
+        <tr><td>MCP</td><td><code>.mcp.json</code></td><td>外部工具连接配置</td></tr>
+        <tr><td>可执行文件</td><td><code>bin/</code></td><td>加入 PATH 的原生工具</td></tr>
+      </tbody>
+    </table>
+    <p>它解决的是「如何把一套能力共享给团队或社区」的问题。安装一个 Plugin，就同时获得了它包含的所有 Skill、Hook、MCP Server 等。</p>
+
+    <h3 id="plugin-dir">目录结构</h3>
+    <pre><code>my-plugin/
+├── .claude-plugin/
+│   └── plugin.json        # 清单文件（必需）
+├── skills/                # Skill 集合
+│   ├── code-review/
+│   │   └── SKILL.md
+│   └── security-audit/
+│       └── SKILL.md
+├── agents/                # 自定义 Subagent
+│   └── reviewer.md
+├── hooks/                 # Hook 配置
+│   └── hooks.json
+├── .mcp.json              # MCP Server 配置
+├── bin/                   # 可执行工具（加入 PATH）
+│   └── my-tool
+└── README.md</code></pre>
+
+    <h3 id="plugin-manifest">清单文件（plugin.json）</h3>
+    <pre><code>{
+  "name": "team-standards",
+  "description": "团队开发规范：代码审查、安全检查、提交规范",
+  "version": "1.0.0",
+  "author": { "name": "DevTeam" },
+  "tags": ["code-review", "security"]
+}</code></pre>
+
+    <h3 id="plugin-essence">Plugin 的本质</h3>
+    <p>
+      Plugin 解决的是「<strong>分发</strong>」问题——它不引入新概念，
+      只是把已有的 Skill、Hook、MCP 等组件打包在一起，加上版本管理和命名空间隔离，使其可以在团队和社区间共享。
+    </p>
+
+    <h2 id="summary">五、总结</h2>
+
+    <h3 id="comparison">综合对比</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>维度</th><th><strong>Tool</strong></th><th><strong>MCP</strong></th>
+          <th><strong>CLI</strong></th><th><strong>Skill</strong></th><th><strong>Plugin</strong></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>定义</td><td>模型可直接调用的原子能力</td><td>Agent 与外部系统通信的开放协议</td><td>服务方提供的命令行接口</td><td>装载程序性知识与可执行资源的目录</td><td>多种能力组件的打包分发单元</td></tr>
+        <tr><td>解决的核心问题</td><td>模型如何执行单步动作</td><td>Agent 能调用哪些外部能力（结构化）</td><td>Agent 如何复用既有 shell 生态</td><td>Agent 应当如何完成某类任务</td><td>能力如何在团队 / 社区间共享</td></tr>
+        <tr><td>形态载体</td><td>函数 schema + 后端实现</td><td>服务进程 + JSON-RPC 协议</td><td>二进制 / 脚本 + stdin/stdout/exit code</td><td>目录（SKILL.md + scripts/ + assets/）</td><td>目录（plugin.json + 子组件）</td></tr>
+        <tr><td>加载与触发</td><td>上下文预置 schema；模型自主调用</td><td>启动时全量加载工具 schema</td><td>不预加载；按需 <code>--help</code> 发现</td><td>元数据预加载；渐进加载</td><td>用户显式安装；子组件按各自机制触发</td></tr>
+        <tr><td>标准化程度</td><td>厂商各自定义 API</td><td>开放标准（modelcontextprotocol.io）</td><td>POSIX 命令行约定</td><td>开放标准（agentskills.io）</td><td>Claude Code 专属</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="layers">层次关系</h3>
+    <p>五者构成由「原子能力」到「分发单元」的递进层级，互补协作而非彼此替代：</p>
+    <ul>
+      <li><strong>Tool</strong> 是 Agent 的基础执行单位（Bash、Read、Edit），构成所有外部交互最终落地的「硬件层」</li>
+      <li><strong>MCP</strong> 通过开放协议把外部系统封装为结构化工具，适合需要类型安全与协议级特性的场景</li>
+      <li><strong>CLI</strong> 通过 Bash Tool 调用既有的命令行程序，是当前 Token 经济性最优、生态覆盖最广的接外部能力路径</li>
+      <li><strong>Skill</strong> 以程序性知识告诉 Agent 应当如何编排上述 Tool / MCP / CLI，沉淀为可复用工序</li>
+      <li><strong>Plugin</strong> 把若干 Skill、Hook、MCP 配置打包并加上版本与命名空间，使能力可分发到团队与社区</li>
+    </ul>
+  </article>
+</body>
+</html>

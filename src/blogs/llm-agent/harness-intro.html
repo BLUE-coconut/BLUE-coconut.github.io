@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harness 导论：从 LLM 到 Agent Harness</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #9b59b6;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(155, 89, 182, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #7d3c98;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #9b59b6;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #faf6fc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      单次调用能解决的不上 Workflow，Workflow 能解决的不上 Agent。
+      每一级复杂度都带来更高的延迟、成本和调试难度。
+      选择依据是任务是否真正需要那个级别的自主性。
+    </p>
+    <blockquote>
+      <p>"Start with the simplest solution possible, and only increase complexity when needed." — Anthropic</p>
+    </blockquote>
+
+    <h2 id="evolution">一、方法论的演进：从 Prompt Engineering 到 Harness Engineering</h2>
+    <p>LLM 应用工程经历了三个阶段，每个阶段的出现都由新的任务需求催生。</p>
+
+    <h3 id="prompt-eng">1.1 Prompt Engineering（2022—2023）</h3>
+    <p>
+      Prompt Engineering 关注<strong>优化单次调用 LLM 的文本指令</strong>：Role 设定、few-shot 示例、Chain-of-Thought 引导。
+    </p>
+    <p>
+      <strong>局限</strong>：随着 Agent 进入多轮交互、工具调用、长会话，「一段精心写好的 prompt」不再够用——
+      模型在不同步骤需要的信息是<strong>动态变化</strong>的。
+    </p>
+
+    <h3 id="context-eng">1.2 Context Engineering（2025 上半年）</h3>
+    <p>
+      2025 年 6 月，Tobi Lütke（Shopify CEO）和 Andrej Karpathy 几乎同时提出 "Context Engineering"，
+      随后被 Simon Willison、LangChain（Harrison Chase）、Anthropic 共同认可。
+      Anthropic 在 <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Effective Context Engineering for AI Agents</a>（2025-09-29）中给出权威定义：
+    </p>
+    <blockquote>
+      <p>"the set of strategies for curating and maintaining the optimal set of tokens (information) during LLM inference"</p>
+    </blockquote>
+    <p>
+      Context Engineering 关注<strong>整个上下文窗口的内容</strong>：系统提示、工具定义、检索结果、历史消息、状态、压缩策略——
+      确保模型在每一步都看到「刚好够用的信息」。
+    </p>
+    <p>
+      <strong>局限</strong>：上下文工程仍然停留在单个上下文窗口内。而当 Agent 需要<strong>跨会话</strong>、<strong>跨上下文窗口</strong>持续执行任务时，
+      需要在复杂的任务环节中稳定地运行，只对上下文内容进行优化是不够的。
+    </p>
+
+    <h3 id="harness-eng">1.3 Harness Engineering（2025 末—2026）</h3>
+    <p>
+      2025 年 11 月，Anthropic 在 <a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Effective Harnesses for Long-Running Agents</a> 中首次将 Harness 概念体系化。
+    </p>
+    <p>
+      2026 年 2 月 5 日，Mitchell Hashimoto（HashiCorp 创始人）在 <a href="https://mitchellh.com/writing/my-ai-adoption-journey">My AI Adoption Journey</a> 中给出了 Harness Engineering 的实践哲学：
+    </p>
+    <blockquote>
+      <p>"anytime you find an agent makes a mistake, you take the time to engineer a solution such that the agent never makes that mistake again."</p>
+    </blockquote>
+    <p>
+      6 天后，OpenAI 的 Ryan Lopopolo 发表 <a href="https://openai.com/index/harness-engineering/">Harness Engineering: Leveraging Codex in an Agent-First World</a>，
+      记录用 Codex 写出约 100 万行代码、零人类编写的实验，从工程实践层面正式确立 Harness Engineering 的地位。
+    </p>
+    <p>
+      Harness Engineering 关注<strong>模型外围的整套基础设施</strong>：工具集、AGENTS.md、结构性测试、验证脚本、子 Agent 编排、运行环境、权限边界、跨会话状态。
+      <strong>目的是「让 Agent 长期、自主、安全地运行」</strong>。
+    </p>
+    <blockquote>
+      <p>
+        Harness Engineering 仍然包括 Prompt 和 Context 的设计，只是进一步在更高层面思考问题：<br>
+        <strong>怎么让模型可以一直自主运行？怎么让出错的概率下降或者让 Agent 能够有效纠正错误？以及怎么让用户更好地能「驾驭」模型？</strong>
+      </p>
+    </blockquote>
+
+    <h2 id="two-types">二、当前 Agent 的两大类型</h2>
+
+    <h3 id="workflow-agent">2.1 编排型 Agent（Workflow Agents）</h3>
+    <p><strong>代表项目</strong>：LangChain / LangGraph、Dify、n8n、Coze</p>
+    <p>
+      <strong>特征</strong>：开发者用图（DAG / StateGraph）搭好执行路径，模型在指定节点做单步推理。
+      控制流由人为设定，模型不参与路由判断。适合用在<strong>专业性的应用</strong>中，人为搭建<strong>稳定可靠</strong>的工作流。
+    </p>
+
+    <h3 id="autonomous-agent">2.2 自主型 Agent（Autonomous Agents）</h3>
+    <p><strong>代表项目</strong>：Claude Code、OpenAI Codex、OpenClaw、Hermes Agent</p>
+    <p>
+      <strong>特征</strong>：模型在一个 <strong>loop</strong> 中自主完成「plan → 调用工具 → 观察结果 → 反思 → 继续或停止」的循环。
+      控制流由模型在运行时根据任务进展动态决定。适用于<strong>探索性、开放性、灵活性强</strong>的任务场景中。
+    </p>
+
+    <h3 id="harness-relation">2.3 两者与 Harness 的关系</h3>
+    <blockquote>
+      <p>
+        个人观点：编排型 Agent 关键在于人为编排工作流和优化每个节点的执行效果——这是 Harness 的一部分实现方式，<strong>但不是 Harness 的全貌</strong>。
+        Harness Engineering 更多地是针对<strong>自主型 Agent 要如何设计其工具调用、运行环境、记忆加载、任务编排、安全权限机制</strong>等的工程性实现方法，以提升用户对 Agent 的「驾驭」。
+      </p>
+    </blockquote>
+    <ul>
+      <li>编排型 Agent 根据人为搭建的工作流做决策——<strong>把约束和流程编排人为写死在流程图里</strong>。</li>
+      <li>自主型 Agent <strong>给模型决策权</strong>——需要通过工具设计、上下文管理、权限边界、可观测性等来引导模型行为。</li>
+    </ul>
+
+    <h2 id="augmented-llm">三、Agent 构建基石：增强型 LLM（Augmented LLM）</h2>
+    <p>在讨论 Workflow 和 Agent 之前，先理解它们共同的基础构件。增强型 LLM 是在基础模型之上叠加三种能力的系统：</p>
+    <ul>
+      <li><strong>工具调用（Tool Use）</strong>：让模型能够主动调用外部函数（搜索、计算、文件操作）</li>
+      <li><strong>记忆（Memory）</strong>：会话内的短期记忆 + 跨会话的长期记忆（向量库 / 文件 / KV）</li>
+      <li><strong>检索（Retrieval）</strong>：从外部知识库中拉取与当前任务相关的信息</li>
+    </ul>
+    <p>这三种能力是 Workflow 与 Agent 的共同底座——无论上层走「编排」还是「自主」路线，都依赖它们之中的至少一种来突破「纯文本对话」的局限。</p>
+
+    <h2 id="architecture">四、架构详解</h2>
+
+    <h3 id="basic">1️⃣ 基础架构：LLM 单次调用</h3>
+    <p>
+      最简单的 LLM 应用就是一次 prompt → response 的单次调用。
+      适合<strong>单步推理任务</strong>：摘要、翻译、改写、问答、分类等。
+      <strong>优势</strong>：最简单、可预测、易调试；<strong>劣势</strong>：没有外部信息源、没有迭代修正。
+    </p>
+    <pre><code>user ──prompt──&gt; LLM ──response──&gt; user</code></pre>
+
+    <h3 id="workflow">2️⃣ 工作流（Workflows）架构</h3>
+    <p>
+      把 LLM 调用嵌入到预先设计好的执行流程中，<strong>控制流由开发者定义</strong>，模型只负责在指定节点做单步推理。
+      典型范式包括：Prompt Chaining、Parallelization、Orchestrator-Workers、Evaluator-Optimizer。
+    </p>
+    <pre><code>            ┌─→ LLM ──┐
+input ──→   ├─→ LLM ──┼──→ aggregator ──→ output
+            └─→ LLM ──┘
+   (Parallelization 示意)</code></pre>
+    <p><strong>适用场景</strong>：流程固定、可拆解、可验证的任务，例如多阶段文档处理、并行多角度分析等。</p>
+
+    <h3 id="autonomous">3️⃣ 自主 Agent（Agents）架构</h3>
+    <p>
+      模型在一个 <strong>loop</strong> 中自主完成「plan → 调用工具 → 观察结果 → 反思 → 继续或停止」的循环。
+      工具调用、状态推进、终止决策全部交给模型。
+    </p>
+    <pre><code>            ┌──────────────────────────┐
+            ↓                          │
+goal ──→ LLM ──plan──→ tool call ──→ env
+            ↑                          │
+            └────── observation ←──────┘
+                  (until stop or done)</code></pre>
+    <p><strong>适用场景</strong>：开放式、探索性、步骤不可预知的任务，例如代码 Agent、调研 Agent 等。</p>
+
+    <h3 id="hybrid">4️⃣ 两者的结合</h3>
+    <p>
+      实践中两者经常<strong>混合使用</strong>：外层是 Workflow（保证主流程可控），内层关键决策用自主 Agent（处理开放子任务）。
+      这种 hybrid 模式能兼顾<strong>稳定性</strong>与<strong>灵活性</strong>，是大多数生产级 Agent 系统的真实形态。
+    </p>
+
+    <h2 id="outlook">五、Harness 展望</h2>
+
+    <h3 id="two-paths">5.1 两条方法路径</h3>
+    <ul>
+      <li><strong>Orchestration-first（编排优先）</strong>：通过更精细的流程设计来约束 Agent 行为，LangGraph 是代表</li>
+      <li><strong>Harness-first（Harness 优先）</strong>：通过 AGENTS.md、Skills、结构化测试、运行环境等基础设施来引导 Agent 行为，Claude Code / OpenAI Codex 是代表</li>
+    </ul>
+    <p>两条路径并非对立，而是<strong>互补</strong>——前者解决「流程的稳定性」，后者解决「长会话的自主性」。</p>
+
+    <h3 id="consensus">5.2 Agent 架构的设计共识</h3>
+    <ol>
+      <li><strong>简单优先</strong>：能单次调用解决的不上 Workflow，能 Workflow 解决的不上 Agent</li>
+      <li><strong>可观测性</strong>：任何 Agent 决策都必须能被 trace、复现、回滚</li>
+      <li><strong>权限最小化</strong>：默认禁止 destructive / external action，需显式批准</li>
+      <li><strong>上下文可控</strong>：Prefix Cache、压缩、摘要等机制保证上下文不爆炸</li>
+      <li><strong>错误纠正</strong>：让 Agent 在出错时能识别、汇报、修复，而不是崩溃</li>
+    </ol>
+
+    <h3 id="my-view">5.3 个人理解</h3>
+    <p>
+      Harness Engineering 不是取代 Prompt 或 Context Engineering，而是<strong>在更高层面回答同一个问题</strong>：
+      「怎么让 LLM 真正有用？」Prompt 解决单次调用质量，Context 解决单次会话质量，Harness 解决长期、自主、安全运行的质量。
+    </p>
+    <p>
+      对开发者来说，把「Agent 会犯错」这件事<strong>当作可工程化问题</strong>（而非随机事件）来对待，是 Harness Engineering 的核心心态——
+      每一次错误都问：「是 prompt 不够好？是上下文不够？还是缺少工具/验证/权限设计？」
+      然后用工程手段让它<strong>下次不会再犯</strong>。
+    </p>
+
+    <h2 id="references">六、参考资料</h2>
+    <ul>
+      <li><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic — Effective Context Engineering for AI Agents</a></li>
+      <li><a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Anthropic — Effective Harnesses for Long-Running Agents</a></li>
+      <li><a href="https://openai.com/index/harness-engineering/">OpenAI — Harness Engineering: Leveraging Codex in an Agent-First World</a></li>
+      <li><a href="https://mitchellh.com/writing/my-ai-adoption-journey">Mitchell Hashimoto — My AI Adoption Journey</a></li>
+      <li><a href="https://simonwillison.net/2025/Oct/16/claude-skills/">Simon Willison — Claude Skills are awesome</a></li>
+    </ul>
+  </article>
+</body>
+</html>

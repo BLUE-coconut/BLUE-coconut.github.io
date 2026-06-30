@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>缓存命中率 &amp; KV Cache</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #9b59b6;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(155, 89, 182, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #7d3c98;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #9b59b6;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #faf6fc;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13.5px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      「缓存命中率」和「KV Cache」涉及到<strong>三个不同层次</strong>的概念：
+      <strong>KV Cache</strong>（机制层）、<strong>Prefix Cache</strong>（工程层）和<strong>缓存命中率</strong>（指标层）。
+      本文逐一辨析这三个概念的边界与关系，并讨论影响命中率的工程因素。
+    </p>
+
+    <h2 id="concepts">一、缓存命中率 vs KV Cache：三个层次的概念边界</h2>
+
+    <h3 id="three-concepts">❓ 什么是 KV Cache、Prefix Cache 与缓存命中率</h3>
+    <p>
+      <strong>KV Cache（Key-Value Cache）</strong> 指 Transformer 在自回归生成过程中，
+      把已处理 token 的 Key 和 Value 投影张量缓存在显存中，使后续 token 的注意力计算无需对历史 token 重新做 K/V 投影。
+      它存在于<strong>单个推理请求的生命周期内</strong>，请求结束即释放。
+    </p>
+    <p>
+      <strong>Prefix Cache（前缀缓存，亦称 Prompt Cache）</strong> 指把不同请求间共享的 token 前缀对应的 KV 张量持久化保存，
+      使后续命中相同前缀的请求能跳过这部分的 Prefill 计算。它是 KV Cache 在<strong>跨请求维度</strong>的工程化延展。
+    </p>
+    <p>
+      <strong>缓存命中率（Cache Hit Rate）</strong> 指一次请求中，
+      通过 Prefix Cache 直接读取（而非重新计算）的 input token 占总 input token 的比例，
+      是衡量 Prefix Cache 复用效果的<strong>定量指标</strong>。
+    </p>
+
+    <h3 id="three-layers">➡️ 三层关系总览</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>层次</th><th>KV Cache（机制层）</th><th>Prefix Cache（工程层）</th><th>命中率（指标层）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>作用域</td><td>单个请求内</td><td>跨请求</td><td>单个请求的统计量</td></tr>
+        <tr><td>是否可选</td><td><strong>必备</strong>，所有 LLM 推理引擎默认启用</td><td>可选，需要框架/服务支持</td><td>可选，需 API 暴露</td></tr>
+        <tr><td>典型实现</td><td>HuggingFace <code>past_key_values</code>、PagedAttention</td><td>vLLM APC、SGLang RadixAttention、Anthropic Prompt Caching</td><td><code>cache_read_input_tokens</code>（Anthropic）、<code>prompt_cache_hit_tokens</code>（DeepSeek）</td></tr>
+        <tr><td>主要收益</td><td>把 Decode 复杂度从 O(n²) 降到 O(n)</td><td>跳过重复前缀的 Prefill 计算</td><td>直接折算成 token 计费折扣与 TTFT 下降</td></tr>
+        <tr><td>失效条件</td><td>请求结束</td><td>TTL 到期、被 LRU 淘汰、前缀不匹配</td><td>当次请求未命中 Prefix Cache</td></tr>
+      </tbody>
+    </table>
+    <blockquote>
+      <p>
+        「缓存命中率」对应的<strong>不是</strong> KV Cache 本身。在 KV Cache 视角下，单请求内 100% 的 token 都「命中」——这是它的定义，讨论命中率毫无意义。
+        <strong>命中率</strong>衡量的对象是 Prefix Cache，即跨请求复用的那部分 KV。
+      </p>
+    </blockquote>
+
+    <h2 id="kv-mechanism">二、KV Cache 的工作机制：单请求内的 token 间复用</h2>
+
+    <h3 id="kv-what">❓ 什么是 KV Cache</h3>
+    <p>在 Transformer Decoder 的自回归生成中，第 t 步生成 token x_t 时，需要计算注意力：</p>
+    <pre><code>Attention(t) = softmax(Q_t · K_{1:t}^T / √d_h) · V_{1:t}
+
+其中:
+  Q_t = x_t · W_Q          ← 当前 token 的 Query
+  K_{1:t} = X_{1:t} · W_K  ← 历史所有 token 的 Key
+  V_{1:t} = X_{1:t} · W_V  ← 历史所有 token 的 Value</code></pre>
+    <p>
+      由于历史 token 的 K_{1:t-1}、V_{1:t-1} 在每一步都<strong>不会发生变化</strong>，把它们缓存在显存中，
+      每一步只需对新 token 计算 K_t、V_t 并追加到缓存末尾，即可避免 O(t) 次冗余的 K/V 投影。这就是 KV Cache。
+    </p>
+
+    <h3 id="kv-memory">💻 显存占用公式</h3>
+    <p><strong>单 token KV Cache 显存公式</strong>：</p>
+    <pre><code>KV(per token) = 2 × L × H_kv × d_head × bytes
+
+      2       = K 与 V 各一份
+      L       = Transformer 层数
+      H_kv    = KV 头数(MHA 时 = H_q, MQA 时 = 1, GQA 时 = H_q / G)
+      d_head  = 单头维度
+      bytes   = 数据类型字节数(FP16 / BF16 = 2)</code></pre>
+    <p>
+      以 Llama 3-70B 为例，8K 上下文的单请求 KV Cache 约为 8192 × 320 KB ≈ 2.5 GB，直接挤占了模型权重之外的可用显存。
+      这便是提出 PagedAttention、MQA/GQA、MLA 等优化方法的根本动因。
+    </p>
+    <blockquote>
+      <p>
+        KV Cache <strong>不是显存优化技术，而是用显存换计算的技术</strong>。
+        它把「对历史 token 重复做 O(n) 次 K/V 投影」换成「在 HBM 中常驻 O(n) 字节」，
+        在 Decode 阶段反而成为 Memory-Bound 的根因——Decode 每步要把整份 KV 从 HBM 读出参与 attention，带宽即瓶颈。
+      </p>
+    </blockquote>
+    <p>
+      围绕显存压力，催生了三条主线优化：<strong>头部维度压缩</strong>（MQA/GQA/MLA，DeepSeek-V2 通过 MLA 把 KV Cache 压到原始 MHA 的 6.7%）；
+      <strong>显存管理</strong>（PagedAttention 用 OS 页式管理思路打散物理显存，vLLM 是其代表）；
+      <strong>跨请求复用</strong>（下一节将展开的 Prefix Cache）。
+    </p>
+
+    <h3 id="kv-value">⭐️ KV Cache 核心价值</h3>
+    <p>把 Decode 阶段的 attention 计算从 O(n²) 降到 O(n)，是 LLM 能做长文本推理的根基。</p>
+
+    <h2 id="prefix">三、从 KV Cache 到 Prefix Cache：跨请求复用的工程化</h2>
+
+    <h3 id="prefix-what">❓ 什么是 Prefix Cache：定义与命中条件</h3>
+    <p>
+      原生 KV Cache 的复用边界是<strong>单个请求</strong>：请求结束，KV 张量被释放，下一个请求即使带有完全相同的 system prompt，也要从零做一遍 Prefill。
+      <strong>Prefix Cache</strong> 把这个边界扩展到了请求之间——以 token 序列为 key 把 KV 张量持久化保存，
+      后续请求若前缀（prefix）与已缓存序列<strong>逐 token 完全一致</strong>，即可直接复用，跳过这部分的 Prefill 计算。
+    </p>
+    <p>这里的「前缀」严格按 token 序列从位置 0 起逐位匹配，无论语义内容是什么。</p>
+
+    <p><strong>典型应用场景</strong>：</p>
+    <ul>
+      <li><strong>多轮对话</strong>：第 N+1 轮 prompt 的前 N 轮历史已在上次请求处理过，整段可作为 prefix 命中</li>
+      <li><strong>Agent 自循环</strong>：system prompt + 工具定义 + 项目背景几乎不变，仅尾部追加新一步 observation/action</li>
+      <li><strong>RAG / Few-shot</strong>：多个用户共享同一组检索片段或 few-shot 示例，仅在尾部插入各自 query</li>
+      <li><strong>Self-consistency / Tree-of-Thought</strong>：同一 prompt 采样多次或分支多路径，分叉点之前完全一致</li>
+      <li><strong>批量评测</strong>：同一组指令配不同测试数据，指令部分跨样本共享</li>
+    </ul>
+    <p>
+      <strong>反例</strong>（会破坏前缀）：相同 system prompt 中嵌入变化的时间戳；
+      工具定义顺序被随机化；对话历史被重排——<strong>任意位置 token 不一致都会让从该位置往后的所有缓存失效</strong>。
+    </p>
+
+    <h3 id="prefix-mechanism">🔵 工作机制：缓存什么、何时工作</h3>
+    <blockquote>
+      <p><strong>两个常见误区：</strong></p>
+      <ul>
+        <li><strong>缓存的是 K/V 张量，不是答案</strong>。Prefix Cache 不像 HTTP 缓存那样直接保存「输入 → 输出」映射。它的逻辑是：当新请求的 input 前缀与先前请求完全相同时，直接复用先前请求中命中的这段前缀的 K/V 张量，从而省掉对这段相同前缀的重复 Prefill 计算。</li>
+        <li><strong>机制只在 Prefill 阶段触发</strong>。新请求进入 Prefill 时做 lookup，输入 prompt 的前缀出现命中后，把缓存的 K/V 挂载进当前工作 KV Cache。其后的 Decode 阶段不经过 Prefix Cache 的查找 / 匹配流程。</li>
+      </ul>
+    </blockquote>
+
+    <table>
+      <thead>
+        <tr><th>维度</th><th>KV Cache（单请求内）</th><th>Prefix Cache（跨请求）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>存什么</td><td>K/V 张量</td><td>K/V 张量（<strong>同一种东西</strong>）</td></tr>
+        <tr><td>数据来源</td><td>当前请求自己在 Prefill / Decode 阶段算出来的</td><td>先前请求中算出后被保留下来的</td></tr>
+        <tr><td>机制工作时机</td><td>Prefill 写入、Decode 读取并追加</td><td><strong>仅 Prefill</strong>：开始时做 lookup，命中即把缓存 K/V 挂载到工作 KV Cache</td></tr>
+        <tr><td>消除的冗余</td><td>当前请求 Decode 时不重算历史 token 的 K/V</td><td>当前请求 Prefill 时不重算与先前请求共享前缀那部分的 K/V</td></tr>
+        <tr><td>寿命</td><td>当前请求生命周期内</td><td>跨请求，受 TTL / LRU 控制</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="prefix-impl">🔧 Prefix Cache 典型实现与 API 封装</h3>
+    <p><strong>推理框架层（自动管理）</strong>：</p>
+    <ul>
+      <li><strong>vLLM Automatic Prefix Caching</strong>：基于 PagedAttention 的固定 block（默认 16 token/块）做哈希，<strong>从 prompt 起点起按 block 边界对齐</strong>才能命中。命中粒度 = block_size。</li>
+      <li><strong>SGLang RadixAttention</strong>：用 radix tree 维护已缓存 token 序列，做最长前缀匹配，命中粒度细到 token 级。在多分支场景（self-consistency、tree-of-thought）下复用率比 block-hash 更高。</li>
+    </ul>
+
+    <p><strong>API 服务层（暴露给开发者）</strong>：</p>
+    <ul>
+      <li><strong>隐式</strong>（DeepSeek、OpenAI）：自动检测前缀，用户无感，无需改 prompt 结构</li>
+      <li><strong>显式</strong>（Anthropic）：开发者通过 <code>cache_control: {type: "ephemeral"}</code> 主动标记 cache breakpoint，最多 4 个</li>
+    </ul>
+
+    <blockquote>
+      <p><strong>什么是 cache breakpoint？</strong></p>
+      <p>
+        它是开发者在 prompt 中手动插入的「缓存终点」标记——给请求体某条内容（可以是 <code>system</code>、<code>tools</code> 数组里的一项，
+        或 <code>messages</code> 中的某条 message）加上 <code>cache_control: {type: "ephemeral"}</code> 字段，
+        相当于告诉模型服务：「<strong>从 prompt 起点到这条内容为止的所有 token，我希望作为一个整体被缓存。</strong>」
+      </p>
+      <p>
+        每次请求最多打 <strong>4 个 breakpoint</strong>，每个 breakpoint 产生一份独立的、覆盖「位置 0 → 该 breakpoint 位置」的缓存条目。
+        <strong>典型用法</strong>：把 system prompt + 工具定义打一个 breakpoint（最稳定）、把固定的会话历史再打一个（次稳定），
+        而<strong>变化频繁的当前用户消息留在最后不打 breakpoint</strong>——这样既最大化命中率，又避免动态内容污染缓存。
+      </p>
+    </blockquote>
+
+    <h3 id="prefix-value">⭐️ Prefix Cache 核心价值</h3>
+    <p>
+      把「反复处理同一段 system prompt / 工具定义 / few-shot 示例」的冗余消除，
+      在<strong>稳定前缀长 + 动态尾部短</strong>的场景（Agent 多轮调用、RAG 共享检索结果、长 system prompt）下作用尤为突出——
+      这也是 Agent 系统能把单次调用成本压到 input 全价的 1/10 量级的关键工程基础。
+    </p>
+
+    <h2 id="hitrate">四、缓存命中率的量化定义：Anthropic 与 DeepSeek 字段辨析</h2>
+
+    <h3 id="hitrate-what">❓ 缓存命中率衡量的是什么</h3>
+    <p>缓存命中率衡量的是「<strong>本次请求的 input 中，有多少 token 是从 Prefix Cache 直接读取的</strong>」：</p>
+    <pre><code>hit_rate = cache_read_tokens / total_input_tokens
+
+其中:
+  cache_read_tokens   = 命中并复用 Prefix Cache 的 input token 数
+  total_input_tokens  = 本次请求总的 input token 数(含命中 + 未命中 + 写入)</code></pre>
+
+    <p>不同厂商把这套语义拆成了不同的字段。<strong>同样是「缓存命中」</strong>，Anthropic 与 DeepSeek 的 <code>usage</code> 返回字段语义不可直接互换，这是 LiteLLM 等聚合层框架最常踩的坑。</p>
+
+    <h3 id="anthropic-fields">Anthropic 的三字段模型</h3>
+    <pre><code>{
+  "input_tokens":               194,    // 既不命中也不写缓存的普通 input
+  "cache_creation_input_tokens": 9474,  // 本次写入缓存的 input（首次创建）
+  "cache_read_input_tokens":     0,     // 本次命中并读取缓存的 input
+  "output_tokens":               7      // 模型生成的 output token 数（按 output 价计费）
+}
+
+总 input = input_tokens + cache_creation_input_tokens + cache_read_input_tokens</code></pre>
+
+    <h3 id="deepseek-fields">DeepSeek 的二字段模型</h3>
+    <pre><code>{
+  "prompt_tokens":             21530,   // 总 input，等价于 hit + miss
+  "prompt_cache_hit_tokens":   320,     // 命中缓存的 input
+  "prompt_cache_miss_tokens":  21210,   // 未命中（走完整 Prefill）的 input
+  "completion_tokens":         9        // 模型生成的 output token 数
+}
+
+总 input = prompt_tokens = hit + miss（无独立"写入"字段，写入计入 miss）</code></pre>
+
+    <h3 id="fields-difference">两种字段模型的核心差异</h3>
+    <table>
+      <thead>
+        <tr><th>维度</th><th>Anthropic</th><th>DeepSeek</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>命中字段</td><td><code>cache_read_input_tokens</code></td><td><code>prompt_cache_hit_tokens</code></td></tr>
+        <tr><td>"写入"是否独立</td><td><strong>独立计费</strong>（<code>cache_creation_input_tokens</code> × 1.25）</td><td>写入计入 miss，与普通 input 同价</td></tr>
+        <tr><td>命中读取计费</td><td>基价 × <strong>0.1</strong>（节省 90%）</td><td>基价 × <strong>0.1</strong>（节省 90%）</td></tr>
+        <tr><td>控制粒度</td><td><strong>显式</strong>：用户用 <code>cache_control</code> 标记 breakpoint</td><td><strong>隐式</strong>：自动按前缀检测</td></tr>
+        <tr><td>TTL</td><td>5 分钟（默认）/ 1 小时（付费，× 2 写入溢价）</td><td>无固定 TTL，LRU 自然淘汰</td></tr>
+        <tr><td>命中率分母</td><td><code>input + creation + read</code></td><td><code>prompt_tokens</code> = <code>hit + miss</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="hitrate-value">⭐️ 命中率核心价值</h3>
+    <p>
+      命中率不仅是性能指标，<strong>更是直接的成本指标</strong>。把它纳入 SLO（Service Level Objective）监控是 LLM 服务工程化的关键一步——
+      一旦命中率从 90% 跌到 50%，意味着 input token 成本接近翻倍。
+    </p>
+
+    <h2 id="cache-friendly">五、影响命中率的工程因素：Cache-Friendly Prompt 设计</h2>
+
+    <h3 id="static-first">核心原则：静态在前、动态在后</h3>
+    <p>Prefix Cache 的命中条件是「逐 token 完全一致的前缀」，这意味着 prompt 的<strong>书写顺序</strong>直接决定了命中率。Cache-Friendly Prompt 的通用结构：</p>
+    <pre><code>① system prompt          ← 跨会话稳定,放最前面
+② tools / function 定义   ← 长期稳定,放在 system 之后
+③ 项目规则 / few-shot     ← 偶尔变更,放在工具之后
+④ 历史对话                ← 单次会话内追加,放在规则之后
+⑤ 当前用户消息            ← 每轮变化,放最后
+   ↑ cache_breakpoint     ← Anthropic 在此打 breakpoint</code></pre>
+    <p>核心规则：<strong>越靠后，变更频率越高</strong>。任何「动态内容前置」都会让该位置之后的所有静态内容跟着失效。</p>
+
+    <h3 id="anti-patterns">破坏命中的反模式</h3>
+    <table>
+      <thead>
+        <tr><th>反模式</th><th>为什么破坏命中</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>system prompt 中嵌入当前时间</td><td>每次请求时间戳都不同，整个 system prefix 失效</td></tr>
+        <tr><td>工具列表顺序随机化</td><td>token 序列改变，从工具定义之后全部 miss</td></tr>
+        <tr><td>对话历史插入到 system 之后</td><td>每轮历史增长，把工具定义和 few-shot 一起拖入失效</td></tr>
+        <tr><td>引入随机 UUID / nonce 在前缀中</td><td>每次必 miss，缓存形同虚设</td></tr>
+        <tr><td>同一会话频繁切换 system prompt</td><td>每次切换都触发一次完整 cache_creation</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="ttl">TTL 的工程含义</h3>
+    <p>
+      Anthropic 默认 TTL 为 5 分钟，意味着<strong>低频调用</strong>（如人工对话间隔超过 5 分钟）会反复触发 cache_creation，反而比无缓存更贵（写入有 1.25x 溢价）。两种应对：
+    </p>
+    <ul>
+      <li><strong>高频场景</strong>（Agent 自动循环、连续编辑会话）：默认 5min TTL 即可，实际间隔远小于 TTL</li>
+      <li><strong>低频场景</strong>（人工偶发请求）：评估「5min 内复用次数」——若 &lt; 1.25 / 0.9 ≈ 1.4 次，缓存反而亏损；若 ≥ 2 次，即便偶尔超 TTL 也大概率盈利。极低频可买 1h TTL（2x 写入溢价，但单次可摊到 12 倍读取）</li>
+    </ul>
+
+    <h3 id="monitor">命中率监控</h3>
+    <blockquote>
+      <p><strong>推荐 SLO 指标</strong>：把 <code>hit_rate = cache_read_tokens / (cache_read + cache_creation + input)</code> 作为<strong>跟 P99 延迟同级</strong>的关键指标。</p>
+      <ul>
+        <li>健康基线：Agent 类应用 ≥ 80%，长 system prompt 的 chatbot ≥ 60%</li>
+        <li>异常告警：连续多个时间窗 hit_rate 跌幅 &gt; 20%，通常意味着 prompt 模板被改坏了</li>
+        <li>成本归因：input 成本异动 → 先查 hit_rate，再查 token 量</li>
+      </ul>
+    </blockquote>
+    <blockquote>
+      <p><strong>注意：命中率并非越接近 100% 越好</strong>。100% 命中意味着所有 input 都来自缓存，通常说明系统在反复发送完全相同的请求（无新增内容），这要么是业务逻辑死循环，要么是测试桩泄漏。健康的 Agent 系统应呈现「<strong>高基线命中率</strong>（80%-95%）<strong>+ 稳定的少量新增 token</strong>」模式。</p>
+    </blockquote>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      从工程角度看，<strong>Agent 系统</strong>的成本治理本质上就是 cache hit rate 治理——
+      一段稳定的 system prompt + 工具定义动辄 10K-20K token，在 50-100 轮长会话中，
+      这部分若反复全价计算，会占据账单的 80%+；若被稳定缓存，边际成本仅是 dynamic suffix。
+      这个事实把「<strong>prompt 工程</strong>」从单纯的「写好提示词」扩展到了「<strong>设计可缓存的</strong>会话结构」，
+      成为现代 LLM 应用的基础设施级能力。
+    </p>
+  </article>
+</body>
+</html>

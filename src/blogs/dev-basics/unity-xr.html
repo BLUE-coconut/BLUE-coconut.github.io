@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unity XR 开发笔记</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #e67e22;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    h4 {
+      font-size: 17px; font-weight: 600;
+      margin: 24px 0 8px;
+      color: #2c3e50;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(230, 126, 34, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #af601a;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #e67e22;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #fdf6ee;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      本文整理 Unity XR 开发中的核心模块：<strong>基本操作、XR Interaction Toolkit（XRI）、Input System、物理模拟</strong>，
+      附上常用学习资料链接。
+    </p>
+
+    <h2 id="resources">一、学习资料</h2>
+    <ul>
+      <li>Unity 基本操作学习：<a href="https://www.bilibili.com/video/BV1gQ4y1e7SS">B 站视频链接</a></li>
+      <li>HTC 环境配置：<a href="https://www.bilibili.com/video/BV1mS421R7be">B 站视频链接</a></li>
+      <li>Vision Pro 开发配置：<a href="https://www.bilibili.com/cheese/play/ep1120469">B 站视频链接</a></li>
+      <li>XRI 参考视频：<a href="https://www.bilibili.com/video/BV14pSbYsEPz">B 站视频链接</a></li>
+    </ul>
+
+    <h2 id="xri">二、XR Interaction Toolkit（XRI）</h2>
+
+    <h3 id="xr-origin">XR Origin（玩家原点）</h3>
+    <p>
+      XR Origin 是 XR 场景中<strong>代表玩家的坐标原点</strong>，承载相机、手柄等设备的位置与朝向。
+      所有的交互（射线、抓取、传送）都基于 XR Origin 坐标系计算。
+    </p>
+
+    <h3 id="input-system-xr">输入系统</h3>
+    <p>Unity 推荐使用新的 <strong>Input System Package</strong> 来处理 XR 设备输入：</p>
+    <img src="/images/blog/feishu/OCekbz53do0AcIxEHxDcA1OVnec.png" alt="XR Interaction Toolkit 输入系统">
+    <ul>
+      <li>Unity Input System 使用方法：<a href="https://docs.unity3d.com/Packages/com.unity.inputsystem@1.14/manual/index.html">官方文档</a></li>
+      <li>Unity XR 输入设备信息：<a href="https://docs.unity.cn/Manual/xr_input.html">官方文档</a></li>
+      <li>Unity VR + XRI 3 输入系统配置：<a href="https://blog.csdn.net/qq_46044366/article/details/132319756">CSDN 博客</a></li>
+    </ul>
+    <img src="/images/blog/feishu/UlQ5bHl3xoCBAHxDwf6cdgtwnog.png" alt="XR 输入设备绑定示意">
+    <img src="/images/blog/feishu/ZLWHbtEKgo4B83x3vX9cgMMinnh.png" alt="XR 控制器按键映射">
+    <p>
+      在 XR 场景中，常见的输入需求包括：
+    </p>
+    <ul>
+      <li>手柄按钮（Trigger / Grip / Menu）</li>
+      <li>手柄摇杆（Thumbstick）</li>
+      <li>手柄位姿（Position + Rotation）</li>
+      <li>手势识别（Hand Tracking）</li>
+    </ul>
+
+    <h3 id="htc-vive">HTC VIVE Basic Input for OpenXR</h3>
+    <p>通过 OpenXR 接入 VIVE 头显与手柄，参考：<a href="https://developer.vive.com/resources/openxr/unity/tutorials/basic-input-for-openxr/">HTC VIVE Basic Input for OpenXR</a>。</p>
+    <blockquote>
+      <p>
+        XRI（XR Interaction Toolkit）封装了常见的 XR 交互模式：<strong>近距抓取（Near Grab）、远距射线抓取（Far Ray Grab）、UI 交互、传送（Teleport）</strong>等，
+        大幅简化了 XR 应用开发。
+      </p>
+    </blockquote>
+
+    <h2 id="input-system">三、Input System（输入系统）</h2>
+
+    <h3 id="input-action">Input Action Asset</h3>
+    <p>
+      建议使用 <strong>Input Action Asset</strong>（.inputactions 文件）来统一管理输入配置，把输入「数据化」：
+    </p>
+    <ul>
+      <li><strong>Action Map</strong>：按场景/角色分组（如 Player、UI）</li>
+      <li><strong>Action</strong>：具体的输入动作（如 Jump、Move）</li>
+      <li><strong>Binding</strong>：动作到具体输入设备的映射（如键盘 Space、XRI 手柄 Trigger）</li>
+    </ul>
+
+    <h3 id="xr-input-types">XR 输入类型</h3>
+    <table>
+      <thead>
+        <tr><th>输入类型</th><th>XR 中的获取方式</th><th>典型用途</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Vector2</td><td>Thumbstick / Touchpad</td><td>移动、转向</td></tr>
+        <tr><td>Button</td><td>Trigger / Grip / Face Button</td><td>抓取、确认、射击</td></tr>
+        <tr><td>Pose</td><td>设备位姿 (Position + Rotation)</td><td>射线、手部 IK</td></tr>
+        <tr><td>Trigger (float)</td><td>扳机按压程度</td><td>力度交互、握力反馈</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="physics">四、Unity 物理模拟</h2>
+    <img src="/images/blog/feishu/PyjJbekQnob2tyxnuA9cWpdcn7d.png" alt="Unity 碰撞与触发条件示意图">
+
+    <h3 id="collision-conditions">产生碰撞的条件</h3>
+    <ol>
+      <li>若要产生碰撞，<strong>双方都要有碰撞器</strong></li>
+      <li>运动的一方<strong>一定要有刚体</strong>，另一方有无刚体无所谓</li>
+    </ol>
+    <blockquote>
+      <p>注：如果运动的一方无刚体，它去碰撞静止的刚体，相当于没撞上。</p>
+    </blockquote>
+
+    <h3 id="contact-types">接触的两种方式</h3>
+    <ol>
+      <li><strong>Collision 碰撞</strong>：造成物理碰撞，可以在碰撞时执行 <code>OnCollision</code> 事件</li>
+      <li><strong>Trigger 触发</strong>：取消所有的物理碰撞，可以在触发时执行 <code>OnTrigger</code> 事件</li>
+    </ol>
+    <blockquote>
+      <p>注：两个物体接触不可能同时产生碰撞 + 接触，最多产生一种。但是可以 A、B 产生碰撞，A、C 产生触发。</p>
+    </blockquote>
+
+    <h3 id="condition-detail">产生不同方式接触的条件</h3>
+    <table>
+      <thead>
+        <tr><th>方式</th><th>条件</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Collision 碰撞</strong></td>
+          <td>
+            1. 双方都有碰撞体<br>
+            2. 运动的一方必须有刚体<br>
+            3. 双方不可同时勾选 Kinematic 运动学<br>
+            4. 双方都不可勾选 Trigger 触发器
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Trigger 触发</strong></td>
+          <td>
+            1. 双方都有碰撞体<br>
+            2. 运动的一方必须是刚体<br>
+            3. 至少一方勾选 Trigger 触发器
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>参考：<a href="https://blog.csdn.net/renatqiang/article/details/47682449">CSDN 博客</a></p>
+
+    <h2 id="xr-tips">五、XR 开发小贴士</h2>
+    <ul>
+      <li><strong>性能优先</strong>：XR 应用对帧率要求严格（一般要求 90 FPS），场景多边形数、shader 复杂度都要严格控制</li>
+      <li><strong>空间音频</strong>：XR 体验强烈依赖空间音频，建议尽早集成 <code>AudioSource</code> 的 Spatial Blend 设置</li>
+      <li><strong>舒适度</strong>：避免强制瞬移、避免持续高速运动、避免立体视觉冲突</li>
+      <li><strong>输入抽象</strong>：用 Input Action Asset 抽象所有输入，方便跨平台（Quest / Vision Pro / PC VR）切换</li>
+    </ul>
+  </article>
+</body>
+</html>

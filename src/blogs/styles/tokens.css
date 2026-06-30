@@ -13,8 +13,13 @@
   --brand-primary-hover-bg: rgba(52, 152, 219, 0.04);
 
   /* ===== 分类色（保留兼容，新 UI 不使用） ===== */
+  --cat-ai-app: #3498db;
+  --cat-llm-agent: #9b59b6;
+  --cat-rl: #16a085;
+  --cat-dev-basics: #e67e22;
+  --cat-english: #e74c3c;
+  /* 旧分类保留兼容 */
   --cat-ai: #3498db;
-  --cat-rl: #9b59b6;
   --cat-game: #e67e22;
   --cat-mobile: #16a085;
   --cat-language: #e74c3c;

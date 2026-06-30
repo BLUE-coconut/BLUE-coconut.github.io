@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flutter 跨平台开发笔记</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #2c3e50;
+      background: #fff;
+    }
+    h1 { font-size: 32px; margin-bottom: 16px; color: #2c3e50; line-height: 1.3; }
+    h2 {
+      font-size: 26px; font-weight: 700;
+      margin: 48px 0 16px;
+      padding-left: 14px;
+      border-left: 4px solid #e67e22;
+      scroll-margin-top: 24px;
+    }
+    h3 {
+      font-size: 20px; font-weight: 600;
+      margin: 32px 0 12px;
+      color: #2c3e50;
+      scroll-margin-top: 24px;
+    }
+    h4 {
+      font-size: 17px; font-weight: 600;
+      margin: 24px 0 8px;
+      color: #2c3e50;
+    }
+    p { margin: 16px 0; }
+    a { color: #3498db; }
+    code {
+      background: rgba(230, 126, 34, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #af601a;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.65;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+    blockquote {
+      border-left: 3px solid #e67e22;
+      padding: 8px 16px;
+      margin: 20px 0;
+      color: #7f8c8d;
+      background: #fdf6ee;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13.5px;
+    }
+    th, td {
+      border: 1px solid #e5e5e5;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+    ul, ol { padding-left: 1.6em; margin: 16px 0; }
+    li { margin: 4px 0; }
+    .lead {
+      font-size: 17px;
+      color: #7f8c8d;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; margin: 20px auto; font-size: 15px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+      h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <p class="lead">
+      Flutter 跨端开发的核心要点整理：<strong>Widget 体系与四棵树、状态管理、路由管理、Key 原理、Provider 状态共享</strong>，
+      附上常用学习资料链接。
+    </p>
+
+    <h2 id="resources">学习资料</h2>
+    <ul>
+      <li>Flutter 环境配置：<a href="https://blog.csdn.net/z119901214/article/details/95540557">CSDN 配置教程</a></li>
+      <li>Flutter 热重载（保存时更新预览）：<a href="https://docs.flutter.cn/tools/hot-reload/">官方文档</a></li>
+      <li>Flutter 实战（第二版）：<a href="https://book.flutterchina.club/">在线阅读</a></li>
+      <li>Flutter 中文网文档：<a href="https://doc.flutterchina.club/">doc.flutterchina.club</a></li>
+      <li>Flutter 官方中文版文档：<a href="https://docs.flutter.cn/">docs.flutter.cn</a></li>
+      <li>Material Design 图标：<a href="https://material.io/tools/icons/">material.io/icons</a></li>
+    </ul>
+
+    <h2 id="widget">一、Widget 基础</h2>
+
+    <h3 id="four-trees">Flutter 中的四棵树</h3>
+    <img src="/images/blog/feishu/Vh2YbJsV1oNDH3xe6FecUAJMn1e.png" alt="Flutter 四棵树：Widget / Element / Render / Layer">
+    <ol>
+      <li><strong>Widget</strong>：描述 UI 的配置信息</li>
+      <li><strong>Element</strong>：根据 Widget 的描述生成真正的实例</li>
+      <li><strong>Render</strong>：应用界面的布局和绘制，保存了元素的大小、布局、颜色等信息</li>
+      <li><strong>Layer</strong></li>
+    </ol>
+
+    <h3 id="widget-classification">Widget 分类</h3>
+    <p>在 Flutter 中，widget 用来描述一个 UI 的配置信息（包括内容、布局信息等），是<strong>不可变的</strong>（immutable）。</p>
+    <p>Widget 有两类：</p>
+    <ul>
+      <li><strong>StatelessWidget</strong>：无状态</li>
+      <li><strong>StatefulWidget</strong>：有状态。由于 widget 是不可变的，对于有状态的组件，需要引入 <code>state</code> 来描述其布局和内容。可以跟随状态（即变量）进行变化，然后根据该 state 生成 widget，再进行页面更新。</li>
+    </ul>
+    <blockquote>
+      <p>当 widget 发生改变时，会触发框架重建 widget 树。Flutter 会遍历 widget 树中每个节点，逐一比较新的 widget 和原先的 widget：</p>
+      <ul>
+        <li>如果新老 widget 为同一类型，但配置改变，仅修改对应 RenderObject 的配置</li>
+        <li>如果新老 widget 不为同一类型，则将对应的 widget、element、RenderObject 节点从树上移除，并用新的对象替换</li>
+      </ul>
+    </blockquote>
+
+    <h2 id="state-management">二、状态管理</h2>
+
+    <h3 id="state-management-ways">状态管理方式</h3>
+    <ol>
+      <li><strong>组件管理自己的状态</strong>：一个组件的颜色、动画等外观属性最好采取这种方式</li>
+      <li><strong>由父组件管理状态</strong>：全局的用户信息（例如：表单中复选框的选中状态、滑块的位置）&amp; 有些状态需要几个组件共享使用的情况</li>
+      <li><strong>混合管理</strong>：既有自己管理的部分，也有父组件管理的部分</li>
+    </ol>
+
+    <h3 id="state-management-impl">状态管理实现</h3>
+    <ol>
+      <li>管理自身状态：使用 <code>setState()</code> 更新 UI 状态</li>
+      <li>管理子组件状态：用<strong>回调函数</strong>。将包含状态更新（即 <code>setState</code>）功能的函数传递给子组件，让子组件在合适的地方调用。</li>
+    </ol>
+
+    <h4>关于回调函数</h4>
+    <p>除了使用普通的 <code>Function(传参类型)</code> 外，Flutter 中有以下预定义的回调函数类型：</p>
+    <table>
+      <thead>
+        <tr><th>类型（typedef）</th><th>实际签名</th><th>典型场景举例</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>VoidCallback</strong></td><td><code>void Function()</code></td><td>按钮点击、动画完成</td></tr>
+        <tr><td><strong>ValueChanged&lt;T&gt;</strong></td><td><code>void Function(T value)</code></td><td>值变化回传（如 <code>Switch.onChanged</code>）</td></tr>
+        <tr><td><strong>ValueSetter&lt;T&gt;</strong></td><td><code>void Function(T value)</code></td><td>语义上强调「设置」而非「变化」</td></tr>
+        <tr><td><strong>ValueGetter&lt;T&gt;</strong></td><td><code>T Function()</code></td><td>懒取值</td></tr>
+        <tr><td><strong>AsyncCallback</strong></td><td><code>Future&lt;void&gt; Function()</code></td><td>异步操作完成回调</td></tr>
+        <tr><td><strong>GestureTapCallback</strong></td><td><code>void Function()</code></td><td>点击手势回调</td></tr>
+        <tr><td><strong>GestureLongPressCallback</strong></td><td><code>void Function()</code></td><td>长按手势回调</td></tr>
+        <tr><td><strong>GestureDragStartCallback</strong></td><td><code>void Function(DragStartDetails)</code></td><td>拖动开始</td></tr>
+        <tr><td><strong>GestureDragUpdateCallback</strong></td><td><code>void Function(DragUpdateDetails)</code></td><td>拖动中</td></tr>
+        <tr><td><strong>GestureDragEndCallback</strong></td><td><code>void Function(DragEndDetails)</code></td><td>拖动结束</td></tr>
+        <tr><td><strong>RouteFactory</strong></td><td><code>Route&lt;dynamic&gt; Function(RouteSettings)</code></td><td>路由生成器</td></tr>
+        <tr><td><strong>LocaleChangedCallback</strong></td><td><code>void Function(Locale? locale)</code></td><td>语言切换监听</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="routing">三、路由管理</h2>
+
+    <h3 id="route-basic">使用路由跳转页面</h3>
+    <ol>
+      <li>Navigator 是路由管理组件，提供打开和退出路由的方法：
+        <ul>
+          <li><code>Navigator.push(context, route)</code>：路由入栈，打开一个新页面，返回值是一个 Future 对象</li>
+          <li><code>Navigator.pop(context, [result])</code>：路由出栈，关闭页面</li>
+        </ul>
+      </li>
+      <li><code>MaterialPageRoute</code> 继承自 <code>PageRoute</code>，定义了路由构建及切换时过渡动画的相关接口。能够针对不同平台实现与平台页面切换动画风格一致的过渡：Android 是上下滑动，iOS 是左右滑动。</li>
+    </ol>
+
+    <h4>示例</h4>
+    <pre><code>class TipRoute extends StatelessWidget {
+  TipRoute({Key key, required this.text}) : super(key: key);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("提示")),
+      body: Padding(
+        padding: EdgeInsets.all(18),
+        child: Center(
+          child: Column(
+            children: &lt;Widget&gt;[
+              Text(text),
+              ElevatedButton(
+                onPressed: () =&gt; Navigator.pop(context, "我是返回值"),
+                child: Text("返回"),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}</code></pre>
+
+    <h3 id="named-route">命名路由</h3>
+    <p>注册路由表：</p>
+    <pre><code>MaterialApp(
+  title: 'Flutter Demo',
+  initialRoute: "/",
+  theme: ThemeData(primarySwatch: Colors.blue),
+  routes: {
+    "new_page": (context) =&gt; NewRoute(),
+    "/": (context) =&gt; MyHomePage(title: 'Flutter Demo Home Page'),
+  }
+);</code></pre>
+
+    <p>用路由名打开页面：</p>
+    <pre><code>onPressed: () {
+  Navigator.pushNamed(context, "new_page");
+},</code></pre>
+
+    <h3 id="route-args">路由传参</h3>
+    <p>对于命名路由，通过 <code>arguments</code> 传参：</p>
+    <pre><code>Navigator.of(context).pushNamed("new_page", arguments: "hi");
+
+class EchoRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // 获取路由参数
+    var args = ModalRoute.of(context).settings.arguments;
+    // ...
+  }
+}</code></pre>
+
+    <h3 id="route-guard">路由跳转前置处理</h3>
+    <p>典型适用场景：访问需要登录的页面，在 <code>onGenerateRoute</code> 中判断并拦截：</p>
+    <pre><code>MaterialApp(
+  initialRoute: "index",
+  onGenerateRoute: myGenerateRoute,
+);
+
+String routeBeforeHook(RouteSettings settings) {
+  final token = Global.prefs.getString('token') ?? '';
+  if (token != '') {
+    if (settings.name == 'login') return 'index';
+    return settings.name;
+  }
+  return 'login';
+}
+
+Route&lt;dynamic&gt; myGenerateRoute(RouteSettings settings) {
+  String routeName = routeBeforeHook(settings);
+  return MaterialPageRoute(builder: (context) {
+    switch (routeName) {
+      case "index": return MyHomePage();
+      case "login": return LoginScreen();
+      default: return Scaffold(body: Center(child: Text("页面不存在")));
+    }
+  });
+}</code></pre>
+
+    <h2 id="key">四、Key 的原理和用法</h2>
+
+    <h3 id="key-purpose">Key 的作用</h3>
+    <p>每个 widget 都有一个 Key，能够解决类似「不同 widget 混淆」的问题。</p>
+
+    <h3 id="key-types">Key 的种类</h3>
+    <ul>
+      <li><strong>LocalKey（局部键）</strong>：在同一级中（对于 widget）要唯一，可以理解为「同级唯一性」。
+        <ul>
+          <li><code>ValueKey</code>、<code>ObjectKey</code>、<code>UniqueKey</code></li>
+        </ul>
+      </li>
+      <li><strong>GlobalKey（全局键）</strong>：在整个 App 中必须唯一。即使 widget 树的节点改变，其内容（GlobalKey 定义的变量）不改变。</li>
+    </ul>
+    <blockquote>
+      <p>使用 <code>GlobalKey</code> 不应该在每次 <code>build</code> 的时候重建 <code>GlobalKey</code>，它应该是 State 拥有的长期存在的对象。</p>
+    </blockquote>
+
+    <h4>获取对应的 State</h4>
+    <pre><code>// 获取当前组件的 count 变量
+floatingActionButton: FloatingActionButton(
+  onPressed: () {
+    print((_globalKey.currentState as _BoxState).count);
+  },
+  child: Icon(Icons.wifi_protected_setup),
+)
+
+// 修改组件的 count 变量
+onPressed: () {
+  final state = _globalKey.currentState as _BoxState;
+  state.setState(() {
+    state.count++;
+  });
+}</code></pre>
+    <p><strong>注意</strong>：修改 state 时，记得使用 setState 来触发 UI 的刷新。</p>
+
+    <h4>获取对应的 context（用于获取 widget 的尺寸、位置）</h4>
+    <pre><code>final renderBox = _globalKey.currentContext!.findRenderObject() as RenderBox;
+renderBox.size;                        // 获取尺寸
+renderBox.localToGlobal(Offset.zero);  // 获取位置</code></pre>
+
+    <h4>获取对应的 widget（如颜色等属性）</h4>
+    <pre><code>onPressed: () {
+  final widget = _globalKey.currentWidget as Box;
+  print(widget.color);
+}</code></pre>
+
+    <h2 id="provider">五、Provider 库的使用</h2>
+
+    <p>Provider 库用于「<strong>跨页面、跨组件共享 + 会变化</strong>」的场景。</p>
+
+    <h3 id="provider-scenarios">典型场景</h3>
+    <ol>
+      <li><strong>全局状态 / 会话级</strong>
+        <ul>
+          <li>用户登录态（AuthProvider）</li>
+          <li>主题 / 国际化（ThemeProvider、LocaleProvider）</li>
+          <li>环境配置（FlavorProvider、FeatureFlagProvider）</li>
+        </ul>
+      </li>
+      <li><strong>页面级共享</strong>
+        <ul>
+          <li>购物车（CartProvider）</li>
+          <li>筛选条件（FilterProvider）</li>
+          <li>分页列表控制器（PagingProvider）</li>
+        </ul>
+      </li>
+      <li><strong>复杂表单 / 多步向导</strong>
+        <ul>
+          <li>表单数据模型（FormProvider）</li>
+          <li>步骤状态机（WizardProvider）</li>
+        </ul>
+      </li>
+      <li><strong>异步一次性数据</strong>
+        <ul>
+          <li>网络请求结果（FutureProvider）</li>
+          <li>WebSocket 消息流（StreamProvider）</li>
+        </ul>
+      </li>
+      <li><strong>需要 dispose 的资源</strong>
+        <ul>
+          <li>蓝牙连接（BleClient）</li>
+          <li>数据库 DAO（AppDatabase）</li>
+          <li>计时器 / 动画控制器</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3 id="provider-usage">三种使用方法</h3>
+    <pre><code>// 1. Consumer —— 监听状态变化，自动重建
+Consumer&lt;VocabularyProvider&gt;(
+  builder: (context, provider, child) {
+    return Text('单词数量: ${provider.words.length}');
+  },
+)
+
+// 2. context.watch —— 简洁的监听方式
+Widget build(BuildContext context) {
+  final provider = context.watch&lt;VocabularyProvider&gt;();
+  return Text('单词数量: ${provider.words.length}');
+}
+
+// 3. context.read —— 不监听，只获取实例（用于事件处理）
+void _addWord() {
+  final provider = context.read&lt;VocabularyProvider&gt;();
+  provider.addWord(newWord); // 不会重建当前 Widget
+}</code></pre>
+
+    <h2 id="summary">小结</h2>
+    <p>
+      Flutter 的核心心智模型可以总结为「<strong>声明式 UI + 不可变 Widget + 状态驱动重建</strong>」。
+      理解四棵树（Widget / Element / Render / Layer）以及它们之间的对应关系，是理解 Flutter 性能与渲染管线的基础；
+      状态管理的关键不在于选择哪种库（<code>setState</code>、<code>Provider</code>、<code>Riverpod</code> 等），而在于「<strong>状态属于谁、由谁负责更新</strong>」的设计划分。
+    </p>
+  </article>
+</body>
+</html>
